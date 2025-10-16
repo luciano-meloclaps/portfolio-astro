@@ -1,0 +1,26 @@
+---
+// Todo el código de JavaScript/TypeScript DEBE estar entre estas dos barreras.
+
+// 1. Importamos el componente de React.
+import { AnimatedHeader } from './AnimatedHero.tsx';
+
+// 2. Definimos las props que este componente de Astro puede recibir.
+interface Props {
+  text: string;
+  className?: string;
+  speed?: number;
+}
+
+// 3. Obtenemos las props que se le pasan a este componente.
+const { text, className, speed } = Astro.props;
+---
+<!-- --- BARRERA DE CIERRE --- -->
+ <!-- Todo el HTML y los componentes van DEBAJO de la barrera de cierre. -->
+
+<!-- 4. Renderizamos el componente de React en la plantilla. -->
+<AnimatedHeader 
+  text={text} 
+  className={className} 
+  speed={speed} 
+  client:load 
+/>
