@@ -1,0 +1,26 @@
+{
+  // 1. Especificamos que Prettier es el formateador por defecto para TODOS los lenguajes.
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // 2. Activamos el formateo automático al guardar.
+  "editor.formatOnSave": true,
+
+  // 3. (Opcional pero recomendado) Si tienes conflictos, puedes ser más explícito.
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // 4. Mantenemos la asociación de Tailwind para el autocompletado.
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
