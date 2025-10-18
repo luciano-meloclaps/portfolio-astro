@@ -1,0 +1,26 @@
+---
+// Este componente es solo un script, no renderiza HTML visible.
+// Su única misión es ejecutarse en el <head> lo más rápido posible.
+---
+<script is:inline>
+  // Esta función se ejecuta inmediatamente para evitar cualquier parpadeo.
+  const theme = (() => {
+    // 1. Primero, buscamos si el usuario ya ha guardado una preferencia en localStorage.
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    // 2. Si no, respetamos la preferencia de su sistema operativo (prefers-color-scheme).
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    // 3. Si no hay nada, el tema por defecto es 'light'.
+    return 'light';
+  })();
+
+  // Aplicamos la clase 'dark' al elemento <html> si es necesario.
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+</script>
