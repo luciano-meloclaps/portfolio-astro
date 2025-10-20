@@ -40,11 +40,13 @@
   --transition-speed-normal: 0.3s;
 
   /* Variables del Tema Claro (por defecto) */
-  --color-background: #dbdbdb;
+  --color-background: #f9f9f9;
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;
+  --color-accent-fill: #1a1a1a;
   --color-grid-line: rgba(0, 0, 0, 0.05);
   --color-border: rgba(0, 0, 0, 0.1);
+  --color-text-hover: #000000;
 }
 
 /* --- 4. MODIFICACIONES PARA EL TEMA OSCURO --- */
@@ -52,8 +54,10 @@
   --color-background: #1f2222;
   --color-text-primary: #f0f2f5;
   --color-text-secondary: #8d97ad;
+  --color-accent-fill: #f0f2f5;
   --color-grid-line: rgba(240, 242, 245, 0.05);
   --color-border: rgba(255, 255, 255, 0.1);
+  --color-text-hover: #ffffff;
 }
 
 /* --- 5. APLICACIÓN DE ESTILOS GLOBALES Y CLASES DE UTILIDAD --- */
