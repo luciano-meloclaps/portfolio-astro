@@ -5,17 +5,15 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* --- 2. COMPONENTES DE LAYOUT GLOBALES --- */
 @layer components {
   .container-wide {
-    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
   .container-narrow {
-    @apply w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8;
   }
 }
-
 
 /* --- 3. DEFINICIÓN DE VARIABLES GLOBALES --- */
 :root {
@@ -36,46 +34,48 @@
   --glass-blur: 24px;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --transition-speed-fast: 0.2s;
   --transition-speed-normal: 0.3s;
 
   /* Variables del Tema Claro (por defecto) */
-  --color-background: #F9F9F9;
-  --color-text-primary: #1A1A1A;
+  --color-background: #dbdbdb;
+  --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;
   --color-grid-line: rgba(0, 0, 0, 0.05);
   --color-border: rgba(0, 0, 0, 0.1);
 }
 
-
 /* --- 4. MODIFICACIONES PARA EL TEMA OSCURO --- */
 .dark {
   --color-background: #1f2222;
-  --color-text-primary: #F0F2F5;
-  --color-text-secondary: #8D97AD;
+  --color-text-primary: #f0f2f5;
+  --color-text-secondary: #8d97ad;
   --color-grid-line: rgba(240, 242, 245, 0.05);
   --color-border: rgba(255, 255, 255, 0.1);
 }
-
 
 /* --- 5. APLICACIÓN DE ESTILOS GLOBALES Y CLASES DE UTILIDAD --- */
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-main);
-  background-image: 
+  background-image:
     linear-gradient(var(--color-grid-line) 1px, transparent 1px),
     linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
   background-size: 3rem 3rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-base {
+  font-size: 1.25em;
   width: 1em;
   height: 1em;
-  stroke-width: 1.5;
-  vertical-align: middle;
+  vertical-align: -0.125em;
+  fill: currentColor;
 }

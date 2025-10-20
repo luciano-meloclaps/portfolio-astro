@@ -1,0 +1,34 @@
+---
+import type { FunctionComponent } from 'react';
+import { techColorMap, defaultTechColor } from '@/config/tech-colors';
+
+interface Props {
+  Icon: FunctionComponent<any> | string;
+  name: string;
+  label?: string;
+  iconClass?: string;
+}
+
+const { Icon, name, label, iconClass } = Astro.props;
+
+const color = techColorMap[name.toLowerCase()] || defaultTechColor;
+---
+
+<div
+  class="inline-flex items-center gap-x-2 rounded-md border bg-clip-padding px-3 py-1.5 backdrop-blur-xl"
+  style=`
+    color: ${color};
+    border-color: ${color};
+    background-color: ${color}1A;
+    border-radius: var(--radius-small);
+  `
+>
+  <Icon class:list={['icon-base', iconClass]} strokeWidth={1.5} />
+
+  <span
+    class="font-sans text-xs uppercase"
+    style=`color: ${color}; font-weight: 300;`
+  >
+    {label || name}
+  </span>
+</div>

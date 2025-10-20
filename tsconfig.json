@@ -1,12 +1,14 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    // 1. La base para las rutas.
     "baseUrl": ".",
+    // 2. La definición de nuestro alias.
     "paths": {
       "@/*": ["src/*"]
-    
-  },    
-  "jsx": "react-jsx",
+    },
+    // 3. Las configuraciones de React, AHORA DENTRO de compilerOptions.
+    "jsx": "react-jsx",
     "jsxImportSource": "react"
-}
+  } // <-- La llave de compilerOptions se cierra aquí, correctamente.
 }

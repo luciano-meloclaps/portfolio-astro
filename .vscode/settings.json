@@ -22,5 +22,6 @@
   // 4. Mantenemos la asociación de Tailwind para el autocompletado.
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "liveServer.settings.multiRootWorkspaceName": "portfolioLanding"
 }

@@ -11,7 +11,7 @@ export default {
   // Aquí le decimos a Prettier que use los plugins que instalamos.
   // El orden es importante: el de Tailwind debe ir al final.
   plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
-  
+
   // Le decimos al plugin de Astro cómo debe ser tratado.
   overrides: [
     {

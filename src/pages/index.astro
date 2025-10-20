@@ -1,15 +1,21 @@
-
 ---
 import Layout from '@/layouts/Layout.astro';
-// Aún no tenemos el ThemeToggle, lo añadiremos después.
+import ChipTech from '@/components/ChipTech.astro';
+import { IconBrandReact, IconBrandHtml5 } from '@tabler/icons-react';
+import IconDotNet from '@/components/icons/IconDotNet.astro';
 ---
-<Layout title="[Tu Nombre] | Software Developer">
-  <main>
-    <!-- Aquí es donde empezaremos a construir. -->
-    <div class="min-h-screen flex justify-center items-center">
-      <h1 class="text-4xl font-bold" style="font-weight: 700;">
-        // INICIO DEL SISTEMA
-      </h1>
+
+<Layout title="Prueba de Componentes Atómicos">
+  <main class="flex min-h-screen items-center justify-center">
+    <div class="flex max-w-2xl flex-wrap justify-center gap-4 p-8">
+      <ChipTech Icon={IconBrandReact} name="React" />
+      <ChipTech Icon={IconBrandHtml5} name="HTML" />
+      <ChipTech
+        Icon={IconDotNet}
+        name="dotnet"
+        label="ASP.NET"
+        iconClass="transform scale-125"
+      />
     </div>
   </main>
 </Layout>
