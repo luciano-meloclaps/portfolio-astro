@@ -1,0 +1,15 @@
+---
+// src/components/AnimatedArrowIcon.astro
+import { IconArrowRight } from '@tabler/icons-react';
+---
+
+<div class="icon-container relative h-[1em] w-[1em]">
+  <IconArrowRight
+    className="icon-base absolute transition-all duration-300 ease-in-out group-hover:translate-y-2 group-hover:opacity-0"
+  />
+
+  <IconArrowRight
+    className="icon-base absolute -translate-y-2 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100"
+    style={{ transform: 'rotate(90deg)' }}
+  />
+</div>
