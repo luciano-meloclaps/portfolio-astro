@@ -5,62 +5,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* --- 2. COMPONENTES DE LAYOUT GLOBALES --- */
-@layer components {
-  .container-wide {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
-  }
-  .container-narrow {
-    @apply mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8;
-  }
-}
-
-/* --- 3. DEFINICIÓN DE VARIABLES GLOBALES --- */
+/* --- 2. DEFINICIÓN DE VARIABLES GLOBALES --- */
 :root {
-  /* Variables Universales */
+  /* --- SISTEMA TIPOGRÁFICO --- */
   --font-main: 'Tomorrow', sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-h3: 1.5rem;
-  --font-size-h2: 2.25rem;
-  --font-size-h1: 3.75rem;
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-h3: 1.5rem; /* 24px */
+  --font-size-h2: 2.25rem; /* 36px */
+  --font-size-h1: 3.75rem; /* 60px */
+
+  /* --- GEOMETRÍA Y ESPACIADO --- */
   --radius-small: 8px;
-  --radius-medium: 16px;
+  --radius-medium: 16px; /* Renombrado de 'base' a 'medium' por claridad */
   --radius-large: 24px;
   --radius-pill: 9999px;
-  --glass-blur: 24px;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --transition-speed-fast: 0.2s;
-  --transition-speed-normal: 0.3s;
 
-  /* Variables del Tema Claro (por defecto) */
+  /* --- EFECTOS VISUALES --- */
+  --blur-base: 4.9px;
+  --shadow-base: 0 4px 30px rgba(0, 0, 0, 0.1);
+  --shadow-inset: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+
+  /* --- PALETA DE COLORES (TEMA CLARO) --- */
   --color-background: #f9f9f9;
+  --color-panel-bg: rgba(0, 0, 0, 0.08);
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;
-  --color-accent-fill: #1a1a1a;
+  --color-border: rgba(0, 0, 0, 2);
+  --color-led-positive: #22c55e;
+  --color-led-warning: #f59e0b; /* NUEVO: Ámbar */
+  --color-led-neutral: #9ca3af; /* NUEVO: Gris */
+  --color-led-active: #38bdf8; /* NUEVO: Cian */
   --color-grid-line: rgba(0, 0, 0, 0.05);
-  --color-border: rgba(0, 0, 0, 0.1);
-  --color-text-hover: #000000;
 }
 
-/* --- 4. MODIFICACIONES PARA EL TEMA OSCURO --- */
 .dark {
+  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  /* --- MODIFICACIONES PARA EL TEMA OSCURO --- */
   --color-background: #1f2222;
+  --color-panel-bg: rgba(255, 255, 255, 0.05);
   --color-text-primary: #f0f2f5;
   --color-text-secondary: #8d97ad;
-  --color-accent-fill: #f0f2f5;
-  --color-grid-line: rgba(240, 242, 245, 0.05);
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-text-hover: #ffffff;
+  --color-border: rgba(255, 255, 255, 0.2);
+  --color-led-positive: #4ade80;
+  --color-led-warning: #facc15; /* NUEVO: Amarillo */
+  --color-led-neutral: #6b7280; /* NUEVO: Gris oscuro */
+  --color-led-active: #7dd3fc; /* NUEVO: Cian claro */
+  --color-grid-line: rgba(240, 242, 255, 0.05);
 }
 
-/* --- 5. APLICACIÓN DE ESTILOS GLOBALES Y CLASES DE UTILIDAD --- */
+/* --- APLICACIÓN DE ESTILOS GLOBALES --- */
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
@@ -69,17 +66,6 @@ body {
     linear-gradient(var(--color-grid-line) 1px, transparent 1px),
     linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
   background-size: 3rem 3rem;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.icon-base {
-  font-size: 1.25em;
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.125em;
-  fill: currentColor;
 }
