@@ -1,36 +1,30 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import Button from '@/components/Button.astro';
-import AnimatedArrowIcon from '@/islands/AnimatedArrowIcon.astro'; // <-- Importamos el nuevo componente
-import { IconBrandGithub } from '@tabler/icons-react';
+import StatusChip from '@/components/StatusChip.astro';
+import { IconCode, IconFocus2, IconUsersGroup } from '@tabler/icons-react';
 ---
 
-<Layout title="Prueba de Composición de Componentes">
+<Layout title="Prueba del Componente StatusChip v3">
   <main class="flex min-h-screen items-center justify-center">
-    <div class="grid grid-cols-2 gap-8 p-8">
-      <!-- Botón Primario con Flecha Animada -->
-      <div class="space-y-4 text-center">
-        <h2 class="font-sans" style="font-weight: 700;">Primary Button</h2>
-        {
-          /* 
-          1. Añadimos la clase `group` al botón.
-          2. Reemplazamos el icono estático por nuestro nuevo componente animado.
-        */
-        }
-        <Button href="#projects" className="group">
-          <span>Ver Proyectos</span>
-          <AnimatedArrowIcon />
-        </Button>
-      </div>
-
-      <!-- Botón Secundario (sin cambios) -->
-      <div class="space-y-4 text-center">
-        <h2 class="font-sans" style="font-weight: 700;">Secondary Button</h2>
-        <Button href="https://github.com" variant="secondary" target="_blank">
-          <IconBrandGithub className="icon-base" />
-          <span>GitHub</span>
-        </Button>
-      </div>
+    <div class="flex flex-wrap gap-8 p-8">
+      <StatusChip
+        Icon={IconCode}
+        label="Mode"
+        value="Full-Stack"
+        variant="active"
+      />
+      <StatusChip
+        Icon={IconFocus2}
+        label="Focus"
+        value="Design & Performance"
+        variant="positive"
+      />
+      <StatusChip
+        Icon={IconUsersGroup}
+        label="Status"
+        value="Client Work"
+        variant="warning"
+      />
     </div>
   </main>
 </Layout>

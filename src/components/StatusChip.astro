@@ -1,0 +1,77 @@
+---
+// src/components/StatusChip.astro
+import type { Icon as TablerIcon } from '@tabler/icons-react';
+
+type Variant = 'positive' | 'warning' | 'neutral' | 'active';
+
+interface Props {
+  Icon: TablerIcon;
+  label: string;
+  value: string;
+  variant?: Variant;
+  className?: string;
+}
+
+const { Icon, label, value, variant = 'positive', className } = Astro.props;
+
+const variantColorMap: Record<Variant, string> = {
+  positive: 'var(--color-led-positive)',
+  warning: 'var(--color-led-warning)',
+  neutral: 'var(--color-led-neutral)',
+  active: 'var(--color-led-active)',
+};
+
+const accentColor = variantColorMap[variant];
+---
+
+<!-- 
+  1. El `box-shadow` ahora incluye nuestra nueva variable `--shadow-inset`.
+     Esto crea la ilusión de un borde más nítido y definido.
+-->
+<div
+  class:list={[
+    'inline-flex items-center justify-between gap-x-4 py-2 pl-3 pr-4',
+    'border border-border-color bg-panel bg-clip-padding backdrop-blur-xl',
+    'rounded-[var(--radius-small)]',
+    className,
+  ]}
+  style=`box-shadow: var(--shadow-inset);`
+>
+  <!-- Contenido Principal (Izquierda) -->
+  <div class="flex items-center gap-x-2">
+    <Icon className="icon-base" color={accentColor} strokeWidth={1.0} />
+
+    <!-- --- JERARQUÍA DE TEXTO CORREGIDA --- -->
+    <div class="font-sans text-sm uppercase tracking-wider">
+      {/* 2. La "clave" ahora es inequívocamente audaz (`font-bold`). */}
+      <span class="font-bold text-text-secondary">{label}:</span>
+
+      {/* 3. El "valor" se mantiene ligero para crear contraste. */}
+      <span class="ml-1 font-light text-text-primary">{value}</span>
+    </div>
+  </div>
+
+  <!-- La Luz LED (Derecha) -->
+  <div class="led-container flex h-2 w-2 items-center justify-center">
+    <span
+      class="absolute h-1.5 w-1.5 rounded-full"
+      style=`background-color: ${accentColor};`></span>
+    <span
+      class="h-full w-full animate-ping rounded-full opacity-80"
+      style=`background-color: ${accentColor};`></span>
+  </div>
+</div>
+
+<!-- La animación de @keyframes no cambia -->
+<style is:global>
+  @keyframes ping {
+    75%,
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+  .animate-ping {
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+</style>
