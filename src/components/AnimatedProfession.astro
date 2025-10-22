@@ -1,0 +1,95 @@
+---
+// src/components/AnimatedProfession.astro
+interface Props {
+  className?: string;
+}
+const { className } = Astro.props;
+---
+
+<h1 class:list={[className, 'relative']}>
+  <span id="text-stroke-target" class="uppercase text-stroke"></span>
+  <span id="text-fill-target" class="uppercase text-fill"></span>
+  <span
+    id="cursor"
+    class="ml-1 inline-block h-[0.85em] w-[2px] bg-text-primary opacity-0"
+    aria-hidden="true"></span>
+</h1>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+
+  gsap.registerPlugin(ScrambleTextPlugin);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const strokeTarget = document.getElementById('text-stroke-target');
+    const fillTarget = document.getElementById('text-fill-target');
+    const cursor = document.getElementById('cursor');
+
+    if (!strokeTarget || !fillTarget || !cursor) return;
+
+    const phrases = [
+      { stroke: 'Full-Stack', fill: 'Developer' },
+      { stroke: 'UX/UI', fill: 'Designer' },
+    ];
+    const scrambleDuration = 1.2;
+    const pauseDuration = 3;
+
+    function scrambleTo(phrase: {
+      stroke: string;
+      fill: string;
+    }): Promise<void> {
+      return new Promise((resolve) => {
+        const tl = gsap.timeline({ onComplete: () => resolve() });
+
+        // --- LA SOLUCIÓN: ANIMACIONES SEPARADAS Y SINCRONIZADAS ---
+        tl.set(cursor, { opacity: 1 })
+          // 1. Animamos el target "stroke" con su string correspondiente.
+          .to(strokeTarget, {
+            duration: scrambleDuration,
+            scrambleText: {
+              text: phrase.stroke,
+              chars: 'lowerCase',
+              speed: 0.3,
+            },
+            ease: 'power3.out',
+          })
+          // 2. Animamos el target "fill" con su string, AL MISMO TIEMPO.
+          .to(
+            fillTarget,
+            {
+              duration: scrambleDuration,
+              scrambleText: {
+                text: ' ' + phrase.fill,
+                chars: 'lowerCase',
+                speed: 0.3,
+              },
+              ease: 'power3.out',
+            },
+            '<'
+          ) // "<" sincroniza el inicio de esta animación con la anterior.
+          .set(cursor, { opacity: 0 });
+      });
+    }
+
+    let currentIndex = 0;
+    async function cyclePhrases() {
+      // Borramos el texto anterior para una transición limpia al inicio del bucle.
+      gsap.set([strokeTarget, fillTarget], { text: '' });
+
+      // 1. Anima hacia la frase actual.
+      await scrambleTo(phrases[currentIndex]);
+
+      // 2. Pausa para la lectura.
+      await gsap.to({}, { duration: pauseDuration });
+
+      // 3. Pasa a la siguiente frase.
+      currentIndex = (currentIndex + 1) % phrases.length;
+
+      // 4. Se llama a sí misma para crear el bucle infinito.
+      cyclePhrases();
+    }
+
+    cyclePhrases();
+  });
+</script>
