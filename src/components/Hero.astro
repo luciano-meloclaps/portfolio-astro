@@ -1,0 +1,93 @@
+---
+// src/components/Hero.astro
+import AnimatedProfession from '@/components/AnimatedProfession.astro';
+import StatusChip from '@/components/StatusChip.astro';
+import Button from '@/components/Button.astro';
+import AnimatedArrowIcon from '@/components/AnimatedArrowIcon.astro';
+import {
+  IconCode,
+  IconFocus2,
+  IconUsersGroup,
+  IconBrandGithub,
+} from '@tabler/icons-react';
+---
+
+<section class="relative grid min-h-screen place-items-center overflow-hidden">
+  <!-- FONDO ATMOSFÉRICO ACTUALIZADO -->
+  <div class="absolute inset-0 z-0" style=`background: var(--hero-gradient);`>
+  </div>
+
+  <!-- NÚCLEO DE CONTENIDO -->
+  <div
+    class="relative z-10 flex flex-col items-center gap-y-8 px-4 text-center"
+  >
+    <div class="hero-title">
+      <AnimatedProfession className="text-h2 md:text-h1" />
+    </div>
+
+    <p
+      class="hero-subtitle max-w-lg text-lg text-text-secondary"
+      style="font-weight: 300;"
+    >
+      Arquitecto de Software especializado en experiencias de usuario de alto
+      rendimiento.
+    </p>
+
+    <div class="hero-chips flex flex-wrap justify-center gap-4">
+      <StatusChip
+        Icon={IconCode}
+        label="Mode"
+        value="Full-Stack"
+        variant="active"
+      />
+      <StatusChip
+        Icon={IconFocus2}
+        label="Focus"
+        value="Performance"
+        variant="positive"
+      />
+      <StatusChip
+        Icon={IconUsersGroup}
+        label="Status"
+        value="Disponible"
+        variant="warning"
+      />
+    </div>
+
+    <div class="hero-buttons flex flex-wrap justify-center gap-4 pt-4">
+      <Button href="#projects" className="group">
+        <span>Ver Proyectos</span>
+        <AnimatedArrowIcon />
+      </Button>
+      <Button
+        href="https://github.com/tu-usuario"
+        variant="secondary"
+        target="_blank"
+      >
+        <IconBrandGithub className="icon-base" />
+        <span>GitHub</span>
+      </Button>
+    </div>
+  </div>
+</section>
+
+<!-- LA COREOGRAFÍA DE ENTRADA (GSAP) - Sin cambios -->
+<script>
+  import gsap from 'gsap';
+  document.addEventListener('DOMContentLoaded', () => {
+    const elementsToAnimate = [
+      '.hero-title',
+      '.hero-subtitle',
+      '.hero-chips',
+      '.hero-buttons',
+    ];
+    gsap.set(elementsToAnimate, { autoAlpha: 0, y: 30 });
+    const tl = gsap.timeline({
+      defaults: { duration: 1.2, ease: 'power3.out' },
+    });
+    tl.to('.hero-title', { autoAlpha: 1, y: 0 }, 0.2)
+      .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.0')
+      .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.0')
+      .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=0.9');
+  });
+</script>

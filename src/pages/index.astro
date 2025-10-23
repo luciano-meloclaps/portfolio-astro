@@ -1,23 +1,14 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import AnimatedProfession from '@/components/AnimatedProfession.astro';
-import AnimatedArrowIcon from '@/components/AnimatedArrowIcon.astro';
-import Button from '@/components/Button.astro';
+import Hero from '@/components/Hero.astro';
 ---
 
 <Layout title="[Tu Nombre] | Portfolio Profesional">
-  <main class="flex min-h-screen items-center justify-center">
-    {
-      /* 
-      Aquí controlamos la apariencia final del componente.
-      - `text-h1`: Define el tamaño, usando nuestra escala tipográfica.
-      - `font-bold`: Define el peso de la fuente para AMBAS partes del texto,
-        asegurando la consistencia visual que solicitaste.
-    */
-    }
-    <AnimatedProfession className="text-h1 font-bold" />
-    <AnimatedArrowIcon />
-    <Button />
+  <main>
+    <Hero />
+
+    <section id="projects" class="container-narrow min-h-screen py-24">
+      <h2 class="text-h2 font-bold">// Proyectos</h2>
+    </section>
   </main>
 </Layout>
-```
