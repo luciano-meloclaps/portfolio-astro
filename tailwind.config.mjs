@@ -6,19 +6,20 @@ export default {
   theme: {
     extend: {
       // --- SINCRONIZACIÓN DE COLORES ---
-      // Conectamos nuestras clases de Tailwind a las variables CSS.
+      // Conectamos nuestras clases de Tailwind a las variables CSS definidas en `global.css`.
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: 'var(--color-background)',
         panel: 'var(--color-panel-bg)',
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
         border: 'var(--color-border)',
       },
+
       // --- SINCRONIZACIÓN DE FUENTES ---
       fontFamily: {
         sans: ['var(--font-main)', 'sans-serif'],
       },
+
       // --- SINCRONIZACIÓN DE ESCALA TIPOGRÁFICA ---
       fontSize: {
         xs: 'var(--font-size-xs)',
@@ -30,6 +31,7 @@ export default {
         h2: 'var(--font-size-h2)',
         h1: 'var(--font-size-h1)',
       },
+
       // --- SINCRONIZACIÓN DE RADIOS Y EFECTOS ---
       borderRadius: {
         small: 'var(--radius-small)',
@@ -45,10 +47,14 @@ export default {
         base: 'var(--shadow-base)',
         inset: 'var(--shadow-inset)',
       },
+
+      // --- ELIMINADO: La lógica del gradiente del Hero ya no vive aquí. ---
+      // backgroundImage: { ... }
     },
   },
   plugins: [
     // --- PLUGIN PARA TIPOGRAFÍA DUAL ---
+    // Este plugin consume correctamente las variables CSS.
     function ({ addUtilities }) {
       addUtilities({
         '.text-stroke': {
