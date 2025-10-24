@@ -9,10 +9,16 @@ interface Props {
   label: string;
   value: string;
   variant?: Variant;
-  className?: string;
+  class?: string;
 }
 
-const { Icon, label, value, variant = 'positive', className } = Astro.props;
+const {
+  Icon,
+  label,
+  value,
+  variant = 'positive',
+  class: className,
+} = Astro.props;
 
 const variantColorMap: Record<Variant, string> = {
   positive: 'var(--color-led-positive)',
@@ -25,33 +31,31 @@ const accentColor = variantColorMap[variant];
 ---
 
 <!-- 
-  1. El `box-shadow` ahora incluye nuestra nueva variable `--shadow-inset`.
-     Esto crea la ilusión de un borde más nítido y definido.
+  ARQUITECTURA "MONOCROMÁTICA CON ACENTO"
+  - El borde ahora es el neutro `--color-border`.
+  - El padding (`px-4`) ha sido aumentado para mayor espaciado.
 -->
 <div
   class:list={[
-    'inline-flex items-center justify-between gap-x-4 py-2 pl-3 pr-4',
-    'border border-border-color bg-panel bg-clip-padding backdrop-blur-xl',
-    'rounded-[var(--radius-small)]',
+    'inline-flex items-center justify-between gap-x-4 rounded-[var(--radius-small)] border border-border-color bg-panel bg-clip-padding px-4 py-2 backdrop-blur-[var(--blur-base)]',
     className,
   ]}
   style=`box-shadow: var(--shadow-inset);`
 >
-  <!-- Contenido Principal (Izquierda) -->
-  <div class="flex items-center gap-x-2">
-    <Icon className="icon-base" color={accentColor} strokeWidth={1.0} />
+  <!-- Contenido Principal (Izquierda) - Ahora completamente monocromático -->
+  <div class="flex items-center gap-x-3">
+    {
+      /* El icono ahora usa el color de texto secundario, es parte de la información base. */
+    }
+    <Icon className="icon-base text-text-secondary" strokeWidth={1.0} />
 
-    <!-- --- JERARQUÍA DE TEXTO CORREGIDA --- -->
     <div class="font-sans text-sm uppercase tracking-wider">
-      {/* 2. La "clave" ahora es inequívocamente audaz (`font-bold`). */}
       <span class="font-bold text-text-secondary">{label}:</span>
-
-      {/* 3. El "valor" se mantiene ligero para crear contraste. */}
-      <span class="ml-1 font-light text-text-primary">{value}</span>
+      <span class="ml-1 font-normal text-text-primary">{value}</span>
     </div>
   </div>
 
-  <!-- La Luz LED (Derecha) -->
+  <!-- La Luz LED (Derecha) - El único portador del color de acento. -->
   <div class="led-container flex h-2 w-2 items-center justify-center">
     <span
       class="absolute h-1.5 w-1.5 rounded-full"
