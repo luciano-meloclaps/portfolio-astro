@@ -15,7 +15,7 @@
   }
 }
 
-/* --- 3. DEFINICIÓN DE VARIABLES GLOBALES --- */
+/* --- 3. DEFINICIÓN DE VARIABLES GLOBALES (LA ÚNICA FUENTE DE VERDAD) --- */
 :root {
   /* Tipografía */
   --font-main: 'Tomorrow';
@@ -35,53 +35,39 @@
   --radius-pill: 9999px;
 
   /* Efectos Visuales */
-  --blur-base: 10px; /* Aumentado para un blur más pronunciado */
+  --blur-base: 10px;
   --shadow-base: 0 4px 30px rgba(0, 0, 0, 0.1);
-  --shadow-inset: inset 0 0 0 0.5px rgba(0, 0, 0, 0.1); /* Borde más fino */
-  --transition-speed-fast: 0.2s;
-  --transition-speed-normal: 0.3s;
+  --shadow-inset: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 
   /* Paleta de Colores (Tema Claro) */
   --color-background: #ffffff;
-  --color-panel-bg: rgba(255, 255, 255, 0.25); /* Más transparente */
+  --color-panel-bg: rgba(255, 255, 255, 0.25);
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;
-  --color-text-hover: #000000;
-  --color-border: rgba(0, 0, 0, 0.1); /* Borde global más fino */
+  --color-border: rgba(0, 0, 0, 0.1);
   --color-grid-line: rgba(0, 0, 0, 0.05);
-  --color-accent-fill: #1a1a1a;
-  --color-led-positive: #22c55e;
-  --color-led-warning: #f59e0b;
-  --color-led-neutral: #9ca3af;
-  --color-led-active: #38bdf8;
-  --hero-gradient: linear-gradient(to bottom, #000000, #d6d6d6, #ffffff);
 }
 
 .dark {
   /* Efectos Oscuros */
-  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.1); /* Borde más fino */
+  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 
   /* Paleta Oscura */
   --color-background: #1f2222;
-  --color-panel-bg: rgba(31, 34, 34, 0.25); /* Más transparente */
+  --color-panel-bg: rgba(31, 34, 34, 0.25);
   --color-text-primary: #f0f2f5;
   --color-text-secondary: #8d97ad;
-  --color-text-hover: #ffffff;
-  --color-border: rgba(255, 255, 255, 0.15); /* Borde global más fino */
+  --color-border: rgba(255, 255, 255, 0.15);
   --color-grid-line: rgba(240, 242, 255, 0.05);
-  --color-accent-fill: #f0f2f5;
-  --color-led-positive: #4ade80;
-  --color-led-warning: #facc15;
-  --color-led-neutral: #6b7280;
-  --color-led-active: #7dd3fc;
-  --hero-gradient: linear-gradient(to bottom, #000000, #1a1a1a, #1f2222);
 }
 
 /* --- 4. APLICACIÓN DE ESTILOS GLOBALES --- */
 body {
+  /* Aplicamos las variables directamente. Esto es robusto y evita errores de compilación. */
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  font-family: var(--font-main);
+  font-family: var(--font-main), sans-serif;
+
   background-image:
     linear-gradient(var(--color-grid-line) 1px, transparent 1px),
     linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);

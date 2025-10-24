@@ -6,23 +6,20 @@ export default {
   theme: {
     extend: {
       // --- SINCRONIZACIÓN DE COLORES ---
+      // Conectamos nuestras clases de Tailwind a las variables CSS.
       colors: {
-        background: 'var(--color-background)',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         panel: 'var(--color-panel-bg)',
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
-        'border-color': 'var(--color-border)',
-        'led-positive': 'var(--color-led-positive)',
-        'led-warning': 'var(--color-led-warning)',
-        'led-neutral': 'var(--color-led-neutral)',
-        'led-active': 'var(--color-led-active)',
+        border: 'var(--color-border)',
       },
       // --- SINCRONIZACIÓN DE FUENTES ---
       fontFamily: {
         sans: ['var(--font-main)', 'sans-serif'],
       },
-
-      // --- ¡LA CORRECCIÓN CRÍTICA! SINCRONIZACIÓN DE ESCALA TIPOGRÁFICA ---
+      // --- SINCRONIZACIÓN DE ESCALA TIPOGRÁFICA ---
       fontSize: {
         xs: 'var(--font-size-xs)',
         sm: 'var(--font-size-sm)',
@@ -42,10 +39,11 @@ export default {
       },
       blur: {
         base: 'var(--blur-base)',
+        xl: 'var(--blur-xl)',
       },
       boxShadow: {
-        inset: 'var(--shadow-inset)',
         base: 'var(--shadow-base)',
+        inset: 'var(--shadow-inset)',
       },
     },
   },
@@ -55,7 +53,6 @@ export default {
       addUtilities({
         '.text-stroke': {
           '-webkit-text-stroke': '1px var(--color-text-secondary)',
-          '-moz-text-stroke': '1px var(--color-text-secondary)',
           color: 'transparent',
         },
         '.text-fill': {
