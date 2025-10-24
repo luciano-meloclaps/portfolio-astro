@@ -1,5 +1,8 @@
 ---
 // src/components/Hero.astro
+// ARQUITECTURA HÍBRIDA INTELIGENTE:
+// - El layout y los estilos se manejan con clases de Tailwind para consistencia y rendimiento.
+// - El fondo de gradiente, al ser un estilo único y complejo, se encapsula en una etiqueta <style>.
 import AnimatedProfession from '@/components/AnimatedProfession.astro';
 import StatusChip from '@/components/StatusChip.astro';
 import Button from '@/components/Button.astro';
@@ -12,12 +15,18 @@ import {
 } from '@tabler/icons-react';
 ---
 
-<section class="relative grid min-h-screen place-items-center overflow-hidden">
-  <!-- FONDO ATMOSFÉRICO ACTUALIZADO -->
-  <div class="absolute inset-0 z-0" style=`background: var(--hero-gradient);`>
-  </div>
+<!-- 
+  1. ESTRUCTURA CON TAILWIND
+     - Usamos clases de utilidad para todo el layout: `relative`, `grid`, `min-h-screen`, etc.
+     - Esto es limpio, legible y aprovecha nuestro sistema de diseño.
+-->
+<section
+  class="hero-container relative grid min-h-screen place-items-center overflow-hidden"
+>
+  <!-- El fondo, ahora con una clase simple para ser apuntado por nuestro CSS "scoped". -->
+  <div class="hero-background"></div>
 
-  <!-- NÚCLEO DE CONTENIDO -->
+  <!-- El núcleo de contenido, también estilizado con Tailwind. -->
   <div
     class="relative z-10 flex flex-col items-center gap-y-8 px-4 text-center"
   >
@@ -25,10 +34,7 @@ import {
       <AnimatedProfession className="text-h2 md:text-h1" />
     </div>
 
-    <p
-      class="hero-subtitle max-w-lg text-lg text-text-secondary"
-      style="font-weight: 300;"
-    >
+    <p class="hero-subtitle max-w-lg text-lg font-light text-text-secondary">
       Arquitecto de Software especializado en experiencias de usuario de alto
       rendimiento.
     </p>
@@ -71,7 +77,7 @@ import {
   </div>
 </section>
 
-<!-- LA COREOGRAFÍA DE ENTRADA (GSAP) - Sin cambios -->
+<!-- La coreografía de entrada de GSAP, sin cambios -->
 <script>
   import gsap from 'gsap';
   document.addEventListener('DOMContentLoaded', () => {
@@ -91,3 +97,26 @@ import {
       .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=0.9');
   });
 </script>
+
+<!-- 
+  2. LA EXCEPCIÓN QUIRÚRGICA
+     - Usamos una etiqueta <style> "scoped" (por defecto en Astro) para el único
+       estilo que es complejo y no reutilizable: el gradiente del fondo.
+-->
+<style>
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* Gradiente para el tema claro */
+    background: linear-gradient(0deg, #ffffff, #d6d6d6, #000000);
+
+    /* background: -webkit-linear-gradient(90deg, #ffffff,#0042a9,#000000,#000000,#000000);background: linear-gradient(90deg, #ffffff,#0042a9,#000000,#000000,#000000);*/
+  }
+
+  /* Sobrescribimos el gradiente para el tema oscuro */
+  .dark .hero-background {
+    /* background: linear-gradient(180deg, #ffffff, #d6d6d6, #000000);*/
+    background: linear-gradient(90deg, #1f2222, #002a6b, #000000);
+  }
+</style>
