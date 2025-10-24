@@ -35,70 +35,57 @@
   --radius-pill: 9999px;
 
   /* Efectos Visuales */
-  --blur-base: 4.9px;
+  --blur-base: 10px; /* Aumentado para un blur más pronunciado */
   --shadow-base: 0 4px 30px rgba(0, 0, 0, 0.1);
-  --shadow-inset: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  --shadow-inset: inset 0 0 0 0.5px rgba(0, 0, 0, 0.1); /* Borde más fino */
   --transition-speed-fast: 0.2s;
   --transition-speed-normal: 0.3s;
 
-  /* --- PALETA DE COLORES (TEMA CLARO) --- */
-  --color-background: #ffffff; /* CAMBIO: A blanco puro para la fusión */
-  --color-panel-bg: rgba(255, 255, 255, 0.5);
+  /* Paleta de Colores (Tema Claro) */
+  --color-background: #ffffff;
+  --color-panel-bg: rgba(255, 255, 255, 0.25); /* Más transparente */
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;
   --color-text-hover: #000000;
-  --color-border: rgba(0, 0, 0, 0.15);
+  --color-border: rgba(0, 0, 0, 0.1); /* Borde global más fino */
   --color-grid-line: rgba(0, 0, 0, 0.05);
   --color-accent-fill: #1a1a1a;
   --color-led-positive: #22c55e;
   --color-led-warning: #f59e0b;
   --color-led-neutral: #9ca3af;
   --color-led-active: #38bdf8;
-
-  /* --- GRADIENTE DEL HERO (TEMA CLARO) INVERTIDO --- */
   --hero-gradient: linear-gradient(to bottom, #000000, #d6d6d6, #ffffff);
 }
 
-/* --- 4. MODIFICACIONES PARA EL TEMA OSCURO --- */
 .dark {
   /* Efectos Oscuros */
-  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.1); /* Borde más fino */
 
   /* Paleta Oscura */
   --color-background: #1f2222;
-  --color-panel-bg: rgba(31, 34, 34, 0.5);
+  --color-panel-bg: rgba(31, 34, 34, 0.25); /* Más transparente */
   --color-text-primary: #f0f2f5;
   --color-text-secondary: #8d97ad;
   --color-text-hover: #ffffff;
-  --color-border: rgba(255, 255, 255, 0.25);
+  --color-border: rgba(255, 255, 255, 0.15); /* Borde global más fino */
   --color-grid-line: rgba(240, 242, 255, 0.05);
   --color-accent-fill: #f0f2f5;
   --color-led-positive: #4ade80;
   --color-led-warning: #facc15;
   --color-led-neutral: #6b7280;
   --color-led-active: #7dd3fc;
-
-  /* --- GRADIENTE DEL HERO (TEMA OSCURO) INVERTIDO Y UNIFICADO --- */
   --hero-gradient: linear-gradient(to bottom, #000000, #1a1a1a, #1f2222);
 }
 
-/* --- 5. APLICACIÓN DE ESTILOS GLOBALES --- */
+/* --- 4. APLICACIÓN DE ESTILOS GLOBALES --- */
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-main);
-  /* La imagen de fondo global (blueprint) sigue aquí, pero será tapada por el Hero */
   background-image:
     linear-gradient(var(--color-grid-line) 1px, transparent 1px),
     linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
   background-size: 3rem 3rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.icon-base {
-  font-size: 1.25em;
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.125em;
 }
