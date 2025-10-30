@@ -6,7 +6,6 @@ export default {
   theme: {
     extend: {
       // --- SINCRONIZACIÓN DE COLORES ---
-      // Conectamos nuestras clases de Tailwind a las variables CSS definidas en `global.css`.
       colors: {
         background: 'var(--color-background)',
         panel: 'var(--color-panel-bg)',
@@ -17,11 +16,12 @@ export default {
 
       // --- SINCRONIZACIÓN DE FUENTES ---
       fontFamily: {
-        sans: ['var(--font-main)', 'sans-serif'],
+        sans: ['var(--font-main)', 'sans-serif'], // Única fuente de verdad para la pila de fuentes
       },
 
       // --- SINCRONIZACIÓN DE ESCALA TIPOGRÁFICA ---
       fontSize: {
+        xxs: 'var(--font-size-xxs)',
         xs: 'var(--font-size-xs)',
         sm: 'var(--font-size-sm)',
         base: 'var(--font-size-base)',
@@ -45,16 +45,14 @@ export default {
       },
       boxShadow: {
         base: 'var(--shadow-base)',
-        inset: 'var(--shadow-inset)',
+        // CORRECCIÓN: Conectamos a las nuevas variables explícitas
+        'inset-light': 'var(--shadow-inset-light)',
+        'inset-dark': 'var(--shadow-inset-dark)',
       },
-
-      // --- ELIMINADO: La lógica del gradiente del Hero ya no vive aquí. ---
-      // backgroundImage: { ... }
     },
   },
   plugins: [
     // --- PLUGIN PARA TIPOGRAFÍA DUAL ---
-    // Este plugin consume correctamente las variables CSS.
     function ({ addUtilities }) {
       addUtilities({
         '.text-stroke': {

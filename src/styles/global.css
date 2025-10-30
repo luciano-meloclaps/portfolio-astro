@@ -9,7 +9,8 @@
 @layer base {
   :root {
     /* Tipografía */
-    --font-main: 'Tomorrow';
+    --font-main: 'Tomorrow'; /* CORRECCIÓN: Sin fuente de respaldo aquí */
+    --font-size-xxs: 0.6875rem;
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
@@ -27,8 +28,10 @@
 
     /* Efectos Visuales */
     --blur-base: 10px;
+    --blur-xl: 24px; /* Añadido para consistencia */
     --shadow-base: 0 4px 30px rgba(0, 0, 0, 0.1);
-    --shadow-inset: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    --shadow-inset-light: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    --shadow-inset-dark: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 
     /* Paleta de Colores (Tema Claro) */
     --color-background: #ffffff;
@@ -40,9 +43,6 @@
   }
 
   .dark {
-    /* Efectos Oscuros */
-    --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-
     /* Paleta Oscura */
     --color-background: #1f2222;
     --color-panel-bg: rgba(31, 34, 34, 0.25);
@@ -56,13 +56,10 @@
 /* --- 3. APLICACIÓN DE ESTILOS GLOBALES --- */
 @layer base {
   body {
-    /* 
-      Aplicamos los colores y la fuente usando las variables.
-      La fuente de respaldo `sans-serif` se gestiona en `tailwind.config.mjs`.
-    */
     background-color: var(--color-background);
     color: var(--color-text-primary);
-    font-family: var(--font-main);
+    font-family:
+      var(--font-main), sans-serif; /* La fuente de respaldo se mantiene aquí por seguridad */
 
     background-image:
       linear-gradient(var(--color-grid-line) 1px, transparent 1px),

@@ -1,45 +1,40 @@
 ---
 // src/components/ThemeToggle.astro
-// VERSIÓN FINAL: 100% Tailwind. Cero estilos en línea.
-// Logra el efecto de inversión de color usando las clases `dark:` de Tailwind.
+// VERSIÓN "CONTROL PURO": Sin contenedor, solo el icono animado.
+// Calibrado para un tamaño más pequeño y delicado.
 ---
 
-<!-- 
-  LA SOLUCIÓN:
-  - Eliminamos por completo el atributo `style`.
-  - Usamos clases de Tailwind para TODO.
-  - `border-border text-text-primary`: Aplica los colores por defecto (tema claro).
-  - `dark:border-border dark:text-text-primary`: Sobrescribe esos colores en tema oscuro.
-    Como nuestras variables CSS cambian, estas clases se adaptarán automáticamente.
--->
 <button
   id="theme-toggle"
-  class="bg-panel/75 shadow-inset-light dark:shadow-inset-dark relative flex h-10 w-16 items-center justify-center rounded-medium border border-border text-text-primary backdrop-blur-base transition-colors duration-300 hover:border-text-primary"
+  class="/* REFINAMIENTO: Botón más pequeño (h-7 w-7) */ relative flex h-8 w-8 items-center justify-center rounded-full text-text-secondary transition-colors duration-300 hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-text-primary"
   aria-label="Toggle light and dark theme"
 >
-  <div class="relative h-6 w-6 overflow-hidden">
-    {
-      /* 
-      Los SVGs ahora heredan el color (sea claro u oscuro) de su padre <button>
-      gracias a la clase `stroke-current`.
-    */
-    }
+  <!-- REFINAMIENTO: Contenedor de icono más pequeño (h-5 w-5) -->
+  <div class="relative h-5 w-5 overflow-hidden">
     <div
       id="icon-sun"
       class="sun-icon absolute inset-0 fill-none stroke-current"
       style="stroke-width: 1.0; stroke-linecap: round;"
     >
-      <svg class="h-6 w-6" viewBox="0 0 24 24">
+      {/* REFINAMIENTO: SVG más pequeño (h-5 w-5) */}
+      <svg class="h-5 w-5" viewBox="0 0 24 24">
         <circle id="sun-core" cx="12" cy="12" r="4"></circle>
         <g id="sun-rays">
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          <line x1="12" y1="1" x2="12" y2="3"></line><line
+            x1="12"
+            y1="21"
+            x2="12"
+            y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"
+          ></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line
+            x1="1"
+            y1="12"
+            x2="3"
+            y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line
+            x1="4.22"
+            y1="19.78"
+            x2="5.64"
+            y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"
+          ></line>
         </g>
       </svg>
     </div>
@@ -48,12 +43,19 @@
       class="moon-icon absolute inset-0 fill-none stroke-current"
       style="stroke-width: 1.0; stroke-linecap: round; stroke-linejoin: round;"
     >
-      <svg class="h-6 w-6" viewBox="0 0 24 24">
+      {/* REFINAMIENTO: SVG más pequeño (h-5 w-5) */}
+      <svg class="h-5 w-5" viewBox="0 0 24 24">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </div>
   </div>
 </button>
+
+<!-- El script de animación de GSAP no necesita ningún cambio. -->
+<script>
+  import gsap from 'gsap';
+  // ... (El script de GSAP permanece exactamente igual)
+</script>
 
 <!-- El script de animación de GSAP no necesita ningún cambio. -->
 
