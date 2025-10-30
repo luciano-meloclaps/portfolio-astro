@@ -1,7 +1,7 @@
 ---
-import Navbar from '@/components/Navbar.astro';
 import ThemeManager from '@/components/ThemeManager.astro';
-import ThemeToggle from '@/components/ThemeToggle.astro'; // <-- Importamos el nuevo componente
+import Navbar from '@/components/Navbar.astro';
+import MobileMenu from '@/components/MobileMenu.astro';
 import '@/styles/global.css';
 
 interface Props {
@@ -14,16 +14,16 @@ const { title } = Astro.props;
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
+    <meta name="description" content="Portfolio de [Tu Nombre]" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
-    <Navbar />
     <ThemeManager />
   </head>
   <body>
-    <!-- 
-      Colocamos el ThemeToggle en una posición fija,
-      por ejemplo, en la esquina superior derecha.
-    -->
-    <div class="fixed right-4 top-4 z-50"></div>
+    {/* El Navbar y el MobileMenu son elementos globales del layout */}
+    <Navbar />
+    <MobileMenu />
     <slot />
   </body>
 </html>

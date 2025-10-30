@@ -1,36 +1,29 @@
 ---
 // src/components/ui/Links.astro
-// -----------------------------------------------------------------------------
-// COMPONENTE DE UI ATÓMICO: Links
-// -----------------------------------------------------------------------------
-// RESPONSABILIDAD:
-// Renderizar la lista principal de enlaces de navegación del sitio.
-// Es un componente 100% estático, performante y puramente presentacional.
-// -----------------------------------------------------------------------------
-
-// --- FUENTE DE VERDAD DE LOS DATOS DE NAVEGACIÓN ---
-// Definimos los enlaces en un array para un mantenimiento fácil y centralizado.
 const navLinks = [
   { href: '#about', label: 'About' },
   { href: '#projects', label: 'Projects' },
   { href: '#experience', label: 'Experience' },
   { href: '#contact', label: 'Contact' },
 ];
+
+interface Props {
+  ulClass?: string; // Clases para el contenedor <ul>
+  aClass?: string; // Clases para cada enlace <a>
+}
+const { ulClass, aClass } = Astro.props;
 ---
 
-<!-- 
-  ESTRUCTURA DE PRESENTACIÓN (PLANTILLA)
-  - `ul`: Contenedor semántico para una lista de navegación.
-  - `map`: Iteramos sobre nuestro array de datos para generar cada enlace.
-  - `a`: Cada enlace está estilizado con clases de Tailwind para consistencia.
--->
-<ul class="flex items-center gap-x-6">
+<ul class:list={['flex items-center gap-x-6', ulClass]}>
   {
     navLinks.map((link) => (
       <li>
         <a
           href={link.href}
-          class="font-sans text-xs font-light uppercase tracking-wider text-text-secondary transition-colors duration-300 hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-text-primary"
+          class:list={[
+            'font-sans text-sm font-light uppercase tracking-widest text-text-secondary transition-colors hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-text-primary',
+            aClass,
+          ]}
         >
           {link.label}
         </a>
