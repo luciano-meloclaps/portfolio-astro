@@ -1,0 +1,100 @@
+---
+// src/components/MobileMenu.astro
+// ARQUITECTURA "PANEL ORQUESTADO":
+// Refinado para una alineación de texto equilibrada y profesional.
+import Links from '@/components/Links.astro';
+---
+
+<div
+  id="mobile-menu-container"
+  class="pointer-events-none fixed inset-0 z-40 opacity-0"
+  aria-hidden="true"
+>
+  <!-- El overlay de fondo -->
+  <div
+    id="mobile-menu-overlay"
+    class="bg-background/80 absolute inset-0 backdrop-blur-xl"
+  >
+  </div>
+
+  <!-- 
+    El contenido del menú, sigue siendo un contenedor flex que centra todo.
+  -->
+  <div class="relative z-10 flex h-full flex-col items-center justify-center">
+    {
+      /* 
+      LA SOLUCIÓN:
+      - `w-64`: Le damos al `<ul>` un ancho fijo de 256px.
+      - `text-left`: Forzamos a que todo el texto DENTRO del `<ul>` se alinee a la izquierda.
+      - `!items-start`: Sobrescribimos el `items-center` del `<ul>` para que los `<li>` se alineen al inicio.
+    */
+    }
+    <Links
+      ulClass="flex-col !gap-y-8 nav-links-mobile w-64 text-left !items-start"
+      aClass="!text-h3 !font-normal"
+    />
+  </div>
+</div>
+
+<!-- El script de GSAP y la lógica de eventos no necesitan ningún cambio. -->
+<script>
+  import gsap from 'gsap';
+
+  const container = document.getElementById('mobile-menu-container');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const links = gsap.utils.toArray('.nav-links-mobile li');
+
+  if (!container || !overlay || links.length === 0) {
+    console.error('Mobile menu elements not found.');
+  } else {
+    gsap.set(links, { y: 30, opacity: 0 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl.to(container, { duration: 0.3, autoAlpha: 1, ease: 'power2.out' }).to(
+      links,
+      {
+        duration: 0.3,
+        opacity: 1,
+        y: 0,
+        stagger: 0.15,
+        ease: 'power3.out',
+      },
+      '-=0.2'
+    );
+
+    let isMenuOpen = false;
+
+    const openMenu = () => {
+      if (isMenuOpen) return;
+      isMenuOpen = true;
+      container.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('overflow-hidden');
+      tl.timeScale(1).play();
+    };
+
+    const closeMenu = () => {
+      if (!isMenuOpen) return;
+      isMenuOpen = false;
+      container.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('overflow-hidden');
+      tl.timeScale(1.5).reverse();
+    };
+
+    document.addEventListener('toggle-menu', () => {
+      isMenuOpen ? closeMenu() : openMenu();
+    });
+
+    overlay.addEventListener('click', closeMenu);
+
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+
+    const handleResize = (e: MediaQueryListEvent) => {
+      if (e.matches && isMenuOpen) {
+        closeMenu();
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleResize);
+  }
+</script>

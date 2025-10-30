@@ -1,21 +1,65 @@
 ---
 // src/components/Navbar.astro
-// ARQUITECTURA "CENTRO DE COMANDO FLOTANTE":
-// Un panel de vidrio minimalista y centrado que aparece al hacer scroll.
+// ARQUITECTURA "CENTRO DE COMANDO ADAPTATIVO":
+// Mantiene su animación de entrada y su estilo de vidrio, pero ahora se adapta
+// a pantallas móviles, mostrando un toggle en lugar de los enlaces.
 import Links from '@/components/Links.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
+import { IconMenu2, IconX } from '@tabler/icons-react';
 ---
 
-<nav
-  id="main-navbar"
-  class="shadow-inset-light dark:shadow-inset-dark <!-- REFINAMIENTO: Padding horizontal aumentado de a --> fixed left-1/2 top-4 z-50 flex w-auto -translate-x-1/2 -translate-y-full items-center gap-x-6 rounded-small border border-border bg-panel/75 px-6 py-2 opacity-0 shadow-lg backdrop-blur-xl"
-  aria-label="Navegación principal"
+<header
+  id="main-header"
+  class="-translate-y-fullopacity-0 fixed left-1/2 top-5 z-50 w-auto -translate-x-1/2"
+  aria-label="Cabecera del sitio"
 >
-  <Links />
-  <ThemeToggle />
-</nav>
+  <nav
+    id="navbar-container"
+    class="bg-panel/75 flex items-center gap-x-8 rounded-small border border-border px-20 py-2 shadow-lg backdrop-blur-xl dark:shadow-inset-dark"
+  >
+    <!-- Logo/Marca: Siempre visible -->
+    {
+      /* <div class="logo">
+      <a
+        href="/"
+        class="font-sans text-sm font-bold uppercase tracking-wider text-text-primary"
+      >
+        * marca*
+      </a>
+    </div>*/
+    }
 
-<!-- El motor de animación de GSAP no necesita ningún cambio. -->
+    <!-- Navegación de Escritorio: Oculta en móvil (`md:flex`) -->
+    <div class="hidden items-center gap-x-6 md:flex">
+      <Links />
+    </div>
+
+    <!-- Controles (ThemeToggle y Menú Móvil): Siempre visibles, pero el menú solo en móvil -->
+    <div class="flex items-center gap-x-2">
+      <ThemeToggle />
+
+      <!-- Botón de Menú Móvil (El Despachador): Visible solo en móvil (`md:hidden`) -->
+      <!-- Botón de Menú Móvil (El Despachador) -->
+      <button
+        id="mobile-menu-toggle"
+        class="p-2 md:hidden"
+        aria-label="Abrir o cerrar menú"
+      >
+        <IconMenu2
+          className="h-6 w-6 text-text-primary"
+          id="icon-menu"
+          stroke={1}
+        />
+        <IconX
+          className="hidden h-6 w-6 text-text-primary"
+          id="icon-close"
+          stroke={1}
+        />
+      </button>
+    </div>
+  </nav>
+</header>
+
 <script>
   import gsap from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -23,9 +67,14 @@ import ThemeToggle from '@/components/ThemeToggle.astro';
   gsap.registerPlugin(ScrollTrigger);
 
   document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.getElementById('main-navbar');
-    if (!navbar) return;
+    const navbar = document.getElementById('main-header');
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const iconMenu = document.getElementById('icon-menu');
+    const iconClose = document.getElementById('icon-close');
 
+    if (!navbar || !mobileMenuToggle || !iconMenu || !iconClose) return;
+
+    // La animación de entrada del Navbar con GSAP (tu código original, es perfecto).
     gsap.to(navbar, {
       y: 0,
       autoAlpha: 1,
@@ -36,6 +85,17 @@ import ThemeToggle from '@/components/ThemeToggle.astro';
         start: 'top top-=-100px',
         toggleActions: 'play none none reverse',
       },
+    });
+
+    // Lógica del Despachador de Eventos.
+    mobileMenuToggle.addEventListener('click', () => {
+      // Crea y "grita" el evento personalizado.
+      const toggleEvent = new CustomEvent('toggle-menu');
+      document.dispatchEvent(toggleEvent);
+
+      // Lógica local para cambiar el icono de hamburguesa a 'X'.
+      iconMenu.classList.toggle('hidden');
+      iconClose.classList.toggle('hidden');
     });
   });
 </script>
