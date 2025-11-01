@@ -8,6 +8,13 @@
 /* --- 2. DEFINICIÓN DE VARIABLES GLOBALES (TOKENS DE DISEÑO) --- */
 @layer base {
   :root {
+    /* Efectos Visuales */
+    --blur-base: 12px;
+    --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --border-light: rgba(0, 0, 0, 0.1); /* Borde sutil para tema claro */
+    --border-dark: rgba(255, 255, 255, 0.1); /* Borde sutil para tema oscuro */
+
     /* Tipografía */
     --font-main: 'Tomorrow'; /* CORRECCIÓN: Sin fuente de respaldo aquí */
     --font-size-xxs: 0.6875rem;
@@ -21,20 +28,20 @@
     --font-size-h1: 3.75rem;
 
     /* Geometría y Espaciado */
-    --radius-small: 8px;
-    --radius-medium: 16px;
-    --radius-large: 24px;
+    --radius-small: 12px;
+    --radius-medium: 4px;
+    --radius-large: 4px;
     --radius-pill: 9999px;
 
-    /* Efectos Visuales */
-    --blur-base: 10px;
-    --blur-xl: 24px; /* Añadido para consistencia */
-    --shadow-base: 0 4px 30px rgba(0, 0, 0, 0.1);
-    --shadow-inset-light: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-    --shadow-inset-dark: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    /* --- EFECTOS VISUALES REFINADOS --- */
+    --blur-base: 12px; /* Un blur más pronunciado para el efecto esmerilado */
+    --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1); /* Sombra sutil para tema claro */
+    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Sombra más profunda para tema oscuro */
+    --border-light: rgba(255, 255, 255, 0.18); /* Borde interior claro */
+    --border-dark: rgba(255, 255, 255, 0.1); /* Borde interior oscuro */
 
     /* Paleta de Colores (Tema Claro) */
-    --color-background: #ffffff;
+    --color-background: #f0f0f0; /* Un gris muy claro para mejor contraste */
     --color-panel-bg: rgba(255, 255, 255, 0.25);
     --color-text-primary: #1a1a1a;
     --color-text-secondary: #666666;
@@ -44,11 +51,11 @@
 
   .dark {
     /* Paleta Oscura */
-    --color-background: #1f2222;
-    --color-panel-bg: rgba(31, 34, 34, 0.25);
-    --color-text-primary: #f0f2f5;
-    --color-text-secondary: #8d97ad;
-    --color-border: rgba(85, 85, 85, 0.658);
+    --color-background: #1f2225;
+    --color-panel-bg: rgba(31, 34, 37, 0.25);
+    --color-text-primary: #eaeaea;
+    --color-text-secondary: #919497;
+    --color-border: #91949757;
     --color-grid-line: rgba(240, 242, 255, 0.05);
   }
 }
@@ -60,11 +67,6 @@
     color: var(--color-text-primary);
     font-family:
       var(--font-main), sans-serif; /* La fuente de respaldo se mantiene aquí por seguridad */
-
-    background-image:
-      linear-gradient(var(--color-grid-line) 1px, transparent 1px),
-      linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
-    background-size: 3rem 3rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -77,5 +79,16 @@
   }
   .container-narrow {
     @apply mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8;
+  }
+  .glass-panel {
+    background: var(--color-panel-bg);
+    backdrop-filter: blur(var(--blur-base));
+    -webkit-backdrop-filter: blur(var(--blur-base));
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-light);
+  }
+  .dark .glass-panel {
+    box-shadow: var(--shadow-dark);
+    border: 1px solid var(--border-dark);
   }
 }

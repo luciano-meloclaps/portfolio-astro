@@ -1,0 +1,142 @@
+---
+// src/components/sections/About.astro
+import Card from '@/components/Card.astro';
+import TerminalHeader from '@/components/TerminalHeader.astro';
+import StatCard from '@/components/StatCard.astro';
+import ChipTech from '@/components/ChipTech.astro';
+import {
+  IconBrandReact,
+  IconBrandAstro,
+  IconBrandTypescript,
+  IconBrandTailwind,
+  IconHexagons,
+  IconSchema,
+  IconPalette,
+  IconSitemap,
+  IconBrandGit,
+  IconBrandDocker,
+  IconBrandGithub,
+  IconBrandMysql,
+  IconBrandVite,
+  IconBrandFigma,
+} from '@tabler/icons-react';
+---
+
+<section id="about" class="py-24 md:py-32">
+  <div class="container-narrow about-section-content space-y-8">
+    <Card padding="none" class="overflow-hidden">
+      <TerminalHeader />
+    </Card>
+
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+      <Card class="md:col-span-2">
+        <h2 class="text-h3 font-bold text-text-primary">
+          Filosofía de Ingeniería
+        </h2>
+        <div
+          class="prose prose-invert mt-6 max-w-none space-y-4 text-text-secondary"
+          style="font-weight: 300;"
+        >
+          <p>...</p>
+        </div>
+      </Card>
+
+      <div class="space-y-8">
+        <StatCard value="8+" label="Años de Experiencia" />
+        <StatCard value="50+" label="Proyectos Completados" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        {
+          /* 
+          LA CORRECCIÓN DEL TAMAÑO DEL ICONO:
+          - Envolvemos el icono en un `div` y le aplicamos `text-xl` para reducir su tamaño.
+        */
+        }
+        <div class="flex items-center gap-x-4 text-xl">
+          <IconSchema
+            className="icon-base text-text-secondary"
+            strokeWidth={1.0}
+          />
+          <h3 class="text-lg font-bold text-text-primary">Arquitectura</h3>
+        </div>
+        <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
+          ...
+        </p>
+      </Card>
+      <Card>
+        <div class="flex items-center gap-x-4 text-xl">
+          <IconPalette
+            className="icon-base text-text-secondary"
+            strokeWidth={1.0}
+          />
+          <h3 class="text-lg font-bold text-text-primary">Diseño UI/UX</h3>
+        </div>
+        <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
+          ...
+        </p>
+      </Card>
+      <Card>
+        <div class="flex items-center gap-x-4 text-xl">
+          <IconSitemap
+            className="icon-base text-text-secondary"
+            strokeWidth={1.0}
+          />
+          <h3 class="text-lg font-bold text-text-primary">Patrones</h3>
+        </div>
+        <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
+          ...
+        </p>
+      </Card>
+    </div>
+
+    <!-- 
+      PANEL DE TOOLKIT RE-ESTRUCTURADO
+      - Ahora es un `Card` de vidrio completo.
+      - Layout de 2 columnas para la nueva categorización.
+    -->
+    <Card>
+      <h3
+        class="text-center font-sans text-sm uppercase tracking-widest text-text-secondary"
+      >
+        Toolkit Principal
+      </h3>
+      <div
+        class="mt-10 grid grid-cols-1 gap-10 text-center md:grid-cols-2 md:text-left"
+      >
+        <!-- Columna de Lenguajes y Frameworks -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-text-primary">Lenguajes & Frameworks</h4>
+          <div class="flex flex-wrap justify-center gap-2 md:justify-start">
+            <ChipTech Icon={IconBrandReact} name="React" />
+            <ChipTech Icon={IconBrandAstro} name="Astro" />
+            <ChipTech Icon={IconBrandTypescript} name="TypeScript" />
+            <ChipTech Icon={IconBrandTailwind} name="Tailwind" />
+            <ChipTech
+              Icon={IconHexagons}
+              name="dotnet"
+              label="ASP.NET"
+              iconClass="transform scale-125"
+            />
+          </div>
+        </div>
+        <!-- Columna de Herramientas y Plataformas -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-text-primary">
+            Herramientas & Plataformas
+          </h4>
+          <div class="flex flex-wrap justify-center gap-2 md:justify-start">
+            <ChipTech Icon={IconBrandGit} name="Git" />
+            <ChipTech Icon={IconBrandGithub} name="GitHub" />
+            <ChipTech Icon={IconBrandDocker} name="Docker" />
+            <ChipTech Icon={IconBrandVite} name="Vite" />
+            <ChipTech Icon={IconBrandFigma} name="Figma" />
+            <ChipTech Icon={IconBrandMysql} name="MySQL" />
+          </div>
+        </div>
+      </div>
+    </Card>
+  </div>
+</section>

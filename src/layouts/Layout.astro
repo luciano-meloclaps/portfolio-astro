@@ -1,4 +1,8 @@
 ---
+// src/layouts/Layout.astro
+// ARQUITECTURA "PARALLAX DE CAPAS":
+// Establece una estructura de capas global para crear un efecto de profundidad
+// donde el contenido parece flotar sobre un fondo de blueprint fijo.
 import ThemeManager from '@/components/ThemeManager.astro';
 import Navbar from '@/components/Navbar.astro';
 import MobileMenu from '@/components/MobileMenu.astro';
@@ -13,7 +17,7 @@ const { title } = Astro.props;
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF--8" />
     <meta name="description" content="Portfolio de [Tu Nombre]" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -21,9 +25,30 @@ const { title } = Astro.props;
     <ThemeManager />
   </head>
   <body>
-    {/* El Navbar y el MobileMenu son elementos globales del layout */}
+    <!-- 
+      CAPA 1: EL FONDO DE BLUEPRINT FIJO
+      - `fixed inset-0`: Lo ancla a la pantalla completa.
+      - `z-[-1]`: Lo envía a la capa más profunda.
+      - Las clases `bg-*` aplican el patrón de cuadrícula.
+    -->
+    <div
+      class="fixed inset-0 z-[-1] bg-[length:3rem_3rem]"
+      style=`
+        background-image: linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+                      linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
+      `
+    >
+    </div>
+
+    <!-- CONTROLES GLOBALES DE UI -->
     <Navbar />
     <MobileMenu />
+
+    <!-- 
+      CAPA 2: EL CONTENIDO FLOTANTE
+      - El <slot /> renderizará todas nuestras secciones (Hero, About, etc.).
+      - Estas secciones se desplazarán normalmente, "flotando" sobre el fondo fijo.
+    -->
     <slot />
   </body>
 </html>
