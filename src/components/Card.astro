@@ -1,0 +1,26 @@
+---
+// src/components/ui/Card.astro
+interface Props {
+  class?: string;
+  padding?: 'sm' | 'md' | 'lg' | 'none';
+}
+const { class: className, padding = 'md' } = Astro.props;
+
+const paddingClasses = {
+  sm: 'p-4',
+  md: 'p-6',
+  lg: 'p-8',
+  none: 'p-0',
+};
+---
+
+<!-- 
+  El Card ahora también usa la clase `.glass-panel`.
+  Cualquier cambio en `.glass-panel` en `global.css` afectará
+  tanto al Navbar como a todas las Cards.
+-->
+<div
+  class:list={['glass-panel rounded-large', paddingClasses[padding], className]}
+>
+  <slot />
+</div>
