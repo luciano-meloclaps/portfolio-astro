@@ -1,15 +1,23 @@
 ---
-import Layout from '@/layouts/Layout.astro';
+// src/pages/index.astro
+// RESPONSABILIDAD: Ensamblar las secciones de la página en el orden correcto.
+import About from '@/components/sections/About.astro';
 import Hero from '@/components/sections/Hero.astro';
-import AboutSection from '@/components/sections/About.astro';
+import Projects from '@/components/sections/Projects.astro';
+import Layout from '@/layouts/Layout.astro';
+// <-- Importamos la sección de proyectos
 ---
 
 <Layout title="[Tu Nombre] | Portfolio Profesional">
   <main>
+    <!-- 
+      SECUENCIA NARRATIVA CORRECTA:
+      Cada sección es un "hermano" del siguiente, no un "hijo".
+    -->
     <Hero />
-    <AboutSection />
-    <section id="projects" class="container-narrow min-h-screen py-24">
-      <h2 class="text-h2 font-bold">// Proyectos</h2>
-    </section>
+    <About />
+    <Projects />
+
+    <!-- Aquí irán las futuras secciones como <Contact /> -->
   </main>
 </Layout>

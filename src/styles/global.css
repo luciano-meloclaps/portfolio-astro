@@ -47,6 +47,8 @@
     --color-text-secondary: #666666;
     --color-border: rgba(0, 0, 0, 0.1);
     --color-grid-line: rgba(0, 0, 0, 0.05);
+    --color-accent-magenta: #4e0041;
+    --color-glow-border: rgba(0, 0, 0, 0.8);
   }
 
   .dark {
@@ -57,6 +59,8 @@
     --color-text-secondary: #919497;
     --color-border: #91949757;
     --color-grid-line: rgba(240, 242, 255, 0.05);
+    --color-accent-magenta: #a33a8a; /* Una versión más brillante para el tema oscuro */
+    --color-glow-border: rgba(255, 255, 255, 0.8);
   }
 }
 
