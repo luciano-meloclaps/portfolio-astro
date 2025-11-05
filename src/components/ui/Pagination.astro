@@ -1,0 +1,47 @@
+---
+// src/components/ui/Pagination.astro
+// ARQUITECTURA "STATELESS": 100% Astro-nativo. Renderiza enlaces `<a>`
+// para una paginación amigable con SEO y View Transitions. Cero JavaScript.
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
+
+// 1. EL CONTRATO CORRECTO: Acepta el estado actual desde fuera.
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+// 2. LÓGICA DE ENLACES: Calcula las URLs para las páginas anterior y siguiente.
+const prevPageUrl =
+  currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : null;
+const nextPageUrl =
+  currentPage < totalPages ? `${baseUrl}?page=${currentPage + 1}` : null;
+---
+
+<div class="flex items-center justify-center gap-x-4">
+  <a
+    href={prevPageUrl}
+    class:list={[
+      'pagination-button',
+      !prevPageUrl && 'is-disabled', // Deshabilita visualmente si no hay página anterior
+    ]}
+    aria-label="Página anterior"
+  >
+    <IconArrowLeft className="icon-base h-5 w-5" />
+  </a>
+
+  <div class="font-mono text-sm text-text-secondary">
+    <span>{currentPage}</span>
+    <span class="mx-1">/</span>sadasdsa
+    <span>{totalPages}</span>
+  </div>
+
+  <a
+    href={nextPageUrl}
+    class:list={['pagination-button', !nextPageUrl && 'is-disabled']}
+    aria-label="Página siguiente"
+  >
+    <IconArrowRight className="icon-base h-5 w-5" />
+  </a>
+</div>

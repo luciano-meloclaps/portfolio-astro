@@ -1,0 +1,66 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ProjectCard from '@/components/ui/ProjectCard.astro';
+
+// 1. TIPADO EXPLÍCITO EN LA FUENTE:
+//    Aseguramos que `allProjects` y, por extensión, `projectsToShow`
+//    tengan el tipo correcto desde el principio.
+const allProjects: CollectionEntry<'projects'>[] =
+  await getCollection('projects');
+allProjects.sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+
+// La lógica de paginación se mantiene, pero ahora es tipográficamente segura.
+const pageSize = 2;
+const currentPage = 1;
+const totalPages = Math.ceil(allProjects.length / pageSize);
+const projectsToShow = allProjects.slice(
+  (currentPage - 1) * pageSize,
+  currentPage * pageSize
+);
+---
+
+<section id="projects" class="py-24 md:py-32">
+  <div class="container-narrow projects-section-content space-y-12">
+    <h2 class="text-h2 font-bold text-text-primary">// Proyectos</h2>
+    <div class="space-y-16">
+      {/* Ahora TypeScript sabe que `project` es del tipo correcto. */}
+      {projectsToShow.map((project) => <ProjectCard project={project} />)}
+    </div>
+    {/* ... (Paginación) ... */}
+  </div>
+</section>
+
+<!-- LA ANIMACIÓN DE SCROLL QUE FALTABA -->
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('.projects-section-content');
+    if (!section) return;
+
+    // Seleccionamos cada tarjeta individualmente para la animación en cascada.
+    const cards = gsap.utils.toArray('.project-card-wrapper');
+
+    gsap.set(cards, { autoAlpha: 0, y: 50 });
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      onEnter: () => {
+        gsap.to(cards, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.2,
+          stagger: 0.3, // Cada tarjeta aparece con un retraso de 0.3s
+          ease: 'power3.out',
+        });
+      },
+      once: true,
+    });
+  });
+</script>
