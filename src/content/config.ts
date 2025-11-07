@@ -13,6 +13,23 @@ const projectsCollection = defineCollection({
   }),
 });
 
+// --- NUEVA COLECCIÓN "CAREER" ---
+const careerCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    type: z.enum(['Work', 'Education']), // Tipo de hito
+    title: z.string(), // Ej: "Senior Full Stack Developer" o "Ingeniería en Sistemas"
+    entity: z.string(), // Ej: "TechCorp Solutions" o "Universidad Nacional"
+    location: z.string(),
+    startDate: z.date(),
+    endDate: z.date().optional(), // Opcional para el trabajo actual
+    contractType: z.string().optional(), // Ej: "Full-Time", "Contract"
+    achievements: z.array(z.string()),
+    techStack: z.array(z.string()).optional(),
+  }),
+});
+
 export const collections = {
   projects: projectsCollection,
+  career: careerCollection, // <-- AÑADIDO
 };

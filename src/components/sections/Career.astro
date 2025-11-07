@@ -1,0 +1,90 @@
+---
+// src/sections/Career.astro
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ExperienceCard from '@/components/ui/ExperienceCard.astro';
+
+const allCareerItems: CollectionEntry<'career'>[] =
+  await getCollection('career');
+allCareerItems.sort(
+  (a, b) => b.data.startDate.valueOf() - a.data.startDate.valueOf()
+);
+---
+
+<section id="experience" class="py-24 md:py-32">
+  <div class="container-narrow career-section-content">
+    <h2 class="mb-16 text-center text-h2 font-bold text-text-primary">
+      // Carrera Profesional
+    </h2>
+
+    <div class="relative">
+      <!-- 
+        LA CORRECCIÓN ARQUITECTÓNICA:
+        - `top-4 bottom-4`: En lugar de `h-full`, estiramos la línea desde un
+          punto cercano al principio hasta un punto cercano al final del contenedor.
+        - Esto asegura que la línea siempre tenga una altura visible, incluso si
+          el contenedor cambia de tamaño, y le da un "aire" en los extremos.
+      -->
+      <div
+        class="timeline-line absolute bottom-4 left-1/2 top-4 w-px -translate-x-1/2 bg-border"
+      >
+      </div>
+
+      <div class="space-y-16">
+        {
+          allCareerItems.map((item, index) => (
+            <div class="timeline-item relative flex items-center">
+              <div class="timeline-node absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-border bg-background" />
+              <div
+                class:list={[
+                  'w-full px-4 md:w-[calc(50%-2rem)]',
+                  {
+                    'md:ml-auto md:pl-0': index % 2 !== 0,
+                    'md:pr-0': index % 2 === 0,
+                  },
+                ]}
+              >
+                <ExperienceCard experience={item} />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('.career-section-content');
+    if (!section) return;
+
+    const line = section.querySelector('.timeline-line');
+    const items = gsap.utils.toArray('.timeline-item');
+
+    gsap.set([line, ...items], { autoAlpha: 0 });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top 60%',
+        once: true,
+      },
+    });
+
+    tl.to(line, {
+      autoAlpha: 1,
+      scaleY: 1,
+      duration: 1.5,
+      from: { scaleY: 0 },
+      ease: 'power2.out',
+    }).to(
+      items,
+      { autoAlpha: 1, y: 0, stagger: 0.3, from: { y: 50 }, ease: 'power3.out' },
+      '-=1.0'
+    );
+  });
+</script>
