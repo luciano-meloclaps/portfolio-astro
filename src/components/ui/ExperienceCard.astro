@@ -1,0 +1,154 @@
+---
+// src/components/ui/ExperienceCard.astro
+import type { CollectionEntry } from 'astro:content';
+import Card from '@/components/ui/Card.astro';
+import ChipTech from '@/components/ui/ChipTech.astro';
+import { techIconMap } from '@/config/tech-icon-map';
+import {
+  IconPointFilled,
+  IconChevronDown,
+  IconFileText,
+} from '@tabler/icons-react'; // Importamos IconFileText
+
+interface Props {
+  experience: CollectionEntry<'career'>;
+}
+const { experience } = Astro.props;
+const {
+  title,
+  entity,
+  location,
+  startDate,
+  endDate,
+  contractType,
+  achievements,
+  techStack,
+} = experience.data;
+
+const formatDate = (date: Date) => new Date(date).getFullYear();
+---
+
+<div class="experience-card-wrapper group cursor-pointer">
+  <Card padding="lg" class="relative overflow-hidden">
+    <div class="halo-effect"></div>
+
+    <div class="relative z-10 flex flex-col">
+      <!-- Encabezado de la Tarjeta -->
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="text-xl font-bold text-text-primary">{title}</h3>
+          <p class="mt-2 text-sm text-text-secondary">
+            {entity} &bull; {location}
+          </p>
+          <p class="text-text-secondary/70 mt-1 text-xs">
+            {formatDate(startDate)} - {
+              endDate ? formatDate(endDate) : 'Presente'
+            }
+          </p>
+        </div>
+
+        {
+          /* 
+          LA SOLUCIÓN: Usamos ChipTech para el tipo de contrato.
+          - `name="contract"`: Usamos una clave para buscar el color en `techColorMap`.
+          - `label={contractType}`: El texto real del contrato.
+          - `Icon={IconFileText}`: Un icono genérico para "contrato".
+          - `class="!px-2 !py-0.5"`: Ajustamos el padding para que sea un chip más pequeño.
+        */
+        }
+        {
+          contractType && (
+            <ChipTech
+              Icon={IconFileText}
+              name="contract"
+              label={contractType}
+              class="!px-2 !py-0.5"
+            />
+          )
+        }
+      </div>
+
+      <!-- Botón de Despliegue -->
+      <button
+        class="details-toggle mt-4 flex items-center gap-x-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+      >
+        <span>{achievements.length} Logros Clave</span>
+        <IconChevronDown
+          className="h-4 w-4 transition-transform duration-300"
+        />
+      </button>
+
+      <!-- Contenido Desplegable (sin cambios) -->
+      <div class="details-container max-h-0 overflow-hidden">
+        <div class="details-content pt-6">
+          <div class="border-t border-border pt-6">
+            <h4
+              class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary"
+            >
+              Logros Clave
+            </h4>
+            <ul class="mt-4 space-y-3">
+              {
+                achievements.map((achievement) => (
+                  <li class="flex items-start gap-x-3">
+                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/50 mt-1" />
+                    <span class="text-sm text-text-secondary">
+                      {achievement}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          {
+            techStack && techStack.length > 0 && (
+              <div class="mt-6">
+                <h4 class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary">
+                  Stack Tecnológico
+                </h4>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {techStack.map((tech) => {
+                    const Icon = techIconMap[tech.toLowerCase()];
+                    return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+                  })}
+                </div>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </Card>
+</div>
+<!-- 3. El script de GSAP para la expansión. Es idéntico en espíritu al de ProjectCard. -->
+<script>
+  import gsap from 'gsap';
+  document
+    .querySelectorAll('.experience-card-wrapper')
+    .forEach((cardWrapper) => {
+      const toggle = cardWrapper.querySelector('.details-toggle');
+      const container = cardWrapper.querySelector('.details-container');
+      const content = cardWrapper.querySelector('.details-content');
+      const chevron = cardWrapper.querySelector('.details-toggle svg');
+      let isVisible = false;
+
+      if (!toggle || !container || !content || !chevron) return;
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(container, {
+        maxHeight: () => content.scrollHeight,
+        duration: 0.8,
+        ease: 'power3.inOut',
+      });
+
+      // La lógica de click ahora se aplica a todo el `cardWrapper`, no solo al botón.
+      cardWrapper.addEventListener('click', (e) => {
+        // Prevenimos que el clic en un enlace dentro de la tarjeta la active.
+        if (e.target instanceof HTMLElement && e.target.closest('a')) return;
+
+        isVisible = !isVisible;
+        gsap.to(chevron, { rotation: isVisible ? 180 : 0, duration: 0.4 });
+        isVisible ? tl.play() : tl.reverse();
+      });
+    });
+</script>
