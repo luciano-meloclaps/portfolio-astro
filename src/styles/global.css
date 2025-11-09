@@ -47,7 +47,7 @@
     --color-text-secondary: #666666;
     --color-border: rgba(0, 0, 0, 0.1);
     --color-grid-line: rgba(0, 0, 0, 0.05);
-    --color-accent-magenta: #4e0041;
+    --color-accent-magenta: #814c78;
     --color-glow-border: rgba(0, 0, 0, 0.8);
   }
 
@@ -59,26 +59,8 @@
     --color-text-secondary: #919497;
     --color-border: #91949757;
     --color-grid-line: rgba(240, 242, 255, 0.05);
-    --color-accent-magenta: #a33a8a; /* Una versión más brillante para el tema oscuro */
+    --color-accent-magenta: #814c78; /* Una versión más brillante para el tema oscuro */
     --color-glow-border: rgba(255, 255, 255, 0.8);
-  }
-  /* 
-    NUEVO: PATRÓN DE DISEÑO "HALO CARD"
-  */
-  .group:hover .halo-effect {
-    opacity: 1;
-  }
-  .halo-effect {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit; /* Hereda el radio de la tarjeta padre */
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out;
-    box-shadow:
-      inset 0 0 0 1.5px var(--color-accent-magenta),
-      0 0 25px 0 var(--color-accent-magenta);
   }
 }
 
