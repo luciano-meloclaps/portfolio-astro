@@ -5,6 +5,7 @@ import About from '@/components/sections/About.astro';
 import Career from '@/components/sections/Career.astro';
 import Hero from '@/components/sections/Hero.astro';
 import Projects from '@/components/sections/Projects.astro';
+import Badge from '@/components/ui/Badge.astro';
 import Layout from '@/layouts/Layout.astro';
 // <-- Importamos la sección de proyectos
 ---
@@ -19,6 +20,10 @@ import Layout from '@/layouts/Layout.astro';
     <About />
     <Projects />
     <Career />
+    <div class="flex gap-4">
+      <Badge text="Full Time" variant="accent" />
+      <Badge text="Contract" variant="accent" />
+    </div>
     <!-- Aquí irán las futuras secciones como <Contact /> -->
   </main>
 </Layout>
