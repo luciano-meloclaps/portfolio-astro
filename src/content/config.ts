@@ -29,7 +29,25 @@ const careerCollection = defineCollection({
   }),
 });
 
+const certificationsCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    issuer: z.string(),
+    category: z.string(),
+    level: z.enum(['Expert', 'Advanced', 'Intermediate', 'Fundamental']),
+    issueDate: z.date(),
+    expiryDate: z.date().optional(),
+    description: z.string(),
+    keySkills: z.array(z.string()),
+    techStack: z.array(z.string()).optional(), // <-- CAMPO AÑADIDO Y OPCIONAL
+    credentialId: z.string().optional(),
+    credentialUrl: z.string().url().optional(),
+  }),
+});
+
 export const collections = {
   projects: projectsCollection,
-  career: careerCollection, // <-- AÑADIDO
+  career: careerCollection,
+  certifications: certificationsCollection,
 };
