@@ -1,0 +1,29 @@
+---
+// src/components/ui/ContactForm.astro
+import FormField from '@/components/ui/FormField.astro';
+import Button from '@/components/ui/Button.astro';
+import { IconSend } from '@tabler/icons-react';
+---
+
+<!-- Mensaje de Éxito (Oculto por defecto) -->
+<div id="success-message" class="hidden text-center">
+  <h3 class="text-h3 font-bold text-text-primary">Mensaje Enviado</h3>
+  <p class="mt-2 text-text-secondary">
+    Gracias por tu contacto. Te responderé a la brevedad.
+  </p>
+</div>
+
+<!-- Formulario (Visible por defecto) -->
+<form id="contact-form" class="space-y-6" novalidate>
+  <h3 class="text-xl font-bold text-text-primary">Enviar un Mensaje</h3>
+  <FormField id="name" label="Nombre *" required />
+  <FormField id="email" label="Email *" type="email" required />
+  <FormField id="subject" label="Asunto *" required />
+  <FormField id="message" label="Mensaje *" as="textarea" required />
+  <div class="pt-2">
+    <Button>
+      <span id="submit-text">Enviar Mensaje</span>
+      <IconSend className="icon-base h-4 w-4" id="submit-icon" />
+    </Button>
+  </div>
+</form>
