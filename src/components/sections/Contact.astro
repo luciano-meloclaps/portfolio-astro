@@ -1,0 +1,133 @@
+---
+// src/sections/Contact.astro
+// ARQUITECTURA "DASHBOARD DE COMUNICACIONES":
+// Una composición modular de paneles de vidrio que presenta la información de contacto
+// de una manera rica, estructurada y profesional.
+import Card from '@/components/ui/Card.astro';
+import ContactForm from '@/components/ui/ContactForm.astro';
+import Button from '@/components/ui/Button.astro';
+import StatusChip from '@/components/ui/StatusChip.astro';
+import {
+  IconBrandGithub,
+  IconBrandLinkedin,
+  IconMail,
+  IconPhone,
+  IconMapPin,
+  IconMessageCircle,
+} from '@tabler/icons-react';
+---
+
+<section id="contact" class="py-24 md:py-32">
+  <div class="container-narrow contact-section-content">
+    <div class="text-center">
+      <h2 class="text-h2 font-bold text-text-primary">// Contacto</h2>
+      <p
+        class="mx-auto mt-4 max-w-2xl text-lg text-text-secondary"
+        style="font-weight: 300;"
+      >
+        Colaboremos en tu próximo proyecto. Si tienes una pregunta, una
+        propuesta o simplemente quieres saludar, me encantaría saber de ti.
+      </p>
+    </div>
+
+    <div class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start">
+      <!-- COLUMNA IZQUIERDA: INFORMACIÓN Y ESTADO -->
+      <div class="space-y-8">
+        <Card>
+          <h3 class="font-bold text-text-primary">Contacto Directo</h3>
+          <div class="mt-6 space-y-4">
+            <div class="flex items-center gap-x-3 text-sm text-text-secondary">
+              <IconMail className="h-5 w-5" />
+              <span>contact@example.com</span>
+            </div>
+            <div class="flex items-center gap-x-3 text-sm text-text-secondary">
+              <IconPhone className="h-5 w-5" />
+              <span>+1 (555) 123-4567</span>
+            </div>
+            <div class="flex items-center gap-x-3 text-sm text-text-secondary">
+              <IconMapPin className="h-5 w-5" />
+              <span>San Francisco, CA</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <h3 class="font-bold text-text-primary">Conecta Conmigo</h3>
+          <div class="mt-6 flex flex-wrap gap-4">
+            <Button
+              href="https://github.com/luciano-meloclaps"
+              variant="secondary"
+              target="_blank"
+            >
+              <IconBrandGithub className="icon-base" />
+              <span>GitHub</span>
+            </Button>
+            <Button
+              href="https://www.linkedin.com/in/luciano-melo-claps/"
+              variant="secondary"
+              target="_blank"
+            >
+              <IconBrandLinkedin className="icon-base" />
+              <span>LinkedIn</span>
+            </Button>
+          </div>
+        </Card>
+
+        <Card>
+          <h3 class="font-bold text-text-primary">Disponibilidad Actual</h3>
+          <p class="mt-2 text-sm text-text-secondary">
+            Abierto a oportunidades freelance y de tiempo completo. Típicamente
+            respondo dentro de 24 horas.
+          </p>
+          <div class="mt-4">
+            <StatusChip
+              Icon={IconMessageCircle}
+              label="Status"
+              value="Disponible"
+              variant="positive"
+            />
+          </div>
+        </Card>
+      </div>
+
+      <!-- COLUMNA DERECHA: FORMULARIO -->
+      <Card class="md:col-span-1">
+        <h3 class="mb-6 font-bold text-text-primary">Enviar un Mensaje</h3>
+        <ContactForm />
+      </Card>
+    </div>
+  </div>
+</section>
+
+<!-- Coreografía de Entrada "Flotante" con GSAP -->
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('.contact-section-content');
+    if (!section) return;
+
+    // Seleccionamos las tarjetas como nuestros targets de animación.
+    const cards = gsap.utils.toArray('.contact-section-content .grid > *');
+
+    gsap.set(cards, { autoAlpha: 0, y: 50 });
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      onEnter: () => {
+        gsap.to(cards, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1,
+          stagger: 0.15, // Una cascada más rápida y sutil
+          ease: 'power3.out',
+        });
+      },
+      once: true,
+    });
+  });
+</script>
