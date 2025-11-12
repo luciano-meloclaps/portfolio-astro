@@ -1,0 +1,56 @@
+---
+// src/sections/Certifications.astro
+import { getCollection } from 'astro:content';
+import CertificationCard from '@/components/ui/CertificationCard.astro';
+
+const allCertifications = await getCollection('certifications');
+allCertifications.sort(
+  (a, b) => b.data.issueDate.valueOf() - a.data.issueDate.valueOf()
+);
+---
+
+<section id="certifications" class="py-24 md:py-32">
+  <div class="container-narrow certifications-section-content">
+    <h2 class="mb-16 text-center text-h2 font-bold text-text-primary">
+      // Certificaciones
+    </h2>
+
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+      {
+        allCertifications.map((cert) => (
+          <CertificationCard certification={cert} />
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  // Script de animación de entrada para la sección
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('.certifications-section-content');
+    if (!section) return;
+
+    const cards = gsap.utils.toArray('.certification-card-wrapper');
+    gsap.set(cards, { autoAlpha: 0, y: 50 });
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      onEnter: () => {
+        gsap.to(cards, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.2,
+          stagger: 0.2,
+          ease: 'power3.out',
+        });
+      },
+      once: true,
+    });
+  });
+</script>

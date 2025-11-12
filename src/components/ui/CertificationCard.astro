@@ -1,0 +1,189 @@
+---
+// src/components/ui/CertificationCard.astro
+import type { CollectionEntry } from 'astro:content';
+import Card from '@/components/ui/Card.astro';
+import ChipTech from '@/components/ui/ChipTech.astro';
+import LevelBadge from '@/components/ui/LevelBadge.astro';
+import { techIconMap } from '@/config/tech-icon-map';
+import {
+  IconCertificate,
+  IconCalendar,
+  IconExternalLink,
+  IconPointFilled,
+  IconChevronDown,
+} from '@tabler/icons-react';
+interface Props {
+  certification: CollectionEntry<'certifications'>;
+}
+const { certification } = Astro.props;
+const {
+  title,
+  issuer,
+  category,
+  level,
+  issueDate,
+  expiryDate,
+  description,
+  keySkills,
+  // ¡IMPORTANTE! Asegúrate de que `techStack` se extrae de los datos.
+  techStack,
+  credentialId,
+  credentialUrl,
+} = certification.data;
+
+const formatDate = (date: Date) => new Date(date).getFullYear();
+---
+
+<div class="certification-card-wrapper group">
+  <Card padding="none" class="relative overflow-hidden">
+    <div class="halo-effect"></div>
+    <div class="relative z-10 flex flex-col p-6">
+      <!-- Encabezado (sin cambios) -->
+      <div class="flex items-center justify-between">
+        <div
+          class="flex items-center gap-x-3 text-sm font-semibold uppercase tracking-wider text-text-secondary"
+        >
+          <IconCertificate className="h-5 w-5" />
+          <span>{category}</span>
+        </div>
+        {
+          credentialUrl && (
+            <a
+              href={credentialUrl}
+              target="_blank"
+              class="text-text-secondary transition-colors hover:text-text-primary"
+              aria-label="Ver credencial"
+            >
+              <IconExternalLink className="h-5 w-5" />
+            </a>
+          )
+        }
+      </div>
+
+      <!-- Contenido Principal (sin cambios) -->
+      <div class="mt-4">
+        <h3 class="text-xl font-bold text-text-primary">{title}</h3>
+        <p class="mt-2 text-sm font-semibold text-text-secondary">{issuer}</p>
+        <div
+          class="text-text-secondary/80 mt-4 flex items-center gap-x-4 text-xs"
+        >
+          <div class="flex items-center gap-x-1.5">
+            <IconCalendar className="h-4 w-4" />
+            <span
+              >{formatDate(issueDate)} - {
+                expiryDate ? formatDate(expiryDate) : 'Sin Vencimiento'
+              }</span
+            >
+          </div>
+          <LevelBadge level={level} />
+        </div>
+        <p class="mt-4 text-base text-text-secondary" style="font-weight: 300;">
+          {description}
+        </p>
+      </div>
+
+      <!-- Botón de Despliegue (ahora más genérico) -->
+      <button
+        class="details-toggle mt-6 flex items-center gap-x-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+      >
+        <span>Ver Detalles</span>
+        <IconChevronDown
+          className="h-4 w-4 transition-transform duration-300"
+        />
+      </button>
+
+      <!-- 
+        LA ARQUITECTURA CORRECTA Y COMPLETA:
+        Tanto "Key Skills" como "Tech Stack" viven DENTRO de `details-content`.
+      -->
+      <div class="details-container max-h-0 overflow-hidden">
+        <div class="details-content pt-4">
+          <!-- Sección Key Skills -->
+          <div class="border-t border-border pt-4">
+            <h4
+              class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary"
+            >
+              Key Skills
+            </h4>
+            <ul class="mt-4 space-y-3">
+              {
+                keySkills.map((skill: string) => (
+                  <li class="flex items-start gap-x-3">
+                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/50 mt-1" />
+                    <span class="text-sm text-text-secondary">{skill}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <!-- SECCIÓN "TECH STACK" RESTAURADA -->
+          {
+            techStack && techStack.length > 0 && (
+              <div class="mt-6">
+                <h4 class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary">
+                  Tech Stack
+                </h4>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {techStack.map((tech: string) => {
+                    const Icon = techIconMap[tech.toLowerCase()];
+                    return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+                  })}
+                </div>
+              </div>
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Footer de la Tarjeta (sin cambios) -->
+      <div
+        class="mt-6 flex items-center justify-between border-t border-border pt-4 font-mono text-xs text-text-secondary"
+      >
+        <span>ID: {credentialId || 'N/A'}</span>
+        {
+          credentialUrl && (
+            <a
+              href={credentialUrl}
+              target="_blank"
+              class="flex items-center gap-x-1.5 transition-colors hover:text-text-primary"
+            >
+              <span>View Credential</span>
+              <IconExternalLink className="h-3 w-3" />
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </Card>
+</div>
+
+<!-- El script de GSAP no necesita ningún cambio. -->
+<script>
+  import gsap from 'gsap';
+  document
+    .querySelectorAll('.certification-card-wrapper')
+    .forEach((cardWrapper) => {
+      const toggle = cardWrapper.querySelector('.details-toggle');
+      const container = cardWrapper.querySelector('.details-container');
+      const content = cardWrapper.querySelector('.details-content');
+      const chevron = cardWrapper.querySelector('.details-toggle svg');
+      let isVisible = false;
+
+      if (!toggle || !container || !content || !chevron) return;
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(container, {
+        maxHeight: () => content.scrollHeight,
+        duration: 0.8,
+        ease: 'power3.inOut',
+      });
+
+      cardWrapper.addEventListener('click', (e) => {
+        if (e.target instanceof HTMLElement && e.target.closest('a')) return;
+        isVisible = !isVisible;
+        gsap.to(chevron, { rotation: isVisible ? 180 : 0, duration: 0.4 });
+        isVisible ? tl.play() : tl.reverse();
+      });
+    });
+</script>
