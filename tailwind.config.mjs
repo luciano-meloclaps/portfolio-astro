@@ -12,6 +12,7 @@ export default {
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
         border: 'var(--color-border)',
+        'accent-magenta': 'var(--color-accent-magenta)', // <-- AÑADIDO
       },
 
       // --- SINCRONIZACIÓN DE FUENTES ---

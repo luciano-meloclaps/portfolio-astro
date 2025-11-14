@@ -1,35 +1,69 @@
 ---
 // src/layouts/Layout.astro
-// ARQUITECTURA "PARALLAX DE CAPAS":
-// Establece una estructura de capas global para crear un efecto de profundidad
-// donde el contenido parece flotar sobre un fondo de blueprint fijo.
+// RESPONSABILIDAD:
+// Ser la plantilla maestra y el "marco" de la aplicación. Define la estructura
+// global del documento, las meta etiquetas esenciales para SEO, y los
+// componentes persistentes de la UI como el Header.
+
+import { SEO } from 'astro-seo';
+import '@/styles/global.css';
 import ThemeManager from '@/components/modules/ThemeManager.astro';
 import Navbar from '@/components/modules/Navbar.astro';
 import MobileMenu from '@/components/modules/MobileMenu.astro';
-import '@/styles/global.css';
 
 interface Props {
   title: string;
+  description?: string;
 }
-const { title } = Astro.props;
+
+const {
+  title = 'Luciano Melo Claps | Software Developer',
+  description = 'Portfolio de un desarrollador Fullstack especializado en .NET y React, con un enfoque en arquitectura de software y diseño de experiencias de usuario.',
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="es" class="scroll-smooth">
   <head>
-    <meta charset="UTF--8" />
-    <meta name="description" content="Portfolio de [Tu Nombre]" />
+    <!-- Meta etiquetas fundamentales -->
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- 
+      Componente de SEO:
+      Gestiona automáticamente el título, la descripción, las etiquetas Open Graph
+      (para redes sociales) y más. Es una mejora masiva para el SEO.
+    -->
+    <SEO
+      title={title}
+      description={description}
+      openGraph={{
+        basic: {
+          title: title,
+          type: 'website',
+          image: '/og-image.png', // Debes crear esta imagen (1200x630px)
+        },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+      }}
+    />
+
+    <!-- Favicon y Fuentes -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+
+    <!-- 
+      El ThemeManager DEBE estar en el <head> para prevenir el parpadeo (FOUC).
+      Es un script de bloqueo intencional.
+    -->
     <ThemeManager />
   </head>
   <body>
     <!-- 
       CAPA 1: EL FONDO DE BLUEPRINT FIJO
-      - `fixed inset-0`: Lo ancla a la pantalla completa.
-      - `z-[-1]`: Lo envía a la capa más profunda.
-      - Las clases `bg-*` aplican el patrón de cuadrícula.
+      - `fixed inset-0 z-[-1]`: Lo ancla a la pantalla y lo envía al fondo.
+      - `bg-[length:3rem_3rem]`: Controla el tamaño de la cuadrícula.
     -->
     <div
       class="fixed inset-0 z-[-1] bg-[length:3rem_3rem]"
@@ -37,18 +71,18 @@ const { title } = Astro.props;
         background-image: linear-gradient(var(--color-grid-line) 1px, transparent 1px),
                       linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
       `
+      aria-hidden="true"
     >
     </div>
 
-    <!-- CONTROLES GLOBALES DE UI -->
+    <!-- Componentes de UI Globales -->
     <Navbar />
     <MobileMenu />
 
     <!-- 
       CAPA 2: EL CONTENIDO FLOTANTE
-      - El <slot /> renderizará todas nuestras secciones (Hero, About, etc.).
-      - Estas secciones se desplazarán normalmente, "flotando" sobre el fondo fijo.
+      - El <slot /> renderizará el contenido de cada página.
     -->
     <slot />
   </body>
-</html>
+</html>```
