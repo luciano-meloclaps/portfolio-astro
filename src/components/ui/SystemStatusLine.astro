@@ -1,0 +1,14 @@
+---
+// src/components/ui/SystemStatusLine.astro
+// RESPONSABILIDAD: Mostrar una línea de texto estilizada como una salida de terminal.
+interface Props {
+  command: string;
+  class?: string;
+}
+const { command, class: className } = Astro.props;
+---
+
+<p class:list={['font-mono text-xs text-text-secondary', className]}>
+  <span class="text-text-primary/80">$</span>
+  {command}
+</p>

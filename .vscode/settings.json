@@ -1,11 +1,17 @@
 {
-  // 1. Especificamos que Prettier es el formateador por defecto para TODOS los lenguajes.
+  // --- ASOCIACIÓN DE LENGUAJE ---
+  // Le decimos a VS Code que trate todos los archivos .css como `tailwindcss`.
+  // Esto activa el autocompletado y el linting correcto.
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // --- FORMATEADOR POR DEFECTO ---
+  // Establecemos Prettier como el formateador por defecto para todo el workspace.
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-  // 2. Activamos el formateo automático al guardar.
-  "editor.formatOnSave": true,
-
-  // 3. (Opcional pero recomendado) Si tienes conflictos, puedes ser más explícito.
+  // --- CONFIGURACIÓN POR LENGUAJE ---
+  // Somos explícitos para evitar conflictos entre extensiones.
   "[astro]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -15,13 +21,23 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-
-  // 4. Mantenemos la asociación de Tailwind para el autocompletado.
-  "files.associations": {
-    "*.css": "tailwindcss"
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "liveServer.settings.multiRootWorkspaceName": "portfolioLanding"
+
+  // --- CALIDAD DE CÓDIGO ---
+  "editor.formatOnSave": true, // Formatea automáticamente al guardar.
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit" // (Opcional) Si usas ESLint, esto arregla errores al guardar.
+  },
+
+  // --- CODIFICACIÓN DE ARCHIVOS ---
+  // Forzamos UTF-8 para evitar problemas con caracteres especiales.
+  "files.encoding": "utf8"
 }

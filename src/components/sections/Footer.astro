@@ -1,0 +1,193 @@
+---
+// src/sections/Footer.astro
+// ARQUITECTURA "TERMINAL DE PERFIL DINÁMICA":
+// Refactorizado para desacoplar los datos y refinar las interacciones.
+import Card from '@/components/ui/Card.astro';
+import Links from '@/components/ui/Links.astro';
+import SystemStatusLine from '@/components/ui/SystemStatusLine.astro';
+import {
+  IconCopy,
+  IconBrandGithub,
+  IconBrandLinkedin,
+} from '@tabler/icons-react';
+import { SITE_CONFIG } from '@/config/site'; // <-- Importamos nuestros datos
+
+const { profile, copyright } = SITE_CONFIG;
+---
+
+<footer id="footer" class="py-24 md:py-32">
+  <div class="container-narrow footer-section-content">
+    <Card padding="none" class="overflow-hidden">
+      <!-- Barra de Título -->
+      <div class="flex items-center gap-x-2 border-b border-border px-4 py-3">
+        <div class="h-3 w-3 rounded-full bg-red-500/90"></div>
+        <div class="h-3 w-3 rounded-full bg-yellow-500/90"></div>
+        <div class="h-3 w-3 rounded-full bg-green-500/90"></div>
+        <p class="ml-auto font-mono text-xs text-text-secondary">
+          ~/luciano.dev -- zsh
+        </p>
+      </div>
+
+      <!-- Contenido Principal -->
+      <div class="p-8">
+        <div
+          id="footer-command-line"
+          class="font-mono text-sm text-text-secondary"
+        >
+          <span class="text-text-primary">$</span>
+        </div>
+        <div
+          id="footer-content-grid"
+          class="mt-6 grid grid-cols-1 gap-12 opacity-0 md:grid-cols-3"
+        >
+          <!-- Columna 1: Perfil -->
+          <div class="space-y-4">
+            <h3 class="footer-heading">PERFIL</h3>
+            <p class="text-sm font-light text-text-secondary">
+              {profile.description}
+            </p>
+          </div>
+
+          <!-- Columna 2: Secciones -->
+          <div class="space-y-4">
+            <h3 class="footer-heading">SECCIONES</h3>
+            <Links
+              ulClass="flex-col !items-start !gap-y-2"
+              aClass="text-sm font-normal tracking-normal uppercase hover:text-[--color-accent-magenta]"
+            />
+          </div>
+
+          <!-- Columna 3: Contacto -->
+          <div class="space-y-4">
+            <h3 class="footer-heading">CONTACTO</h3>
+            <div class="flex flex-col items-start gap-4">
+              <button
+                class="contact-item group"
+                data-copy-text={profile.email}
+                aria-live="polite"
+              >
+                <IconCopy class="icon-base" strokeWidth={1.0} />
+                <span class="copy-text">Email</span>
+              </button>
+              <a
+                href={profile.githubUrl}
+                target="_blank"
+                class="contact-item group"
+              >
+                <IconBrandGithub class="icon-base" strokeWidth={1.0} />
+                <span>GitHub</span>
+              </a>
+              <a
+                href={profile.linkedinUrl}
+                target="_blank"
+                class="contact-item group"
+              >
+                <IconBrandLinkedin class="icon-base" strokeWidth={1.0} />
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Línea de Cierre -->
+        <div class="mt-12 border-t border-border pt-6">
+          <SystemStatusLine command="git status" />
+          <p class="mt-2 font-mono text-sm text-green-500">On branch main...</p>
+          <p class="text-text-secondary/70 mt-4 font-mono text-xs">
+            {copyright}
+          </p>
+        </div>
+      </div>
+    </Card>
+  </div>
+</footer>
+
+<!-- Estilos y Animación -->
+<style>
+  .footer-heading {
+    @apply font-mono text-lg font-normal uppercase tracking-wider text-text-primary;
+  }
+  .contact-item {
+    @apply flex items-center gap-x-3 font-mono text-sm text-text-secondary transition-colors duration-200;
+  }
+  .contact-item:hover {
+    color: var(--color-accent-magenta);
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { TextPlugin } from 'gsap/TextPlugin';
+
+  gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('.footer-section-content');
+    const commandLine = document.getElementById('footer-command-line');
+    const contentGrid = document.getElementById('footer-content-grid');
+
+    if (!section || !commandLine || !contentGrid) return;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top 80%',
+        once: true,
+      },
+    });
+
+    tl.to(commandLine, {
+      duration: 1.5,
+      text: '$ cd ~/luciano-portfolio',
+      ease: 'none',
+    })
+      .to({}, { duration: 0.5 })
+      .to(commandLine, {
+        duration: 1.0,
+        text: '$ ls -F',
+        ease: 'none',
+        overwrite: 'auto',
+      })
+      .to(
+        contentGrid,
+        {
+          duration: 0.8,
+          opacity: 1,
+          ease: 'power3.out',
+        },
+        '-=0.5'
+      );
+
+    document.querySelectorAll('[data-copy-text]').forEach((button) => {
+      const textElement = button.querySelector('.copy-text');
+      if (!textElement) return;
+
+      const originalText = textElement.textContent;
+
+      button.addEventListener('click', () => {
+        const textToCopy = (button as HTMLElement).dataset.copyText;
+        if (!textToCopy) return;
+
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => {
+            // Feedback visual y de accesibilidad
+            textElement.textContent = '¡Copiado!';
+            button.classList.add('text-green-500');
+
+            // Usamos una timeline de GSAP para el "fade out" del estado de éxito
+            gsap.to(button, {
+              delay: 2,
+              duration: 0.5,
+              color: '', // GSAP es lo suficientemente inteligente para volver al color original
+              onComplete: () => {
+                textElement.textContent = originalText;
+              },
+            });
+          })
+          .catch((err) => console.error('Error al copiar:', err));
+      });
+    });
+  });
+</script>
