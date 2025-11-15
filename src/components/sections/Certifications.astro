@@ -1,7 +1,7 @@
 ---
 // src/sections/Certifications.astro
 import { getCollection } from 'astro:content';
-import CertificationCard from '@/components/ui/CertificationCard.astro';
+import CertificationCard from '@/components/modules/CertificationCard.astro';
 
 const allCertifications = await getCollection('certifications');
 allCertifications.sort(
