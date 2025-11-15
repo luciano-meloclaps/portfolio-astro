@@ -1,7 +1,7 @@
 ---
 // src/sections/Career.astro
 import { getCollection, type CollectionEntry } from 'astro:content';
-import ExperienceCard from '@/components/ui/ExperienceCard.astro';
+import ExperienceCard from '@/components/modules/ExperienceCard.astro';
 
 const allCareerItems: CollectionEntry<'career'>[] =
   await getCollection('career');
