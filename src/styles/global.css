@@ -28,9 +28,9 @@
     --font-size-h1: 3.75rem;
 
     /* Geometría y Espaciado */
-    --radius-small: 12px;
-    --radius-medium: 4px;
-    --radius-large: 4px;
+    --radius-small: 5px;
+    --radius-medium: 3px;
+    --radius-large: 0px;
     --radius-pill: 9999px;
 
     /* --- EFECTOS VISUALES REFINADOS --- */
