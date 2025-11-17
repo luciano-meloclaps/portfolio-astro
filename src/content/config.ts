@@ -1,16 +1,22 @@
 import { defineCollection, z } from 'astro:content';
 
+// --- COLECCIÓN "PROJECTS" (CON ESQUEMA DE IMAGEN CORRECTO) ---
 const projectsCollection = defineCollection({
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    images: z.array(z.string()).optional(),
-    keyFeatures: z.array(z.string()),
-    techStack: z.array(z.string()),
-    publishDate: z.date(),
-    liveUrl: z.string().url().optional(),
-    repoUrl: z.string().url().optional(),
-  }),
+  type: 'content',
+  // 1. LA SOLUCIÓN: Usamos el `image` helper que viene con el `schema`.
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      // 2. `images` ahora es un array de `image()`.
+      //    Astro validará que la ruta exista y preparará la imagen.
+      images: z.array(image()),
+      keyFeatures: z.array(z.string()),
+      techStack: z.array(z.string()),
+      publishDate: z.date(),
+      liveUrl: z.string().url().optional(),
+      repoUrl: z.string().url().optional(),
+    }),
 });
 
 // --- NUEVA COLECCIÓN "CAREER" ---
