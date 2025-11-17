@@ -1,52 +1,101 @@
 ---
-// src/components/ui/ProjectCard.astro
-// Versión simplificada sin imágenes
-
+// src/components/cards/ProjectCard.astro
+// ARQUITECTURA "CÁPSULA DE CASO DE ESTUDIO TÁCTICO" - VERSIÓN TIPOGRÁFICAMENTE SEGURA
+import { Image } from 'astro:assets';
 import Card from '@/components/ui/Card.astro';
 import Button from '@/components/ui/Button.astro';
 import ChipTech from '@/components/ui/ChipTech.astro';
+import { techIconMap } from '@/config/tech-icon-map';
 import {
   IconPointFilled,
+  IconChevronLeft,
+  IconChevronRight,
   IconBrandGithub,
-  IconWorld,
-  IconBrandReact,
-  IconBrandAstro,
-  IconBrandTypescript,
-  IconBrandTailwind,
-  IconHexagons,
+  IconBrandFigma,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import type { CollectionEntry } from 'astro:content';
 
-// --- MAPA DE ICONOS PARA TECH STACK ---
-const techIconMap: Record<string, astroHTML.JSX.Element> = {
-  react: IconBrandReact,
-  astro: IconBrandAstro,
-  typescript: IconBrandTypescript,
-  tailwind: IconBrandTailwind,
-  dotnet: IconHexagons,
-};
-
-// --- CONTRATO DEL COMPONENTE ---
 interface Props {
   project: CollectionEntry<'projects'>;
 }
 const { project } = Astro.props;
-const { title, description, keyFeatures, techStack, liveUrl, repoUrl } =
-  project.data;
+const {
+  title,
+  description,
+  images,
+  keyFeatures,
+  techStack,
+  repoUrl,
+  figmaUrl,
+} = project.data;
 ---
 
-<div class="project-card-wrapper group cursor-pointer">
-  <Card padding="none" class="relative overflow-hidden">
-    <div class="halo-effect"></div>
-    <div class="p-6 md:p-8">
-      <h3 class="text-h3 font-bold text-text-primary">{title}</h3>
-      <p
-        class="project-description mt-2 text-base text-text-secondary"
-        style="font-weight: 300;"
+<div class="project-card-wrapper group">
+  <Card padding="none" class="relative flex flex-col overflow-hidden">
+    <div class="halo-effect pointer-events-none"></div>
+
+    <div class="image-carousel relative aspect-video w-full overflow-hidden">
+      <div class="carousel-track flex h-full w-full">
+        {
+          images.map((img, index) => (
+            <div class="carousel-slide h-full w-full flex-shrink-0">
+              <Image
+                src={img}
+                alt={`Imagen ${index + 1} del proyecto ${title}`}
+                class="h-full w-full object-cover"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                widths={[400, 800, 1200]}
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+          ))
+        }
+      </div>
+      <div
+        class="absolute inset-0 flex items-center justify-between p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       >
+        <button
+          class="carousel-prev bg-background/50 text-foreground/80 hover:text-foreground rounded-full p-1 backdrop-blur-sm"
+        >
+          <IconChevronLeft className="h-6 w-6" />
+        </button>
+        <button
+          class="carousel-next bg-background/50 text-foreground/80 hover:text-foreground rounded-full p-1 backdrop-blur-sm"
+        >
+          <IconChevronRight className="h-6 w-6" />
+        </button>
+      </div>
+      <div
+        class="progress-indicators absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-x-1.5"
+      >
+        {
+          images.map(() => (
+            <div class="indicator h-1 w-6 rounded-full bg-white/20">
+              <div class="indicator-fill h-full w-full origin-left scale-x-0 rounded-full bg-white/80" />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- ZONA DE CONTENIDO -->
+    <div class="content-wrapper relative z-10 flex flex-col p-6 md:p-8">
+      <h3 class="text-h3 font-bold text-text-primary">{title}</h3>
+      <p class="mt-2 text-base text-text-secondary" style="font-weight: 300;">
         {description}
       </p>
 
+      <button
+        class="details-toggle mt-6 flex w-full cursor-pointer items-center justify-between text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+      >
+        <span>Ver Detalles</span>
+        <IconChevronDown
+          className="h-4 w-4 transition-transform duration-300"
+        />
+      </button>
+
+      <!-- Contenido Desplegable -->
       <div class="details-container max-h-0 overflow-hidden">
         <div class="details-content pt-6">
           <div class="border-t border-border pt-6">
@@ -57,7 +106,7 @@ const { title, description, keyFeatures, techStack, liveUrl, repoUrl } =
             </h4>
             <ul class="mt-4 space-y-3">
               {
-                keyFeatures.map((feature) => (
+                keyFeatures.map((feature: string) => (
                   <li class="flex items-start gap-x-3">
                     <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/50 mt-1" />
                     <span class="text-sm text-text-secondary">{feature}</span>
@@ -74,15 +123,9 @@ const { title, description, keyFeatures, techStack, liveUrl, repoUrl } =
             </h4>
             <div class="mt-4 flex flex-wrap gap-2">
               {
-                techStack.map((tech) => {
+                techStack.map((tech: string) => {
                   const Icon = techIconMap[tech.toLowerCase()];
-                  return Icon ? (
-                    <ChipTech
-                      Icon={Icon}
-                      name={tech}
-                      className="!px-2 !py-0.5 !text-xs"
-                    />
-                  ) : null;
+                  return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
                 })
               }
             </div>
@@ -90,30 +133,21 @@ const { title, description, keyFeatures, techStack, liveUrl, repoUrl } =
         </div>
       </div>
 
+      <!-- Botones de Acción -->
       <div
-        class="mt-8 flex flex-grow flex-col justify-end gap-y-4 md:flex-row md:gap-x-4"
+        class="mt-8 flex flex-grow flex-col items-end justify-end gap-y-4 border-t border-border pt-6 md:flex-row md:gap-x-4"
       >
         {
-          liveUrl && (
-            <Button
-              href={liveUrl}
-              target="_blank"
-              variant="primary"
-              className="!w-full !px-4 !py-1.5 !text-xs md:!w-auto"
-            >
-              <IconWorld className="icon-base" /> Live Demo
+          repoUrl && (
+            <Button href={repoUrl} target="_blank" variant="secondary">
+              <IconBrandGithub className="icon-base" strokeWidth={1.0} /> Código
             </Button>
           )
         }
         {
-          repoUrl && (
-            <Button
-              href={repoUrl}
-              target="_blank"
-              variant="secondary"
-              className="!w-full !px-4 !py-1.5 !text-xs md:!w-auto"
-            >
-              <IconBrandGithub className="icon-base" /> Código
+          figmaUrl && (
+            <Button href={figmaUrl} target="_blank" variant="secondary">
+              <IconBrandFigma className="icon-base" strokeWidth={1.0} /> Figma
             </Button>
           )
         }
@@ -122,53 +156,79 @@ const { title, description, keyFeatures, techStack, liveUrl, repoUrl } =
   </Card>
 </div>
 
-<!-- El script de GSAP para el despliegue -->
+<!-- LA ISLA DE SCRIPT -->
 <script>
   import gsap from 'gsap';
 
-  document.querySelectorAll('.project-card-wrapper').forEach((cardWrapper) => {
-    const detailsContainer = cardWrapper.querySelector('.details-container');
-    const detailsContent = cardWrapper.querySelector('.details-content');
-    let isDetailsVisible = false;
+  // Función para inicializar la expansión de una tarjeta
+  function initExpansion(card: HTMLElement) {
+    const toggleButton = card.querySelector('.details-toggle');
+    const container = card.querySelector('.details-container');
+    const content = card.querySelector('.details-content');
+    const chevron = card.querySelector('.details-toggle svg');
+    let isVisible = false;
 
-    if (!detailsContainer || !detailsContent) return;
+    if (!toggleButton || !container || !content || !chevron) return;
 
-    const revealTl = gsap.timeline({ paused: true });
-    revealTl.to(detailsContainer, {
-      maxHeight: () => detailsContent.scrollHeight,
-      duration: 0.8,
+    const tl = gsap.timeline({ paused: true });
+    tl.to(container, {
+      maxHeight: () => content.scrollHeight,
+      duration: 0.4,
       ease: 'power3.inOut',
     });
 
-    cardWrapper.addEventListener('click', (e) => {
-      const target = e.target;
-      if (target && target.closest('a')) return;
+    toggleButton.addEventListener('click', () => {
+      isVisible = !isVisible;
+      gsap.to(chevron, { rotation: isVisible ? 180 : 0, duration: 0.1 });
+      isVisible ? tl.play() : tl.reverse();
+    });
+  }
 
-      isDetailsVisible = !isDetailsVisible;
-      if (isDetailsVisible) {
-        revealTl.play();
-      } else {
-        revealTl.reverse();
-      }
+  // Función para inicializar el carrusel de una tarjeta
+  function initCarousel(card: HTMLElement) {
+    const track = card.querySelector('.carousel-track');
+    const prevButton = card.querySelector('.carousel-prev');
+    const nextButton = card.querySelector('.carousel-next');
+    const indicators = gsap.utils.toArray('.indicator-fill', card);
+    const numImages = indicators.length;
+    let currentIndex = 0;
+
+    if (!track || !prevButton || !nextButton || numImages <= 1) {
+      (prevButton?.parentElement as HTMLElement)?.classList.add('hidden');
+      return;
+    }
+
+    gsap.set(indicators[0], { scaleX: 1 });
+
+    function goToSlide(index: number) {
+      gsap.to(track, {
+        xPercent: -100 * index,
+        duration: 0.4,
+        ease: 'power3.inOut',
+      });
+      gsap.to(indicators, { scaleX: 0, duration: 0.3 });
+      gsap.to(indicators[index], { scaleX: 1, duration: 0.3, delay: 0.1 });
+      currentIndex = index;
+    }
+
+    prevButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      gsap.fromTo(e.currentTarget, { scale: 0.9 }, { scale: 1, duration: 0.2 });
+      goToSlide((currentIndex - 1 + numImages) % numImages);
+    });
+
+    nextButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      gsap.fromTo(e.currentTarget, { scale: 0.9 }, { scale: 1, duration: 0.2 });
+      goToSlide((currentIndex + 1) % numImages);
+    });
+  }
+
+  // Inicializamos cada tarjeta cuando el DOM está listo.
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.project-card-wrapper').forEach((card) => {
+      initExpansion(card as HTMLElement);
+      initCarousel(card as HTMLElement);
     });
   });
 </script>
-
-<!-- Estilos encapsulados para el Halo de Luz -->
-<style>
-  .halo-effect {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out;
-    box-shadow:
-      inset 0 0 0 1.5px var(--color-glow-border, white),
-      0 0 25px 0 var(--color-glow-border, white);
-  }
-  .group:hover .halo-effect {
-    opacity: 1;
-  }
-</style>
