@@ -1,34 +1,69 @@
 ---
 // src/components/ui/StatusBadge.astro
-// RESPONSABILIDAD: Mostrar el estado de un proyecto con un color semántico.
-type Status = 'Completed' | 'In Progress' | 'Archived';
-interface Props {
-  status: Status;
-}
-const { status } = Astro.props;
+import {
+  IconCircleCheckFilled, // Icono más sólido y premium
+  IconClockFilled,
+  IconArchiveFilled,
+  IconAlertCircleFilled,
+} from '@tabler/icons-react';
 
-const statusConfig = {
+// Definimos los estados posibles
+type Status = 'Completed' | 'In Progress' | 'Archived' | 'On Hold';
+
+interface Props {
+  status: string;
+  class?: string;
+}
+
+const { status, class: className } = Astro.props;
+
+// Configuración de Diseño Centralizada
+const statusConfig: Record<
+  string,
+  { icon: any; colorClass: string; label: string }
+> = {
   Completed: {
-    text: 'Terminado',
-    classes: 'text-green-400 border-green-500/20 bg-green-500/10',
+    icon: IconCircleCheckFilled,
+    // Verde esmeralda vibrante con fondo sutil
+    colorClass:
+      'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.1)]',
+    label: 'Completado',
   },
   'In Progress': {
-    text: 'En Progreso',
-    classes: 'text-amber-400 border-amber-500/20 bg-amber-500/10',
+    icon: IconClockFilled,
+    colorClass: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    label: 'En Desarrollo',
   },
   Archived: {
-    text: 'Archivado',
-    classes: 'text-gray-400 border-gray-500/20 bg-gray-500/10',
+    icon: IconArchiveFilled,
+    colorClass: 'text-slate-400 bg-slate-500/10 border-slate-500/20',
+    label: 'Archivado',
+  },
+  default: {
+    icon: IconAlertCircleFilled,
+    colorClass: 'text-gray-400 bg-gray-500/10 border-gray-500/20',
+    label: status,
   },
 };
-const config = statusConfig[status];
+
+const config = statusConfig[status] || statusConfig['default'];
+const Icon = config.icon;
 ---
 
-<span
+<div
   class:list={[
-    'flex-shrink-0 self-start rounded-pill border px-2.5 py-1 text-xxs font-semibold uppercase',
-    config.classes,
+    'inline-flex cursor-default items-center gap-x-1.5 rounded-full border px-3 py-1 backdrop-blur-md transition-all duration-300 hover:scale-105',
+    config.colorClass,
+    className,
   ]}
 >
-  {config.text}
-</span>
+  <Icon
+    className={`h-4 w-4 ${status === 'In Progress' ? 'animate-pulse' : ''}`}
+  />
+
+  <span
+    class="pt-[1px] text-[10px] font-bold uppercase leading-none tracking-wider"
+  >
+    {config.label}
+  </span>
+</div>
