@@ -1,77 +1,165 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
-import ProjectCard from '@/components/modules/ProjectCard.astro';
+// src/components/sections/Projects.astro
+import { getCollection } from 'astro:content';
 import ProjectThumbnailCard from '../modules/ProjectThumbnailCard.astro';
+import ProjectCard from '../modules/ProjectCard.astro';
 
-// 1. TIPADO EXPLÍCITO EN LA FUENTE:
-//    Aseguramos que `allProjects` y, por extensión, `projectsToShow`
-//    tengan el tipo correcto desde el principio.
-const allProjects: CollectionEntry<'projects'>[] =
-  await getCollection('projects');
+const allProjects = await getCollection('projects');
+// Ordenar por fecha
 allProjects.sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 );
-
-// La lógica de paginación se mantiene, pero ahora es tipográficamente segura.
-const pageSize = 2;
-const currentPage = 1;
-const totalPages = Math.ceil(allProjects.length / pageSize);
-const projectsToShow = allProjects.slice(
-  (currentPage - 1) * pageSize,
-  currentPage * pageSize
-);
 ---
 
-<section id="projects" class="py-24 md:py-32">
+<section id="projects" class="relative py-24 md:py-32">
   <div class="container-narrow projects-section-content space-y-12">
-    <h2 class="text-h2 font-bold text-text-primary">// Proyectos</h2>
-    <div class="space-y-16">
-      {/* Ahora TypeScript sabe que `project` es del tipo correcto. */}
-      {projectsToShow.map((project) => <ProjectCard project={project} />)}
-      <!-- La Galería de "Expedientes" -->
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {
-          allProjects.map((project) => (
-            <ProjectThumbnailCard project={project} />
-               <ProjectThumbnailCard project={project} />
-                  <ProjectThumbnailCard project={project} />
-                     <ProjectThumbnailCard project={project} />
-          ))
-        }
-      </div>
+    <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+      <h2 class="text-h2 font-bold text-text-primary">// Proyectos</h2>
+      <p
+        class="hidden max-w-md text-right text-sm text-text-secondary md:block md:text-base"
+      >
+        Una selección de casos de estudio técnicos y creativos.
+      </p>
     </div>
 
-    <!-- LA ANIMACIÓN DE SCROLL QUE FALTABA -->
-    <script>
-      import gsap from 'gsap';
-      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    <!-- 
+      ESTRATEGIA DE LAYOUT: GRILLA RESPONSIVE
+      - Mobile: 1 columna (grid-cols-1)
+      - Tablet/Desktop: 2 columnas (md:grid-cols-2)
+      - Gap generoso (gap-8) para que respire.
+    -->
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+      {
+        allProjects.map((project, index) => (
+          <ProjectThumbnailCard project={project} index={index} />
+        ))
+      }
+    </div>
+  </div>
 
-      gsap.registerPlugin(ScrollTrigger);
+  <!-- OVERLAY (Sin cambios en lógica, solo asegurando que funcione con el nuevo layout) -->
+  <div
+    id="project-overlay"
+    class="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 opacity-0"
+  >
+    <div
+      class="bg-background/90 absolute inset-0 backdrop-blur-sm"
+      id="overlay-bg"
+    >
+    </div>
 
-      document.addEventListener('DOMContentLoaded', () => {
-        const section = document.querySelector('.projects-section-content');
-        if (!section) return;
-
-        // Seleccionamos cada tarjeta individualmente para la animación en cascada.
-        const cards = gsap.utils.toArray('.project-card-wrapper');
-
-        gsap.set(cards, { autoAlpha: 0, y: 50 });
-
-        ScrollTrigger.create({
-          trigger: section,
-          start: 'top 70%',
-          onEnter: () => {
-            gsap.to(cards, {
-              autoAlpha: 1,
-              y: 0,
-              duration: 1.2,
-              stagger: 0.3, // Cada tarjeta aparece con un retraso de 0.3s
-              ease: 'power3.out',
-            });
-          },
-          once: true,
-        });
-      });
-    </script>
+    <div
+      class="no-scrollbar relative flex h-full max-h-screen w-full items-center justify-center overflow-y-auto py-10"
+    >
+      {
+        allProjects.map((project) => (
+          <div
+            class="project-detail-wrapper flex hidden w-full justify-center"
+            data-slug={project.slug}
+          >
+            <ProjectCard project={project} />
+          </div>
+        ))
+      }
+    </div>
   </div>
 </section>
+
+<!-- El script se mantiene igual que en la versión anterior corregida -->
+<script>
+  import gsap from 'gsap';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('project-overlay');
+    const overlayBg = document.getElementById('overlay-bg');
+    const triggers = document.querySelectorAll('.project-thumbnail-trigger');
+    const closeButtons = document.querySelectorAll('.close-modal-btn');
+
+    let activeSlug: string | null = null;
+
+    const openProject = (slug: string) => {
+      if (activeSlug || !overlay) return;
+      activeSlug = slug;
+
+      const targetWrapper = document.querySelector(
+        `.project-detail-wrapper[data-slug="${slug}"]`
+      );
+
+      if (!targetWrapper || !targetWrapper.firstElementChild) return;
+
+      document.body.style.overflow = 'hidden';
+      targetWrapper.classList.remove('hidden');
+
+      const tl = gsap.timeline();
+
+      gsap.set(overlay, { pointerEvents: 'auto' });
+      tl.to(overlay, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+
+      tl.fromTo(
+        targetWrapper.firstElementChild,
+        { y: 50, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.2)' },
+        '-=0.1'
+      );
+    };
+
+    const closeProject = () => {
+      if (!activeSlug || !overlay) return;
+
+      const targetWrapper = document.querySelector(
+        `.project-detail-wrapper[data-slug="${activeSlug}"]`
+      );
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          targetWrapper?.classList.add('hidden');
+          gsap.set(overlay, { pointerEvents: 'none' });
+          document.body.style.overflow = '';
+          activeSlug = null;
+        },
+      });
+
+      if (targetWrapper && targetWrapper.firstElementChild) {
+        tl.to(targetWrapper.firstElementChild, {
+          y: 20,
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.3,
+          ease: 'power2.in',
+        });
+      }
+
+      tl.to(overlay, { opacity: 0, duration: 0.3 }, '-=0.2');
+    };
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const slug = trigger.getAttribute('data-project-slug');
+        if (slug) openProject(slug);
+      });
+    });
+
+    closeButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeProject();
+      });
+    });
+
+    overlayBg?.addEventListener('click', closeProject);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && activeSlug) closeProject();
+    });
+  });
+</script>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

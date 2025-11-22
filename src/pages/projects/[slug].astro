@@ -1,0 +1,26 @@
+---
+// src/pages/projects/[slug].astro
+import { getCollection, getEntryBySlug } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import ProjectCard from '@/components/modules/ProjectCard.astro';
+
+// Genera una página para cada proyecto
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+---
+
+<Layout title={project.data.title}>
+  <main class="py-24 md:py-32">
+    <div class="container-narrow">
+      <!-- Renderizamos el MISMO componente, pero en su estado "expandido" -->
+      <ProjectCard project={project} isTeaser={false} />
+    </div>
+  </main>
+</Layout>

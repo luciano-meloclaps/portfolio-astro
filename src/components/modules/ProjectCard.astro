@@ -1,9 +1,9 @@
 ---
-// src/components/cards/ProjectCard.astro
-// ARQUITECTURA "CÁPSULA DE CASO DE ESTUDIO TÁCTICO" - VERSIÓN TIPOGRÁFICAMENTE SEGURA
+// src/components/modules/ProjectCard.astro
 import { Image } from 'astro:assets';
 import Card from '@/components/ui/Card.astro';
 import Button from '@/components/ui/Button.astro';
+import StatusBadge from '@/components/ui/StatusBadge.astro';
 import ChipTech from '@/components/ui/ChipTech.astro';
 import { techIconMap } from '@/config/tech-icon-map';
 import {
@@ -12,6 +12,7 @@ import {
   IconChevronRight,
   IconBrandGithub,
   IconBrandFigma,
+  IconX,
   IconChevronDown,
 } from '@tabler/icons-react';
 import type { CollectionEntry } from 'astro:content';
@@ -28,102 +29,165 @@ const {
   techStack,
   repoUrl,
   figmaUrl,
+  status,
 } = project.data;
+
+// CONFIGURACIÓN DE VISIBILIDAD
+const INITIAL_VISIBLE_COUNT = 1;
+
+const visibleFeatures = keyFeatures.slice(0, INITIAL_VISIBLE_COUNT);
+const hiddenFeatures = keyFeatures.slice(INITIAL_VISIBLE_COUNT);
+const hasHiddenFeatures = hiddenFeatures.length > 0;
 ---
 
-<div class="project-card-wrapper group">
-  <Card padding="none" class="relative flex flex-col overflow-hidden">
-    <div class="halo-effect pointer-events-none"></div>
+<div
+  class="project-full-card mx-auto w-full max-w-6xl"
+  id={`card-${project.slug}`}
+>
+  <Card
+    padding="none"
+    class="relative flex flex-col overflow-hidden border border-border bg-background shadow-2xl ring-1 ring-white/5"
+  >
+    <!-- 
+      BOTÓN CERRAR (AJUSTADO):
+      - Mobile: top-2 right-2 (Bien pegado a la esquina, solo 8px de margen)
+      - Desktop: md:top-4 md:right-4 (Un poco más de aire en pantallas grandes)
+    -->
+    <button
+      class="close-modal-btn bg-background/20 hover:bg-background/40 group absolute right-2 top-2 z-50 rounded-small border border-border p-2 text-text-primary backdrop-blur-md transition-all duration-300 active:scale-95 md:right-4 md:top-4"
+      aria-label="Cerrar detalles"
+    >
+      <IconX
+        className="h-6 w-6 transition-transform duration-300 group-hover:rotate-90"
+        strokeWidth={1.5}
+      />
+    </button>
 
-    <div class="image-carousel relative aspect-video w-full overflow-hidden">
-      <div class="carousel-track flex h-full w-full">
+    <div class="flex min-h-[600px] flex-col lg:grid lg:grid-cols-[1.3fr_1fr]">
+      <!-- COLUMNA 1: CARRUSEL -->
+      <div
+        class="image-carousel group relative h-[350px] w-full overflow-hidden border-b border-border bg-panel lg:h-full lg:border-b-0 lg:border-r"
+      >
+        <div class="carousel-track flex h-full w-full">
+          {
+            images.map((img, index) => (
+              <div class="carousel-slide relative h-full w-full flex-shrink-0">
+                <Image
+                  src={img}
+                  alt={`Vista previa ${index + 1}`}
+                  class="h-full w-full object-cover transition-transform duration-700"
+                  loading="lazy"
+                />
+                <div class="from-background/40 pointer-events-none absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+              </div>
+            ))
+          }
+        </div>
+
         {
-          images.map((img, index) => (
-            <div class="carousel-slide h-full w-full flex-shrink-0">
-              <Image
-                src={img}
-                alt={`Imagen ${index + 1} del proyecto ${title}`}
-                class="h-full w-full object-cover"
-                loading={index === 0 ? 'eager' : 'lazy'}
-                widths={[400, 800, 1200]}
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          ))
+          images.length > 1 && (
+            <>
+              <div class="pointer-events-none absolute inset-0 flex items-center justify-between px-4">
+                <button class="carousel-prev bg-background/10 hover:bg-background/30 pointer-events-auto -translate-x-4 rounded-small border border-white/10 p-3 text-white opacity-0 backdrop-blur-md transition-all duration-300 focus:opacity-100 active:scale-95 group-hover:translate-x-0 group-hover:opacity-100">
+                  <IconChevronLeft className="w-6 h-6" strokeWidth={1.5} />
+                </button>
+                <button class="carousel-next bg-background/10 hover:bg-background/30 pointer-events-auto translate-x-4 rounded-small border border-white/10 p-3 text-white opacity-0 backdrop-blur-md transition-all duration-300 focus:opacity-100 active:scale-95 group-hover:translate-x-0 group-hover:opacity-100">
+                  <IconChevronRight className="w-6 h-6" strokeWidth={1.5} />
+                </button>
+              </div>
+              <div class="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+                {images.map((_, i) => (
+                  <button
+                    class="carousel-dot h-1.5 w-1.5 rounded-full bg-white/40 transition-all duration-300 hover:bg-white/80 data-[active=true]:w-8 data-[active=true]:rounded-pill data-[active=true]:bg-white"
+                    data-index={i}
+                  />
+                ))}
+              </div>
+            </>
+          )
         }
       </div>
+
+      <!-- COLUMNA 2: CONTENIDO -->
       <div
-        class="absolute inset-0 flex items-center justify-between p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        class="content-wrapper relative flex max-h-[60vh] flex-col overflow-y-auto bg-background p-8 lg:max-h-none lg:p-12"
       >
-        <button
-          class="carousel-prev bg-background/50 text-foreground/80 hover:text-foreground rounded-full p-1 backdrop-blur-sm"
-        >
-          <IconChevronLeft className="h-6 w-6" />
-        </button>
-        <button
-          class="carousel-next bg-background/50 text-foreground/80 hover:text-foreground rounded-full p-1 backdrop-blur-sm"
-        >
-          <IconChevronRight className="h-6 w-6" />
-        </button>
-      </div>
-      <div
-        class="progress-indicators absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-x-1.5"
-      >
-        {
-          images.map(() => (
-            <div class="indicator h-1 w-6 rounded-full bg-white/20">
-              <div class="indicator-fill h-full w-full origin-left scale-x-0 rounded-full bg-white/80" />
-            </div>
-          ))
-        }
-      </div>
-    </div>
+        <div class="stagger-item mb-8">
+          <div class="mb-4 flex items-center justify-between">
+            <StatusBadge status={status} />
+          </div>
+          <h3
+            class="mb-6 text-h2 font-bold leading-[1.1] tracking-tight text-text-primary"
+          >
+            {title}
+          </h3>
+          <p class="text-lg font-light leading-relaxed text-text-secondary">
+            {description}
+          </p>
+        </div>
 
-    <!-- ZONA DE CONTENIDO -->
-    <div class="content-wrapper relative z-10 flex flex-col p-6 md:p-8">
-      <h3 class="text-h3 font-bold text-text-primary">{title}</h3>
-      <p class="mt-2 text-base text-text-secondary" style="font-weight: 300;">
-        {description}
-      </p>
+        <div class="my-2 h-px w-full bg-border"></div>
 
-      <button
-        class="details-toggle mt-6 flex w-full cursor-pointer items-center justify-between text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
-      >
-        <span>Ver Detalles</span>
-        <IconChevronDown
-          className="h-4 w-4 transition-transform duration-300"
-        />
-      </button>
-
-      <!-- Contenido Desplegable -->
-      <div class="details-container max-h-0 overflow-hidden">
-        <div class="details-content pt-6">
-          <div class="border-t border-border pt-6">
+        <div class="mt-8 grid flex-grow grid-cols-1 gap-10">
+          <!-- CARACTERÍSTICAS CLAVE -->
+          <div class="stagger-item features-section">
             <h4
-              class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary"
+              class="font-main mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-accent-magenta"
             >
-              Key Features
+              <span class="h-1.5 w-1.5 rounded-full bg-accent-magenta"></span>
+              CARACTERÍSTICAS CLAVE
             </h4>
-            <ul class="mt-4 space-y-3">
+
+            <ul class="space-y-4">
               {
-                keyFeatures.map((feature: string) => (
-                  <li class="flex items-start gap-x-3">
-                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/50 mt-1" />
-                    <span class="text-sm text-text-secondary">{feature}</span>
+                visibleFeatures.map((feature) => (
+                  <li class="group/item flex items-start gap-x-3">
+                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/40 group-hover/item:text-accent-magenta transition-colors mt-1" />
+                    <span class="text-sm font-light text-text-secondary transition-colors group-hover/item:text-text-primary">
+                      {feature}
+                    </span>
                   </li>
                 ))
               }
             </ul>
+
+            {
+              hasHiddenFeatures && (
+                <>
+                  <div class="hidden-features-container h-0 overflow-hidden opacity-0">
+                    <ul class="mt-4 space-y-4">
+                      {hiddenFeatures.map((feature) => (
+                        <li class="group/item flex items-start gap-x-3">
+                          <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/40 group-hover/item:text-accent-magenta transition-colors mt-1" />
+                          <span class="text-sm font-light text-text-secondary transition-colors group-hover/item:text-text-primary">
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button class="features-toggle group/btn relative z-10 mt-6 flex cursor-pointer items-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-accent-magenta transition-colors hover:text-text-primary">
+                    <span class="toggle-text">
+                      Ver {hiddenFeatures.length} más
+                    </span>
+                    <IconChevronDown className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-y-0.5" />
+                  </button>
+                </>
+              )
+            }
           </div>
-          <div class="mt-6">
+
+          <!-- TECNOLOGÍAS -->
+          <div class="stagger-item">
             <h4
-              class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary"
+              class="font-main text-text-secondary/60 mb-5 text-xs font-bold uppercase tracking-widest"
             >
-              Tech Stack
+              TECNOLOGÍAS
             </h4>
-            <div class="mt-4 flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2">
               {
-                techStack.map((tech: string) => {
+                techStack.map((tech) => {
                   const Icon = techIconMap[tech.toLowerCase()];
                   return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
                 })
@@ -131,104 +195,127 @@ const {
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Botones de Acción -->
-      <div
-        class="mt-8 flex flex-grow flex-col items-end justify-end gap-y-4 border-t border-border pt-6 md:flex-row md:gap-x-4"
-      >
-        {
-          repoUrl && (
-            <Button href={repoUrl} target="_blank" variant="secondary">
-              <IconBrandGithub className="icon-base" strokeWidth={1.0} /> Código
-            </Button>
-          )
-        }
-        {
-          figmaUrl && (
-            <Button href={figmaUrl} target="_blank" variant="secondary">
-              <IconBrandFigma className="icon-base" strokeWidth={1.0} /> Figma
-            </Button>
-          )
-        }
+        <div
+          class="stagger-item mt-12 flex flex-wrap justify-start gap-4 border-t border-border pt-8"
+        >
+          {
+            repoUrl && (
+              <Button
+                href={repoUrl}
+                target="_blank"
+                variant="primary"
+                class="w-full justify-center sm:w-auto"
+              >
+                <IconBrandGithub className="icon-base" /> Ver Código
+              </Button>
+            )
+          }
+          {
+            figmaUrl && (
+              <Button
+                href={figmaUrl}
+                target="_blank"
+                variant="secondary"
+                class="w-full justify-center sm:w-auto"
+              >
+                <IconBrandFigma className="icon-base" /> Diseño Figma
+              </Button>
+            )
+          }
+        </div>
       </div>
     </div>
   </Card>
 </div>
 
-<!-- LA ISLA DE SCRIPT -->
 <script>
   import gsap from 'gsap';
 
-  // Función para inicializar la expansión de una tarjeta
-  function initExpansion(card: HTMLElement) {
-    const toggleButton = card.querySelector('.details-toggle');
-    const container = card.querySelector('.details-container');
-    const content = card.querySelector('.details-content');
-    const chevron = card.querySelector('.details-toggle svg');
-    let isVisible = false;
-
-    if (!toggleButton || !container || !content || !chevron) return;
-
-    const tl = gsap.timeline({ paused: true });
-    tl.to(container, {
-      maxHeight: () => content.scrollHeight,
-      duration: 0.4,
-      ease: 'power3.inOut',
-    });
-
-    toggleButton.addEventListener('click', () => {
-      isVisible = !isVisible;
-      gsap.to(chevron, { rotation: isVisible ? 180 : 0, duration: 0.1 });
-      isVisible ? tl.play() : tl.reverse();
-    });
-  }
-
-  // Función para inicializar el carrusel de una tarjeta
-  function initCarousel(card: HTMLElement) {
-    const track = card.querySelector('.carousel-track');
+  function initCardInteractions(card: HTMLElement) {
+    // 1. Carrusel
+    const track = card.querySelector('.carousel-track') as HTMLElement;
     const prevButton = card.querySelector('.carousel-prev');
     const nextButton = card.querySelector('.carousel-next');
-    const indicators = gsap.utils.toArray('.indicator-fill', card);
-    const numImages = indicators.length;
-    let currentIndex = 0;
+    const dots = card.querySelectorAll('.carousel-dot');
 
-    if (!track || !prevButton || !nextButton || numImages <= 1) {
-      (prevButton?.parentElement as HTMLElement)?.classList.add('hidden');
-      return;
-    }
-
-    gsap.set(indicators[0], { scaleX: 1 });
-
-    function goToSlide(index: number) {
-      gsap.to(track, {
-        xPercent: -100 * index,
-        duration: 0.4,
-        ease: 'power3.inOut',
+    if (track) {
+      let currentIndex = 0;
+      const slides = card.querySelectorAll('.carousel-slide');
+      const maxIndex = slides.length - 1;
+      const updateSlide = () => {
+        gsap.to(track, {
+          xPercent: -100 * currentIndex,
+          duration: 0.6,
+          ease: 'power3.out',
+        });
+        dots.forEach((dot, i) => {
+          if (i === currentIndex) dot.setAttribute('data-active', 'true');
+          else dot.removeAttribute('data-active');
+        });
+      };
+      updateSlide();
+      prevButton?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = currentIndex > 0 ? currentIndex - 1 : maxIndex;
+        updateSlide();
       });
-      gsap.to(indicators, { scaleX: 0, duration: 0.3 });
-      gsap.to(indicators[index], { scaleX: 1, duration: 0.3, delay: 0.1 });
-      currentIndex = index;
+      nextButton?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = currentIndex < maxIndex ? currentIndex + 1 : 0;
+        updateSlide();
+      });
+      dots.forEach((dot) => {
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          currentIndex = parseInt(
+            (e.currentTarget as HTMLElement).dataset.index || '0'
+          );
+          updateSlide();
+        });
+      });
     }
 
-    prevButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      gsap.fromTo(e.currentTarget, { scale: 0.9 }, { scale: 1, duration: 0.2 });
-      goToSlide((currentIndex - 1 + numImages) % numImages);
-    });
+    // 2. Expansión
+    const toggleBtn = card.querySelector('.features-toggle');
+    const hiddenContainer = card.querySelector('.hidden-features-container');
+    const toggleText = card.querySelector('.toggle-text');
+    const toggleIcon = card.querySelector('.features-toggle svg');
 
-    nextButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      gsap.fromTo(e.currentTarget, { scale: 0.9 }, { scale: 1, duration: 0.2 });
-      goToSlide((currentIndex + 1) % numImages);
-    });
+    if (toggleBtn && hiddenContainer) {
+      let isExpanded = false;
+      const originalText = toggleText?.textContent || 'Ver más';
+
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isExpanded = !isExpanded;
+
+        if (isExpanded) {
+          gsap.to(hiddenContainer, {
+            height: 'auto',
+            opacity: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+          });
+          gsap.to(toggleIcon, { rotation: 180, duration: 0.3 });
+          if (toggleText) toggleText.textContent = 'Ver menos';
+        } else {
+          gsap.to(hiddenContainer, {
+            height: 0,
+            opacity: 0,
+            duration: 0.25,
+            ease: 'power2.inOut',
+          });
+          gsap.to(toggleIcon, { rotation: 0, duration: 0.25 });
+          if (toggleText) toggleText.textContent = originalText;
+        }
+      });
+    }
   }
 
-  // Inicializamos cada tarjeta cuando el DOM está listo.
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.project-card-wrapper').forEach((card) => {
-      initExpansion(card as HTMLElement);
-      initCarousel(card as HTMLElement);
+    document.querySelectorAll('.project-full-card').forEach((card) => {
+      initCardInteractions(card as HTMLElement);
     });
   });
 </script>

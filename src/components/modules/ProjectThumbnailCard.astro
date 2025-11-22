@@ -1,45 +1,88 @@
 ---
-// src/components/cards/ProjectTeaserCard.astro
+// src/components/modules/ProjectThumbnailCard.astro
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
-import Badge from '@/components/ui/Badge.astro';
+import StatusBadge from '@/components/ui/StatusBadge.astro';
+import ChipTech from '@/components/ui/ChipTech.astro'; // Importamos ChipTech
+import { techIconMap } from '@/config/tech-icon-map'; // Importamos el mapa de iconos
 
 interface Props {
   project: CollectionEntry<'projects'>;
+  index: number;
 }
-const { project } = Astro.props;
-const { title, tagline, cover, status } = project.data;
+const { project, index } = Astro.props;
+const { title, tagline, cover, status, techStack } = project.data;
+
+// Limitamos a 3 o 4 tecnologías para que la tarjeta no crezca demasiado
+const visibleTechs = techStack.slice(0, 3);
 ---
 
-<a href={`/projects/${project.slug}`} class="project-teaser-card group block">
-  <Card padding="none" class="relative h-full overflow-hidden">
+<div
+  class="project-thumbnail-trigger group h-full cursor-pointer"
+  data-project-slug={project.slug}
+  role="button"
+  aria-label={`Ver detalles de ${title}`}
+>
+  <Card
+    padding="none"
+    class="relative flex h-full flex-col overflow-hidden border border-border bg-panel transition-transform duration-300 hover:-translate-y-1"
+  >
     <div class="halo-effect pointer-events-none"></div>
 
-    <!-- Imagen de Portada Optimizada -->
-    <div class="aspect-video overflow-hidden">
+    <div class="relative aspect-video overflow-hidden">
       <Image
         src={cover}
-        alt={`Imagen de portada del proyecto ${title}`}
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
+        alt={`Portada de ${title}`}
+        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        loading={index < 2 ? 'eager' : 'lazy'}
         widths={[400, 800]}
-        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
       />
+      <div
+        class="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"
+      >
+      </div>
     </div>
 
-    <!-- Contenido de Texto -->
-    <div class="flex flex-col p-6">
-      <h4 class="text-lg font-bold text-text-primary">{title}</h4>
+    <div class="flex flex-grow flex-col p-6">
+      <div class="mb-3 flex items-start justify-between gap-4">
+        <h4
+          class="text-lg font-bold leading-tight text-text-primary transition-colors"
+        >
+          {title}
+        </h4>
+      </div>
+
       <p
-        class="mt-2 flex-grow text-sm text-text-secondary"
-        style="font-weight: 300;"
+        class="mb-4 flex-grow text-sm font-light leading-relaxed text-text-secondary"
       >
         {tagline}
       </p>
-      <div class="mt-4">
-        <Badge text={status} variant="accent" />
+
+      <!-- NUEVO: Tech Stack en el Thumbnail -->
+      <div class="mb-6 flex flex-wrap gap-2">
+        {
+          visibleTechs.map((tech) => {
+            const Icon = techIconMap[tech.toLowerCase()];
+            // Usamos una versión simplificada del ChipTech si es necesario,
+            // o el componente tal cual.
+            return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+          })
+        }
+        {
+          techStack.length > 3 && (
+            <span class="self-center text-xs text-text-secondary">
+              +{techStack.length - 3}
+            </span>
+          )
+        }
+      </div>
+
+      <div
+        class="border-border/50 mt-auto flex items-center justify-between border-t pt-4"
+      >
+        <StatusBadge status={status} />
       </div>
     </div>
   </Card>
-</a>
+</div>
