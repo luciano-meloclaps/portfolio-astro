@@ -1,0 +1,100 @@
+---
+// src/components/ui/CategoryBadge.astro
+import {
+  IconBrain,
+  IconCloud,
+  IconCode,
+  IconMicrophone,
+  IconPalette,
+  IconLanguage,
+  IconCertificate,
+  IconShieldLock,
+} from '@tabler/icons-react';
+
+interface Props {
+  category: string;
+  class?: string;
+}
+
+const { category, class: className } = Astro.props;
+
+// Configuración Centralizada con EFECTO NEON (Shadows)
+const categoryConfig: Record<
+  string,
+  { icon: any; colorClass: string; label: string }
+> = {
+  AI: {
+    icon: IconBrain,
+    // Violeta Neon
+    colorClass:
+      'text-violet-400 bg-violet-500/10 border-violet-500/20 shadow-[0_0_10px_rgba(167,139,250,0.15)]',
+    label: 'Inteligencia Artificial',
+  },
+  Cloud: {
+    icon: IconCloud,
+    // Sky Neon
+    colorClass:
+      'text-sky-400 bg-sky-500/10 border-sky-500/20 shadow-[0_0_10px_rgba(56,189,248,0.15)]',
+    label: 'Cloud Computing',
+  },
+  Development: {
+    icon: IconCode,
+    // Blue Neon
+    colorClass:
+      'text-blue-400 bg-blue-500/10 border-blue-500/20 shadow-[0_0_10px_rgba(96,165,250,0.15)]',
+    label: 'Desarrollo',
+  },
+  'Soft Skills': {
+    icon: IconMicrophone,
+    // Orange Neon
+    colorClass:
+      'text-orange-400 bg-orange-500/10 border-orange-500/20 shadow-[0_0_10px_rgba(251,146,60,0.15)]',
+    label: 'Liderazgo & Comunicación',
+  },
+  Design: {
+    icon: IconPalette,
+    // Pink Neon
+    colorClass:
+      'text-pink-400 bg-pink-500/10 border-pink-500/20 shadow-[0_0_10px_rgba(244,114,182,0.15)]',
+    label: 'Diseño UX/UI',
+  },
+  Languages: {
+    icon: IconLanguage,
+    // Emerald Neon
+    colorClass:
+      'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.15)]',
+    label: 'Idiomas',
+  },
+  Security: {
+    icon: IconShieldLock,
+    // Red Neon
+    colorClass:
+      'text-red-400 bg-red-500/10 border-red-500/20 shadow-[0_0_10px_rgba(248,113,113,0.15)]',
+    label: 'Ciberseguridad',
+  },
+  default: {
+    icon: IconCertificate,
+    colorClass:
+      'text-slate-400 bg-slate-500/10 border-slate-500/20 shadow-[0_0_10px_rgba(148,163,184,0.1)]',
+    label: category,
+  },
+};
+
+const config = categoryConfig[category] || categoryConfig['default'];
+const Icon = config.icon;
+---
+
+<div
+  class:list={[
+    'inline-flex cursor-default select-none items-center gap-x-2 rounded-full border px-3 py-1 backdrop-blur-md transition-all duration-300 hover:scale-105',
+    config.colorClass,
+    className,
+  ]}
+>
+  <Icon className="h-4 w-4" strokeWidth={1.0} />
+  <span
+    class="pt-[1px] text-[10px] font-bold uppercase leading-none tracking-wider"
+  >
+    {config.label}
+  </span>
+</div>

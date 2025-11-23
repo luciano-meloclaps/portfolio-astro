@@ -2,7 +2,6 @@
 title: 'AWS Solutions Architect - Professional'
 issuer: 'Amazon Web Services'
 category: 'Cloud'
-level: 'Expert'
 issueDate: 2023-01-01
 expiryDate: 2026-01-01
 description: 'Certificación avanzada para diseñar sistemas distribuidos en AWS, demostrando experiencia en arquitectura de nube, despliegue y optimización.'
