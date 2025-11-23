@@ -3,7 +3,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
 import ChipTech from '@/components/ui/ChipTech.astro';
-import LevelBadge from '@/components/ui/LevelBadge.astro';
+import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import { techIconMap } from '@/config/tech-icon-map';
 import {
   IconCertificate,
@@ -12,39 +12,44 @@ import {
   IconPointFilled,
   IconChevronDown,
 } from '@tabler/icons-react';
+
 interface Props {
   certification: CollectionEntry<'certifications'>;
 }
+
 const { certification } = Astro.props;
 const {
   title,
   issuer,
   category,
-  level,
   issueDate,
   expiryDate,
   description,
   keySkills,
-  // ¡IMPORTANTE! Asegúrate de que `techStack` se extrae de los datos.
   techStack,
   credentialId,
   credentialUrl,
 } = certification.data;
 
 const formatDate = (date: Date) => new Date(date).getFullYear();
+// Generamos un ID único para accesibilidad (ARIA)
+const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialId || Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <div class="certification-card-wrapper group">
-  <Card padding="none" class="relative overflow-hidden">
+  <Card
+    padding="none"
+    class="relative overflow-hidden border border-border bg-panel"
+  >
     <div class="halo-effect"></div>
     <div class="relative z-10 flex flex-col p-6">
-      <!-- Encabezado (sin cambios) -->
+      <!-- Header -->
       <div class="flex items-center justify-between">
         <div
-          class="flex items-center gap-x-3 text-sm font-semibold uppercase tracking-wider text-text-secondary"
+          class="text-text-secondary/70 text-s flex items-center gap-x-2 font-bold uppercase tracking-wider"
         >
-          <IconCertificate className="h-5 w-5" />
-          <span>{category}</span>
+          <IconCertificate className="h-4 w-4" strokeWidth={1.0} />
+          <span>{issuer}</span>
         </div>
         {
           credentialUrl && (
@@ -54,78 +59,83 @@ const formatDate = (date: Date) => new Date(date).getFullYear();
               class="text-text-secondary transition-colors hover:text-text-primary"
               aria-label="Ver credencial"
             >
-              <IconExternalLink className="h-5 w-5" />
+              <IconExternalLink className="h-5 w-5" strokeWidth={1.0} />
             </a>
           )
         }
       </div>
 
-      <!-- Contenido Principal (sin cambios) -->
-      <div class="mt-4">
-        <h3 class="text-xl font-bold text-text-primary">{title}</h3>
-        <p class="mt-2 text-sm font-semibold text-text-secondary">{issuer}</p>
-        <div
-          class="text-text-secondary/80 mt-4 flex items-center gap-x-4 text-xs"
-        >
-          <div class="flex items-center gap-x-1.5">
-            <IconCalendar className="h-4 w-4" />
+      <!-- Main Content -->
+      <div class="mt-3">
+        <h3 class="text-xl font-bold leading-tight text-text-primary">
+          {title}
+        </h3>
+        <div class="mt-4 flex flex-wrap items-center gap-4">
+          <CategoryBadge category={category} />
+          <div
+            class="flex items-center gap-x-1.5 font-mono text-xs text-text-secondary"
+          >
+            <IconCalendar className="h-3.5 w-3.5" />
             <span
               >{formatDate(issueDate)} - {
-                expiryDate ? formatDate(expiryDate) : 'Sin Vencimiento'
+                expiryDate ? formatDate(expiryDate) : 'Indefinido'
               }</span
             >
           </div>
-          <LevelBadge level={level} />
         </div>
-        <p class="mt-4 text-base text-text-secondary" style="font-weight: 300;">
+        <p class="mt-4 text-sm font-light leading-relaxed text-text-secondary">
           {description}
         </p>
       </div>
 
-      <!-- Botón de Despliegue (ahora más genérico) -->
+      <!-- Toggle Button (Accessible) -->
       <button
-        class="details-toggle mt-6 flex items-center gap-x-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+        id={`btn-${uniqueId}`}
+        aria-controls={`content-${uniqueId}`}
+        aria-expanded="false"
+        class="details-toggle border-border/50 group/btn mt-6 flex w-full cursor-pointer items-center justify-between border-t pt-4 text-xs font-bold uppercase tracking-wider text-text-secondary transition-colors hover:text-text-primary"
       >
-        <span>Ver Detalles</span>
+        <span>Detalles Técnicos</span>
         <IconChevronDown
-          className="h-4 w-4 transition-transform duration-300"
+          className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-y-0.5"
         />
       </button>
 
-      <!-- 
-        LA ARQUITECTURA CORRECTA Y COMPLETA:
-        Tanto "Key Skills" como "Tech Stack" viven DENTRO de `details-content`.
-      -->
-      <div class="details-container max-h-0 overflow-hidden">
+      <!-- Collapsible Content -->
+      <div
+        id={`content-${uniqueId}`}
+        class="details-container max-h-0 overflow-hidden"
+        role="region"
+        aria-labelledby={`btn-${uniqueId}`}
+      >
         <div class="details-content pt-4">
-          <!-- Sección Key Skills -->
-          <div class="border-t border-border pt-4">
+          <!-- Skills -->
+          <div>
             <h4
-              class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary"
+              class="text-text-secondary/60 mb-3 font-sans text-[10px] font-bold uppercase tracking-widest"
             >
-              Key Skills
+              Competencias Clave
             </h4>
-            <ul class="mt-4 space-y-3">
+            <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {
-                keySkills.map((skill: string) => (
-                  <li class="flex items-start gap-x-3">
-                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/50 mt-1" />
-                    <span class="text-sm text-text-secondary">{skill}</span>
+                keySkills.map((skill) => (
+                  <li class="flex items-start gap-x-2">
+                    <IconPointFilled className="h-3 w-3 flex-shrink-0 text-accent-magenta mt-1" />
+                    <span class="text-xs text-text-secondary">{skill}</span>
                   </li>
                 ))
               }
             </ul>
           </div>
-
-          <!-- SECCIÓN "TECH STACK" RESTAURADA -->
+          <!-- Tech Stack -->
           {
             techStack && techStack.length > 0 && (
-              <div class="mt-6">
-                <h4 class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary">
-                  Tech Stack
+              <div class="border-border/30 mt-5 border-t pt-4">
+                <h4 class="text-text-secondary/60 mb-3 font-sans text-[10px] font-bold uppercase tracking-widest">
+                  Tecnologías
                 </h4>
-                <div class="mt-4 flex flex-wrap gap-2">
-                  {techStack.map((tech: string) => {
+                <div class="flex flex-wrap gap-2">
+                  {techStack.map((tech) => {
                     const Icon = techIconMap[tech.toLowerCase()];
                     return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
                   })}
@@ -135,55 +145,61 @@ const formatDate = (date: Date) => new Date(date).getFullYear();
           }
         </div>
       </div>
-
-      <!-- Footer de la Tarjeta (sin cambios) -->
-      <div
-        class="mt-6 flex items-center justify-between border-t border-border pt-4 font-mono text-xs text-text-secondary"
-      >
-        <span>ID: {credentialId || 'N/A'}</span>
-        {
-          credentialUrl && (
-            <a
-              href={credentialUrl}
-              target="_blank"
-              class="flex items-center gap-x-1.5 transition-colors hover:text-text-primary"
-            >
-              <span>View Credential</span>
-              <IconExternalLink className="h-3 w-3" />
-            </a>
-          )
-        }
-      </div>
     </div>
   </Card>
 </div>
 
-<!-- El script de GSAP no necesita ningún cambio. -->
 <script>
   import gsap from 'gsap';
-  document
-    .querySelectorAll('.certification-card-wrapper')
-    .forEach((cardWrapper) => {
-      const toggle = cardWrapper.querySelector('.details-toggle');
-      const container = cardWrapper.querySelector('.details-container');
-      const content = cardWrapper.querySelector('.details-content');
-      const chevron = cardWrapper.querySelector('.details-toggle svg');
-      let isVisible = false;
 
-      if (!toggle || !container || !content || !chevron) return;
+  // Función de inicialización para soportar View Transitions en el futuro
+  function initCertCards() {
+    document
+      .querySelectorAll('.certification-card-wrapper')
+      .forEach((cardWrapper) => {
+        const toggle = cardWrapper.querySelector('.details-toggle');
+        const container = cardWrapper.querySelector('.details-container');
+        const content = cardWrapper.querySelector('.details-content');
+        const chevron = cardWrapper.querySelector('.details-toggle svg');
 
-      const tl = gsap.timeline({ paused: true });
-      tl.to(container, {
-        maxHeight: () => content.scrollHeight,
-        duration: 0.8,
-        ease: 'power3.inOut',
+        if (!toggle || !container || !content || !chevron) return;
+
+        // Evitamos re-inicializar si ya tiene listeners (buena práctica en SPAs)
+        if (toggle.hasAttribute('data-initialized')) return;
+        toggle.setAttribute('data-initialized', 'true');
+
+        let isVisible = false;
+
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          isVisible = !isVisible;
+
+          // Actualizamos ARIA
+          toggle.setAttribute('aria-expanded', String(isVisible));
+
+          // Animación GSAP
+          if (isVisible) {
+            gsap.to(container, {
+              maxHeight: content.scrollHeight,
+              duration: 0.4,
+              ease: 'power2.out',
+            });
+            gsap.to(chevron, { rotation: 180, duration: 0.0 });
+          } else {
+            gsap.to(container, {
+              maxHeight: 0,
+              duration: 0.3,
+              ease: 'power2.in',
+            });
+            gsap.to(chevron, { rotation: 0, duration: 0.0 });
+          }
+        });
       });
+  }
 
-      cardWrapper.addEventListener('click', (e) => {
-        if (e.target instanceof HTMLElement && e.target.closest('a')) return;
-        isVisible = !isVisible;
-        gsap.to(chevron, { rotation: isVisible ? 180 : 0, duration: 0.4 });
-        isVisible ? tl.play() : tl.reverse();
-      });
-    });
+  // Ejecutar en carga inicial
+  initCertCards();
+
+  // Si usas View Transitions de Astro, descomenta la siguiente línea:
+  document.addEventListener('astro:page-load', initCertCards);
 </script>
