@@ -1,95 +1,121 @@
 ---
-// src/components/AnimatedProfession.astro
+// src/components/ui/AnimatedProfession.astro
 interface Props {
-  className?: string;
+  class?: string;
 }
-const { className } = Astro.props;
+
+const { class: className } = Astro.props;
+
+// Frases del Hero
+const phrases = [
+  { stroke: 'FULL-STACK', fill: 'DEVELOPER' },
+  { stroke: 'UX/UI', fill: 'DESIGNER' },
+];
 ---
 
-<h1 class:list={[className, 'relative']}>
-  <span id="text-stroke-target" class="uppercase text-stroke"></span>
-  <span id="text-fill-target" class="uppercase text-fill"></span>
-  <span
-    id="cursor"
-    class="ml-1 inline-block h-[0.85em] w-[2px] bg-text-primary opacity-0"
-    aria-hidden="true"></span>
-</h1>
+<!-- 
+  CAMBIOS RESPONSIVE APLICADOS:
+  1. 'flex-col': Por defecto (Móvil) es columna.
+  2. 'lg:flex-row': AHORA SOLO se pone horizontal en pantallas Grandes (Laptop/Desktop), saltándose la Tablet.
+  3. 'items-center': Centrado horizontalmente cuando está en columna (Móvil/Tablet).
+  4. 'lg:items-baseline': Alineado a la base del texto cuando está en fila (Desktop).
+  5. 'gap-2 lg:gap-4': Ajuste de espaciado.
+-->
+<div
+  class:list={[
+    'hero-profession relative inline-flex flex-col items-center gap-2 text-4xl font-bold uppercase tracking-tighter md:text-6xl lg:flex-row lg:items-baseline lg:gap-4 lg:text-7xl',
+    className,
+  ]}
+>
+  <!-- SEO -->
+  <h1 class="sr-only">
+    {phrases.map((p) => `${p.stroke} ${p.fill}`).join(', ')}
+  </h1>
+
+  <!-- Visual -->
+  <div
+    class="flex flex-col items-center gap-2 lg:flex-row lg:items-baseline lg:gap-4"
+    aria-hidden="true"
+  >
+    <!-- Stroke -->
+    <span
+      class="text-stroke-thin text-center opacity-80 lg:text-left"
+      data-role="stroke"></span>
+
+    <!-- Fill -->
+    <span
+      class="relative text-center text-text-primary lg:text-left"
+      data-role="fill"
+    >
+      <!-- Cursor -->
+      <span
+        class="cursor-blink absolute -right-3 bottom-1 top-1 w-[2px] bg-accent-magenta opacity-0 shadow-[0_0_10px_var(--color-accent-magenta)] lg:-right-4 lg:w-[3px]"
+      ></span>
+    </span>
+  </div>
+</div>
+
+<style>
+  .text-stroke-thin {
+    -webkit-text-stroke: 0.5px var(--color-text-primary);
+    color: transparent;
+  }
+  :global(.dark) .text-stroke-thin {
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.6);
+  }
+</style>
 
 <script>
   import gsap from 'gsap';
-  import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+  import { scrambleText } from '@/lib/animation.ts';
 
-  gsap.registerPlugin(ScrambleTextPlugin);
+  function initHeroAnimation() {
+    const wrappers = document.querySelectorAll('.hero-profession');
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const strokeTarget = document.getElementById('text-stroke-target');
-    const fillTarget = document.getElementById('text-fill-target');
-    const cursor = document.getElementById('cursor');
+    wrappers.forEach((wrapper) => {
+      if (wrapper.hasAttribute('data-init')) return;
+      wrapper.setAttribute('data-init', 'true');
 
-    if (!strokeTarget || !fillTarget || !cursor) return;
+      const strokeEl = wrapper.querySelector(
+        '[data-role="stroke"]'
+      ) as HTMLElement;
+      const fillEl = wrapper.querySelector('[data-role="fill"]') as HTMLElement;
+      const cursorEl = wrapper.querySelector('.cursor-blink');
 
-    const phrases = [
-      { stroke: 'Full-Stack', fill: 'Developer' },
-      { stroke: 'UX/UI', fill: 'Designer' },
-    ];
-    const scrambleDuration = 1.2;
-    const pauseDuration = 3;
+      const phrases = [
+        { stroke: 'FULL-STACK', fill: 'DEVELOPER' },
+        { stroke: 'UX/UI', fill: 'DESIGNER' },
+      ];
 
-    function scrambleTo(phrase: {
-      stroke: string;
-      fill: string;
-    }): Promise<void> {
-      return new Promise((resolve) => {
-        const tl = gsap.timeline({ onComplete: () => resolve() });
+      const masterTl = gsap.timeline({ repeat: -1 });
 
-        // --- LA SOLUCIÓN: ANIMACIONES SEPARADAS Y SINCRONIZADAS ---
-        tl.set(cursor, { opacity: 1 })
-          // 1. Animamos el target "stroke" con su string correspondiente.
-          .to(strokeTarget, {
-            duration: scrambleDuration,
-            scrambleText: {
-              text: phrase.stroke,
-              chars: 'lowerCase',
-              speed: 0.3,
-            },
-            ease: 'power3.out',
-          })
-          // 2. Animamos el target "fill" con su string, AL MISMO TIEMPO.
-          .to(
-            fillTarget,
-            {
-              duration: scrambleDuration,
-              scrambleText: {
-                text: ' ' + phrase.fill,
-                chars: 'lowerCase',
-                speed: 0.3,
-              },
-              ease: 'power3.out',
-            },
-            '<'
-          ) // "<" sincroniza el inicio de esta animación con la anterior.
-          .set(cursor, { opacity: 0 });
+      phrases.forEach((phrase) => {
+        const stepTl = gsap.timeline({
+          repeat: 1,
+          yoyo: true,
+          repeatDelay: 2.5,
+        });
+
+        stepTl.set(cursorEl, { opacity: 1 });
+
+        stepTl.add(scrambleText(strokeEl, phrase.stroke, 1.0));
+        stepTl.add(scrambleText(fillEl, phrase.fill, 1.0), '-=0.8');
+
+        stepTl.set(cursorEl, { opacity: 0 }, '+=0.1');
+
+        masterTl.add(stepTl);
       });
-    }
 
-    let currentIndex = 0;
-    async function cyclePhrases() {
-      // Borramos el texto anterior para una transición limpia al inicio del bucle.
-      gsap.set([strokeTarget, fillTarget], { text: '' });
+      gsap.to(cursorEl, {
+        opacity: 0,
+        duration: 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'steps(1)',
+      });
+    });
+  }
 
-      // 1. Anima hacia la frase actual.
-      await scrambleTo(phrases[currentIndex]);
-
-      // 2. Pausa para la lectura.
-      await gsap.to({}, { duration: pauseDuration });
-
-      // 3. Pasa a la siguiente frase.
-      currentIndex = (currentIndex + 1) % phrases.length;
-
-      // 4. Se llama a sí misma para crear el bucle infinito.
-      cyclePhrases();
-    }
-
-    cyclePhrases();
-  });
+  document.addEventListener('astro:page-load', initHeroAnimation);
+  document.addEventListener('DOMContentLoaded', initHeroAnimation);
 </script>
