@@ -1,0 +1,55 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  class?: string;
+}
+
+const { title, subtitle, class: className } = Astro.props;
+---
+
+<!-- 
+  ESTADO ACTUAL: ESTÁTICO Y LIMPIO
+  - Centrado con flex-col items-center.
+  - Sin animación de glitch por ahora para evitar errores visuales.
+-->
+<div
+  class:list={[
+    'section-title-wrapper mb-16 flex w-full select-none flex-col items-center text-center',
+    className,
+  ]}
+>
+  <h2 class="sr-only">{title}</h2>
+
+  <!-- Contenedor Visual -->
+  <div class="relative inline-flex overflow-hidden" aria-hidden="true">
+    <!-- Solo mostramos el texto sólido (Fill) -->
+    <span
+      class="relative z-10 text-h2 font-bold uppercase tracking-tighter text-text-primary"
+    >
+      {title}
+    </span>
+  </div>
+
+  {
+    subtitle && (
+      <p class="mt-4 max-w-lg text-sm font-light text-text-secondary md:text-base">
+        {subtitle}
+      </p>
+    )
+  }
+</div>
+
+<!-- 
+  TODO: Reactivar animación cuando se solucione el glitch de superposición.
+  Código comentado para futura referencia.
+-->
+<!-- 
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { scrambleText } from '@/lib/animations';
+
+  gsap.registerPlugin(ScrollTrigger);
+  // ... lógica de animación pendiente de fix ...
+</script> -->
