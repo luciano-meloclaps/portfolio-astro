@@ -1,24 +1,19 @@
 ---
-// -----------------------------------------------------------------------------
-// COMPONENTE DE UI ATÓMICO: StatusChip
-// -----------------------------------------------------------------------------
-// RESPONSABILIDAD:
-// Mostrar una pieza de información de estado con una estética de "panel de vidrio".
-// -----------------------------------------------------------------------------
+// src/components/ui/StatusChip.astro
+import type { ElementType } from 'react';
 
-// --- DEFINICIÓN DE TIPOS ---
+// Definimos los estados posibles
 type Variant = 'positive' | 'warning' | 'neutral' | 'active';
 
 interface Props {
-  // 2. Usamos el tipo global `astroHTML.JSX.Element` directamente.
-  Icon: astroHTML.JSX.Element;
+  // Aceptamos cualquier componente (Astro o React) o función que renderice un SVG
+  Icon: ElementType | any;
   label: string;
   value: string;
   variant?: Variant;
   class?: string;
 }
 
-// --- LÓGICA DEL COMPONENTE (FRONTMATTER) ---
 const {
   Icon,
   label,
@@ -27,57 +22,83 @@ const {
   class: className,
 } = Astro.props;
 
-const variantColorClasses: Record<Variant, { text: string; bg: string }> = {
-  positive: { text: 'text-green-500', bg: 'bg-green-500' },
-  warning: { text: 'text-amber-500', bg: 'bg-amber-500' },
-  neutral: { text: 'text-gray-500', bg: 'bg-gray-500' },
-  active: { text: 'text-cyan-500', bg: 'bg-cyan-500' },
+// Configuración de colores semánticos (Texto y Luces)
+const variantConfig: Record<
+  Variant,
+  { text: string; dot: string; glow: string }
+> = {
+  positive: {
+    text: 'text-emerald-600 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+    glow: 'shadow-emerald-500/20', // Glow sutil del mismo color
+  },
+  warning: {
+    text: 'text-amber-600 dark:text-amber-400',
+    dot: 'bg-amber-500',
+    glow: 'shadow-amber-500/20',
+  },
+  neutral: {
+    text: 'text-slate-600 dark:text-slate-400',
+    dot: 'bg-slate-500',
+    glow: 'shadow-slate-500/20',
+  },
+  active: {
+    text: 'text-cyan-600 dark:text-cyan-400',
+    dot: 'bg-cyan-500',
+    glow: 'shadow-cyan-500/20',
+  },
 };
 
-const accentClasses = variantColorClasses[variant];
+const theme = variantConfig[variant];
 ---
 
-<!-- ESTRUCTURA DE PRESENTACIÓN (PLANTILLA) -->
 <div
   class:list={[
-    'bg-panel/75 dark:bg-panel/50 inline-flex items-center justify-between gap-x-4 rounded-small border border-border px-4 py-2 backdrop-blur-xl',
-    'shadow-inset-light dark:shadow-inset-dark',
+    // BASE: Flex, forma y transición
+    'inline-flex select-none items-center justify-between gap-x-3 rounded-small px-3 py-1.5 transition-all duration-300',
+
+    // ESTÉTICA GLASS CONSISTENTE CON NAVBAR:
+    // - bg-panel/20: Transparencia light
+    // - dark:bg-panel/10: Transparencia dark
+    // - backdrop-filter: blur variable CSS
+    // - border: 1px solid var(--border-light/dark): Border marcado
+    'bg-panel/20 dark:bg-panel/10 border border-border',
+    'backdrop-blur-[var(--blur-base)]',
+
+    // Sombra sutil para levantar del fondo
+    'shadow-sm',
+
     className,
   ]}
 >
-  <!-- Contenido Principal: Icono y Texto -->
-  <div class="flex items-center gap-x-3">
-    <div class="text-sm">
-      <Icon class:list={['icon-base', accentClasses.text]} strokeWidth={1.0} />
-    </div>
-    <div class="font-sans text-sm uppercase tracking-wider">
-      <span class="font-bold text-text-secondary">{label}:</span>
-      <span class="ml-1 font-normal text-text-primary">{value}</span>
+  <!-- Contenido: Icono y Texto -->
+  <div class="flex items-center gap-x-2.5">
+    <!-- Icono con el color de la variante -->
+    <Icon class:list={['h-4 w-4', theme.text]} strokeWidth={1.5} />
+
+    <div class="flex gap-1.5 font-sans text-xs uppercase tracking-wider">
+      <span class="text-text-secondary/80 font-bold">{label}</span>
+      <!-- Separador vertical sutil -->
+      <span class="bg-border/50 h-3 w-[1px] self-center"></span>
+      <span class="font-medium text-text-primary">{value}</span>
     </div>
   </div>
 
-  <!-- Indicador de Estado: Luz LED Palpitante -->
-  <div class="led-container relative flex h-2 w-2 items-center justify-center">
-    <span class:list={['absolute h-1.5 w-1.5 rounded-full', accentClasses.bg]}
-    ></span>
+  <!-- Indicador de Estado (LED) -->
+  <div class="relative ml-1 flex h-1.5 w-1.5 items-center justify-center">
+    <!-- Punto sólido -->
+    <span class:list={['absolute h-1.5 w-1.5 rounded-full', theme.dot]}></span>
+    <!-- Ping (Onda expansiva) -->
     <span
       class:list={[
-        'h-full w-full animate-ping rounded-full opacity-75',
-        accentClasses.bg,
+        'absolute h-full w-full animate-ping rounded-full opacity-75',
+        theme.dot,
+      ]}></span>
+    <!-- Glow estático para ambiente -->
+    <span
+      class:list={[
+        'absolute h-2 w-2 rounded-full opacity-50 blur-[2px]',
+        theme.dot,
       ]}></span>
   </div>
 </div>
-
-<!-- ESTILOS ENCAPSULADOS -->
-<style>
-  @keyframes ping {
-    75%,
-    100% {
-      transform: scale(2.5);
-      opacity: 0;
-    }
-  }
-  .animate-ping {
-    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-</style>

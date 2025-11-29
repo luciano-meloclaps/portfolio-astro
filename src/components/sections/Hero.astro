@@ -1,8 +1,5 @@
 ---
-// src/components/Hero.astro
-// ARQUITECTURA HÍBRIDA INTELIGENTE:
-// - El layout y los estilos se manejan con clases de Tailwind para consistencia y rendimiento.
-// - El fondo de gradiente, al ser un estilo único y complejo, se encapsula en una etiqueta <style>.
+// src/components/sections/Hero.astro
 import AnimatedProfession from '@/components/ui/AnimatedProfession.astro';
 import StatusChip from '@/components/ui/StatusChip.astro';
 import Button from '@/components/ui/Button.astro';
@@ -16,29 +13,39 @@ import {
 ---
 
 <!-- 
-  1. ESTRUCTURA CON TAILWIND
-     - Usamos clases de utilidad para todo el layout: `relative`, `grid`, `min-h-screen`, etc.
-     - Esto es limpio, legible y aprovecha nuestro sistema de diseño.
+  ARQUITECTURA HERO "TWIN ATMOSPHERES"
+  - Los efectos decorativos (gradient, grid, vignette) se aplican via ::before pseudoelemento
+  - El contenido flota naturalmente en la misma capa que otras secciones
 -->
 <section
-  class="hero-container relative grid min-h-screen place-items-center overflow-hidden"
+  class="selection:bg-accent-magenta/20 hero-section relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden text-gray-900 transition-colors duration-500 selection:text-black dark:text-white"
 >
-  <!-- El fondo, ahora con una clase simple para ser apuntado por nuestro CSS "scoped". -->
-  <div class="hero-background"></div>
+  <!-- =====================================================================
+       ATMÓSFERA LIGHT/DARK via ::before pseudoelemento en CSS
+       Los elementos decorativos están en una capa de fondo sin afectar z-index del contenido
+       ===================================================================== -->
 
-  <!-- El núcleo de contenido, también estilizado con Tailwind. -->
+  <!-- =====================================================================
+       CONTENIDO PRINCIPAL (En la misma capa que otras secciones)
+       ===================================================================== -->
   <div
-    class="relative z-10 flex flex-col items-center gap-y-8 px-4 text-center"
+    class="relative z-10 flex flex-col items-center gap-y-10 px-4 text-center"
   >
-    <div class="hero-title">
-      <AnimatedProfession class="text-h2 md:text-h1" />
+    <!-- Título Animado -->
+    <!-- drop-shadow ajustado para que se vea bien en blanco también -->
+    <div class="hero-title drop-shadow-xl dark:drop-shadow-2xl">
+      <AnimatedProfession />
     </div>
 
-    <p class="hero-subtitle max-w-lg text-lg font-light text-text-secondary">
+    <!-- Subtítulo Adaptable -->
+    <p
+      class="hero-subtitle max-w-xl text-lg font-light leading-relaxed tracking-wide text-gray-600 dark:text-gray-300 md:text-xl"
+    >
       Arquitecto de Software especializado en experiencias de usuario de alto
       rendimiento.
     </p>
 
+    <!-- Chips -->
     <div class="hero-chips flex flex-wrap justify-center gap-4">
       <StatusChip
         Icon={IconCode}
@@ -60,13 +67,20 @@ import {
       />
     </div>
 
-    <div class="hero-buttons flex flex-wrap justify-center gap-4 pt-4">
-      <Button href="#projects" class="group">
+    <!-- Botones Adaptables -->
+    <div class="hero-buttons flex flex-wrap justify-center gap-4 pt-6">
+      <!-- Botón Principal -->
+      <Button
+        href="#projects"
+        variant="primary"
+      >
         <span>Ver Proyectos</span>
         <AnimatedArrowIcon />
       </Button>
+
+      <!-- Botón Secundario: GitHub -->
       <Button
-        href="https://github.com/tu-usuario"
+        href="https://github.com/luciano-meloclaps"
         variant="secondary"
         target="_blank"
       >
@@ -77,61 +91,26 @@ import {
   </div>
 </section>
 
-<!-- La coreografía de entrada de GSAP, sin cambios -->
 <script>
   import gsap from 'gsap';
-  document.addEventListener('DOMContentLoaded', () => {
+
+  document.addEventListener('astro:page-load', () => {
     const elementsToAnimate = [
       '.hero-title',
       '.hero-subtitle',
       '.hero-chips',
       '.hero-buttons',
     ];
+
     gsap.set(elementsToAnimate, { autoAlpha: 0, y: 30 });
+
     const tl = gsap.timeline({
-      defaults: { duration: 1.2, ease: 'power3.out' },
+      defaults: { duration: 1.4, ease: 'power4.out' },
     });
+
     tl.to('.hero-title', { autoAlpha: 1, y: 0 }, 0.2)
-      .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.0')
-      .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.0')
-      .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=0.9');
+      .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.2')
+      .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.2')
+      .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=1.1');
   });
 </script>
-
-<!-- 
-  2. LA EXCEPCIÓN QUIRÚRGICA
-     - Usamos una etiqueta <style> "scoped" (por defecto en Astro) para el único
-       estilo que es complejo y no reutilizable: el gradiente del fondo.
--->
-<style>
-  .hero-background {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    /* Gradiente para el tema claro */
-    /* background: linear-gradient(0deg, #ffffff, #d6d6d6, #000000);*/
-
-    background: -webkit-linear-gradient(
-      90deg,
-      #ffffff,
-      #4e0041,
-      #000000,
-      #000000,
-      #000000
-    );
-    background: linear-gradient(
-      90deg,
-      #ffffff,
-      #4e0041,
-      #000000,
-      #000000,
-      #000000
-    );
-  }
-
-  /* Sobrescribimos el gradiente para el tema oscuro */
-  .dark .hero-background {
-    /* background: linear-gradient(180deg, #ffffff, #d6d6d6, #000000);*/
-    background: linear-gradient(90deg, #1f2222, #002a6b, #000000);
-  }
-</style>

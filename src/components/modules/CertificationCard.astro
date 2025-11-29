@@ -37,10 +37,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
 ---
 
 <div class="certification-card-wrapper group">
-  <Card
-    padding="none"
-    class="relative overflow-hidden border border-border bg-panel"
-  >
+  <Card padding="none" class="relative overflow-hidden">
     <div class="halo-effect"></div>
     <div class="relative z-10 flex flex-col p-6">
       <!-- Header -->
@@ -93,7 +90,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
         id={`btn-${uniqueId}`}
         aria-controls={`content-${uniqueId}`}
         aria-expanded="false"
-        class="details-toggle border-border/50 group/btn mt-6 flex w-full cursor-pointer items-center justify-between border-t pt-4 text-xs font-bold uppercase tracking-wider text-text-secondary transition-colors hover:text-text-primary"
+        class="details-toggle group/btn mt-6 flex w-full cursor-pointer items-center justify-between border-t border-border pt-4 text-xs font-bold uppercase tracking-wider text-text-secondary transition-colors hover:text-text-primary"
       >
         <span>Detalles Técnicos</span>
         <IconChevronDown
@@ -130,7 +127,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
           <!-- Tech Stack -->
           {
             techStack && techStack.length > 0 && (
-              <div class="border-border/30 mt-5 border-t pt-4">
+              <div class="border-t border-border mt-5 pt-4">
                 <h4 class="text-text-secondary/60 mb-3 font-sans text-[10px] font-bold uppercase tracking-widest">
                   Tecnologías
                 </h4>

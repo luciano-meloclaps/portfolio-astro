@@ -8,15 +8,8 @@
 /* --- 2. DEFINICIÓN DE VARIABLES GLOBALES (TOKENS DE DISEÑO) --- */
 @layer base {
   :root {
-    /* Efectos Visuales */
-    --blur-base: 12px;
-    --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --border-light: rgba(0, 0, 0, 0.1); /* Borde sutil para tema claro */
-    --border-dark: rgba(255, 255, 255, 0.1); /* Borde sutil para tema oscuro */
-
     /* Tipografía */
-    --font-main: 'Tomorrow'; /* CORRECCIÓN: Sin fuente de respaldo aquí */
+    --font-main: 'Tomorrow';
     --font-size-xxs: 0.6875rem;
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
@@ -33,25 +26,36 @@
     --radius-large: 0px;
     --radius-pill: 9999px;
 
-    /* --- EFECTOS VISUALES REFINADOS --- */
-    --blur-base: 12px; /* Un blur más pronunciado para el efecto esmerilado */
-    --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1); /* Sombra sutil para tema claro */
-    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Sombra más profunda para tema oscuro */
-    --border-light: rgba(255, 255, 255, 0.18); /* Borde interior claro */
-    --border-dark: rgba(255, 255, 255, 0.1); /* Borde interior oscuro */
+    /* Efectos Visuales */
+    --blur-base: 12px;
+    --blur-gradient-light: 40px;
+    --blur-gradient-dark: 60px;
+
+    /* Sombras y Bordes (Light Theme) */
+    --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --border-light: rgba(0, 0, 0, 0.22); /* Refinado: balance visual con dark mode */
+
+    /* Gradientes Light Theme */
+    --gradient-light-primary: rgba(129, 76, 120, 0.25);
+    --gradient-light-secondary: rgba(100, 150, 200, 0.18);
+    --gradient-light-opacity: 0.75;
 
     /* Paleta de Colores (Tema Claro) */
-    --color-background: #f0f0f0; /* Un gris muy claro para mejor contraste */
+    --color-background: #f0f0f0;
     --color-panel-bg: rgba(255, 255, 255, 0.25);
     --color-text-primary: #1a1a1a;
     --color-text-secondary: #666666;
-    --color-border: rgba(0, 0, 0, 0.1);
+    --color-border: rgba(0, 0, 0, 0.22); /* Match con --border-light para total homogeneidad */
     --color-grid-line: rgba(0, 0, 0, 0.05);
     --color-accent-magenta: #814c78;
     --color-glow-border: rgba(0, 0, 0, 0.8);
   }
 
   .dark {
+    /* Sombras y Bordes (Dark Theme) */
+    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --border-dark: #91949757; /* Sincronizado con --color-border */
+
     /* Paleta Oscura */
     --color-background: #1f2225;
     --color-panel-bg: rgba(31, 34, 37, 0.25);
@@ -59,7 +63,7 @@
     --color-text-secondary: #919497;
     --color-border: #91949757;
     --color-grid-line: rgba(240, 242, 255, 0.05);
-    --color-accent-magenta: #814c78; /* Una versión más brillante para el tema oscuro */
+    --color-accent-magenta: #814c78;
     --color-glow-border: rgba(255, 255, 255, 0.8);
   }
 }
@@ -116,4 +120,21 @@
       inset 0 0 0 1.5px var(--color-text-primary),
       0 0 25px 0 var(--color-text-primary);
   }
+}
+
+/* --- 5. SISTEMA DE ATMÓSFERAS LIGHT/DARK (NUEVO) --- */
+.light-atmosphere {
+  display: block;
+}
+
+.dark .light-atmosphere {
+  display: none;
+}
+
+.dark-atmosphere {
+  display: none;
+}
+
+.dark .dark-atmosphere {
+  display: block;
 }
