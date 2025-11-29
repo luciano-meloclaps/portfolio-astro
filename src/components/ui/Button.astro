@@ -1,8 +1,5 @@
 ---
 // src/components/ui/Button.astro
-// ARQUITECTURA "FUSIÓN GLACIAL" Y "INVERSIÓN DE CONTRASTE":
-// Un componente de botón universal con dos variantes de animación de élite.
-
 interface Props {
   href?: string;
   variant?: 'primary' | 'secondary';
@@ -14,28 +11,26 @@ const { href, variant = 'primary', class: className, target } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
 
-// --- LÓGICA DE ESTILOS DE ÉLITE ---
 const baseClasses = `
   relative inline-flex items-center justify-center gap-x-2 px-6 py-3 
   font-sans text-sm uppercase tracking-wider overflow-hidden
-  border 
-  transition-all duration-300 ease-in-out
+  border rounded-small
+  transition-all duration-300 ease-out
   focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background
+  active:scale-95
 `;
 
+const borderStyle = 'border-color: var(--color-border);'; // Shared border variable across all components
+
 const variantClasses = {
-  // VARIANTE PRIMARIA (FUSIÓN GLACIAL): Sólido que se disuelve en vidrio.
   primary: `
-    bg-text-primary text-background border-transparent
-    hover:bg-transparent hover:text-text-primary hover:border-text-primary
-    hover:backdrop-blur-base
-    focus-visible:ring-text-primary
+    bg-text-primary text-background border
+    hover:bg-transparent hover:text-text-primary
   `,
-  // VARIANTE SECUNDARIA (INVERSIÓN DE CONTRASTE): Contorno que se rellena.
+  // MEJORA: Usa variable de border compartida (consistencia con glass-panel, Navbar, Card, StatusChip)
   secondary: `
-    bg-transparent border-text-primary text-text-primary
+    bg-text-primary/5 border text-text-primary
     hover:bg-text-primary hover:text-background
-    focus-visible:ring-text-primary
   `,
 };
 ---
@@ -43,13 +38,10 @@ const variantClasses = {
 <Tag
   href={href}
   target={target}
-  class:list={[
-    baseClasses,
-    variantClasses[variant],
-    className,
-    'rounded-small',
-  ]}
+  style={borderStyle}
+  class:list={[baseClasses, variantClasses[variant], className]}
 >
+  <!-- Z-index para asegurar que el texto esté sobre cualquier efecto de fondo -->
   <span class="relative z-10 flex items-center gap-x-2">
     <slot />
   </span>
