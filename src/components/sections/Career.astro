@@ -2,6 +2,7 @@
 // src/sections/Career.astro
 import { getCollection, type CollectionEntry } from 'astro:content';
 import ExperienceCard from '@/components/modules/ExperienceCard.astro';
+import SectionTitle from '@/components/ui/SectionTitle.astro';
 
 const allCareerItems: CollectionEntry<'career'>[] =
   await getCollection('career');
@@ -11,19 +12,13 @@ allCareerItems.sort(
 ---
 
 <section id="experience" class="py-24 md:py-32">
-  <div class="container-narrow career-section-content">
-    <h2 class="mb-16 text-center text-h2 font-bold text-text-primary">
-      // Carrera Profesional
-    </h2>
+  <div class="container-narrow career-section-content space-y-16">
+    <SectionTitle
+      title="Carrera"
+      subtitle="Un viaje a través de mis experiencias profesionales y crecimiento."
+    />
 
     <div class="relative">
-      <!-- 
-        LA CORRECCIÓN ARQUITECTÓNICA:
-        - `top-4 bottom-4`: En lugar de `h-full`, estiramos la línea desde un
-          punto cercano al principio hasta un punto cercano al final del contenedor.
-        - Esto asegura que la línea siempre tenga una altura visible, incluso si
-          el contenedor cambia de tamaño, y le da un "aire" en los extremos.
-      -->
       <div
         class="timeline-line absolute bottom-4 left-1/2 top-4 w-px -translate-x-1/2 bg-border"
       >
@@ -58,12 +53,12 @@ allCareerItems.sort(
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initCareerAnimation() {
     const section = document.querySelector('.career-section-content');
     if (!section) return;
 
-    const line = section.querySelector('.timeline-line');
-    const items = gsap.utils.toArray('.timeline-item');
+    const line = section.querySelector('.timeline-line') as HTMLElement;
+    const items = gsap.utils.toArray('.timeline-item') as HTMLElement[];
 
     gsap.set([line, ...items], { autoAlpha: 0 });
 
@@ -71,7 +66,6 @@ allCareerItems.sort(
       scrollTrigger: {
         trigger: section,
         start: 'top 60%',
-        once: true,
       },
     });
 
@@ -86,5 +80,8 @@ allCareerItems.sort(
       { autoAlpha: 1, y: 0, stagger: 0.3, from: { y: 50 }, ease: 'power3.out' },
       '-=1.0'
     );
-  });
+  }
+
+  document.addEventListener('astro:page-load', initCareerAnimation);
+  document.addEventListener('DOMContentLoaded', initCareerAnimation);
 </script>

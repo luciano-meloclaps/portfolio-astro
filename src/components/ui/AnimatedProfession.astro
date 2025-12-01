@@ -6,33 +6,22 @@ interface Props {
 
 const { class: className } = Astro.props;
 
-// Frases del Hero
 const phrases = [
   { stroke: 'FULL-STACK', fill: 'DEVELOPER' },
   { stroke: 'UX/UI', fill: 'DESIGNER' },
 ];
 ---
 
-<!-- 
-  CAMBIOS RESPONSIVE APLICADOS:
-  1. 'flex-col': Por defecto (Móvil) es columna.
-  2. 'lg:flex-row': AHORA SOLO se pone horizontal en pantallas Grandes (Laptop/Desktop), saltándose la Tablet.
-  3. 'items-center': Centrado horizontalmente cuando está en columna (Móvil/Tablet).
-  4. 'lg:items-baseline': Alineado a la base del texto cuando está en fila (Desktop).
-  5. 'gap-2 lg:gap-4': Ajuste de espaciado.
--->
 <div
   class:list={[
     'hero-profession relative inline-flex flex-col items-center gap-2 text-4xl font-bold uppercase tracking-tighter md:text-6xl lg:flex-row lg:items-baseline lg:gap-4 lg:text-7xl',
     className,
   ]}
 >
-  <!-- SEO -->
   <h1 class="sr-only">
     {phrases.map((p) => `${p.stroke} ${p.fill}`).join(', ')}
   </h1>
 
-  <!-- Visual -->
   <div
     class="flex flex-col items-center gap-2 lg:flex-row lg:items-baseline lg:gap-4"
     aria-hidden="true"
@@ -47,7 +36,6 @@ const phrases = [
       class="relative text-center text-text-primary lg:text-left"
       data-role="fill"
     >
-      <!-- Cursor -->
       <span
         class="cursor-blink absolute -right-3 bottom-1 top-1 w-[2px] bg-accent-magenta opacity-0 shadow-[0_0_10px_var(--color-accent-magenta)] lg:-right-4 lg:w-[3px]"
       ></span>
@@ -67,7 +55,7 @@ const phrases = [
 
 <script>
   import gsap from 'gsap';
-  import { scrambleText } from '@/lib/animation.ts';
+  import { scrambleText } from '@/lib/animations';
 
   function initHeroAnimation() {
     const wrappers = document.querySelectorAll('.hero-profession');
@@ -82,6 +70,7 @@ const phrases = [
       const fillEl = wrapper.querySelector('[data-role="fill"]') as HTMLElement;
       const cursorEl = wrapper.querySelector('.cursor-blink');
 
+      // Define las frases a animar (Opción 2: Solo 2 frases, más cinematográfico)
       const phrases = [
         { stroke: 'FULL-STACK', fill: 'DEVELOPER' },
         { stroke: 'UX/UI', fill: 'DESIGNER' },
@@ -89,29 +78,40 @@ const phrases = [
 
       const masterTl = gsap.timeline({ repeat: -1 });
 
-      phrases.forEach((phrase) => {
-        const stepTl = gsap.timeline({
-          repeat: 1,
-          yoyo: true,
-          repeatDelay: 2.5,
-        });
-
-        stepTl.set(cursorEl, { opacity: 1 });
-
-        stepTl.add(scrambleText(strokeEl, phrase.stroke, 1.0));
-        stepTl.add(scrambleText(fillEl, phrase.fill, 1.0), '-=0.8');
-
-        stepTl.set(cursorEl, { opacity: 0 }, '+=0.1');
-
-        masterTl.add(stepTl);
-      });
-
+      // Cursor parpadeante independiente - timing estándar terminal
       gsap.to(cursorEl, {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.5, // Opción 2: Estándar terminal (más elegante)
         repeat: -1,
         yoyo: true,
         ease: 'steps(1)',
+      });
+
+      phrases.forEach((phrase: { stroke: string; fill: string }) => {
+        const stepTl = gsap.timeline({
+          repeat: 1,
+          yoyo: true,
+          repeatDelay: 1.8, // Opción 2: Pausa noble pero no excesiva
+        });
+
+        // Limpiar estado anterior
+        stepTl.call(() => {
+          strokeEl.innerText = '';
+          fillEl.innerText = '';
+          Object.keys(strokeEl.dataset).forEach((key) => {
+            if (key.startsWith('char')) delete strokeEl.dataset[key];
+          });
+          Object.keys(fillEl.dataset).forEach((key) => {
+            if (key.startsWith('char')) delete fillEl.dataset[key];
+          });
+        });
+
+        stepTl.set(cursorEl, { opacity: 1 });
+        stepTl.add(scrambleText(strokeEl, phrase.stroke, 1.2), 0); // Opción 2: 1.2s (más cinematográfico)
+        stepTl.add(scrambleText(fillEl, phrase.fill, 1.2), 0.25); // Offset aumentado a 0.25s
+        stepTl.set(cursorEl, { opacity: 0 }, '+=0.1');
+
+        masterTl.add(stepTl);
       });
     });
   }
