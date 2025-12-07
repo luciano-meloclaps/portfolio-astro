@@ -1,0 +1,122 @@
+---
+// src/components/ui/FilterPill.astro
+// REFACTORIZADO: Sin accent-magenta, usando patrones coherentes del sistema
+// Inspirado en Button.astro y StatusBadge.astro
+// Responsabilidad: Pill individual para filtros (projects, certifications, etc)
+
+interface Props {
+  name: string; // Nombre del filtro (e.g., "React", "TypeScript")
+  sectionId?: string; // "projects" | "certifications"
+  isActive?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  sectionId = 'projects',
+  isActive = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<button
+  class:list={[
+    // BASE: Layout y transiciones
+    'group relative inline-flex items-center gap-1 rounded-sm border px-3 py-1.5 font-mono text-sm uppercase tracking-normal transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+
+    // INACTIVE STATE: Subtle y elegante
+    !isActive && [
+      'border-border text-text-secondary',
+      'hover:bg-text-primary/5 hover:border-text-primary hover:text-text-primary',
+      'focus-visible:ring-text-primary',
+    ],
+
+    // ACTIVE STATE: Resaltado coherente (usa --color-text-primary, NO magenta)
+    isActive && [
+      'bg-text-primary/10 border-text-primary text-text-primary',
+      'shadow-text-primary/20 shadow-sm',
+      'focus-visible:ring-text-primary',
+    ],
+
+    className,
+  ]}
+  data-filter-name={name}
+  data-filter-section={sectionId}
+  data-filter-active={isActive}
+  aria-pressed={isActive}
+  aria-label={`Filtrar por ${name}`}
+  title={`Clic para filtrar por ${name}`}
+>
+  <!-- Contenido visible del pill -->
+  <span class="relative z-10">{name}</span>
+
+  <!-- Remove button (✕) - aparece solo cuando activo -->
+  {
+    isActive && (
+      <button
+        class="ml-1 opacity-70 transition-opacity duration-150 hover:opacity-100 focus:outline-none"
+        aria-label={`Remover filtro ${name}`}
+        onclick="event.stopPropagation(); this.parentElement?.click();"
+      >
+        ✕
+      </button>
+    )
+  }
+</button>
+
+<style>
+  button {
+    border-radius: var(--radius-small);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button[data-filter-active='true'] {
+    border-color: var(--color-text-primary);
+    background-color: rgb(var(--color-text-primary) / 0.1);
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0.25rem rgb(var(--color-text-primary) / 0.2);
+  }
+
+  button:hover:not([data-filter-active='true']) {
+    border-color: var(--color-text-primary);
+    color: var(--color-text-primary);
+    background-color: rgb(var(--color-text-primary) / 0.05);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--color-text-primary);
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initFilterPills() {
+    const pills = document.querySelectorAll('[data-filter-active]');
+
+    pills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        // Animation: scale feedback
+        gsap.fromTo(
+          pill,
+          { scale: 1 },
+          { scale: 0.95, duration: 0.1, ease: 'power2.out' }
+        );
+        gsap.to(pill, {
+          scale: 1,
+          duration: 0.15,
+          delay: 0.1,
+          ease: 'elastic.out(1, 0.3)',
+        });
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initFilterPills);
+  document.addEventListener('DOMContentLoaded', initFilterPills);
+</script>

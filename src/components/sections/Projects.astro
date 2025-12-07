@@ -3,11 +3,18 @@ import { getCollection } from 'astro:content';
 import ProjectThumbnailCard from '../modules/ProjectThumbnailCard.astro';
 import ProjectCard from '../modules/ProjectCard.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
+import FilterBar from '@/components/ui/FilterBar.astro';
+import LoadingIndicator from '@/components/ui/LoadingIndicator.astro';
 
 const allProjects = await getCollection('projects');
 allProjects.sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 );
+
+// Extraer todas las tecnologías únicas disponibles
+const availableTechs = Array.from(
+  new Set(allProjects.flatMap((p) => p.data.techStack || []).filter(Boolean))
+).sort();
 ---
 
 <section id="projects" class="relative py-24 md:py-32">
@@ -21,7 +28,16 @@ allProjects.sort(
       />
     </div>
 
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <!-- FILTER BAR -->
+    {
+      availableTechs.length > 0 && (
+        <div class="filter-bar-wrapper">
+          <FilterBar availableTechs={availableTechs} sectionId="projects" />
+        </div>
+      )
+    }
+
+    <div id="projects-grid" class="grid grid-cols-1 gap-8 md:grid-cols-2">
       {
         allProjects.map((project, index) => (
           <ProjectThumbnailCard project={project} index={index} />
@@ -30,7 +46,10 @@ allProjects.sort(
     </div>
   </div>
 
-  <!-- ... Overlay y Script del Overlay (sin cambios) ... -->
+  <!-- Loading Indicator (aparece durante filtrado pesado) -->
+  <LoadingIndicator />
+
+  <!-- Overlay para vista detallada de proyectos -->
   <div
     id="project-overlay"
     class="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 opacity-0"
@@ -59,19 +78,216 @@ allProjects.sort(
 </section>
 
 <script>
-  // ... (Tu script existente del modal) ...
   import gsap from 'gsap';
-  // ... (Mantén el script del modal tal cual estaba en tu código anterior)
-  // Solo asegúrate de usar 'astro:page-load'
-  function initProjects() {
-    // ... lógica del modal ...
-    const overlay = document.getElementById('project-overlay');
-    // ... etc ...
-    // (Si necesitas que te pegue el script del modal completo de nuevo, pídemelo,
-    // pero asumo que ese ya funcionaba bien y solo querías arreglar el título)
+  import { normalizeTechArray } from '@/lib/normalizeTech';
+
+  // Reuse timeline instance para evitar crear nuevas en cada filter
+  let filterTimeline: gsap.core.Timeline | null = null;
+
+  function handleFilterChange(event: Event) {
+    const customEvent = event as CustomEvent;
+    const { activeTechs } = customEvent.detail as { activeTechs: string[] };
+    
+    // activeTechs ya viene normalizado desde FilterBar, no re-normalizar
+    const cards = document.querySelectorAll('[data-project-slug][data-tech]');
+
+    // Cancelar timeline anterior si está en progreso
+    if (filterTimeline) {
+      filterTimeline.kill();
+    }
+
+    // Crear nuevo timeline para esta operación de filtrado
+    filterTimeline = gsap.timeline({ defaults: { duration: 0.15, ease: 'power2.inOut' } });
+
+    const cardsToShow: HTMLElement[] = [];
+    const cardsToHide: HTMLElement[] = [];
+
+    // Primera pasada: determinar qué cards mostrar/ocultar
+    cards.forEach((card) => {
+      const el = card as HTMLElement;
+      const techStr = el.getAttribute('data-tech');
+      let show = true;
+      
+      if (techStr && activeTechs && activeTechs.length > 0) {
+        try {
+          const projectTechs = JSON.parse(techStr);
+          const normalizedProjectTechs = normalizeTechArray(projectTechs);
+          // AND logic - acumulativo
+          show = activeTechs.every((tech: string) => normalizedProjectTechs.includes(tech));
+        } catch (e) {
+          console.error('Error parsing tech stack:', techStr, e);
+          show = true;
+        }
+      }
+      
+      if (show) {
+        cardsToShow.push(el);
+      } else {
+        cardsToHide.push(el);
+      }
+    });
+
+    // Animar salida (hide) de cards
+    cardsToHide.forEach((el) => {
+      filterTimeline!.to(
+        el,
+        {
+          opacity: 0,
+          scale: 0.92,
+          duration: 0.12,
+          onComplete: () => {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+            el.style.pointerEvents = 'none';
+            el.style.cursor = 'default';
+          },
+        },
+        0 // Start immediatamente en timeline
+      );
+    });
+
+    // Animar entrada (show) de cards
+    cardsToShow.forEach((el) => {
+      el.classList.remove('hidden');
+      el.style.display = '';
+      el.style.pointerEvents = 'auto';
+      el.style.cursor = 'pointer';
+      
+      filterTimeline!.to(
+        el,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.15,
+        },
+        0 // Start inmediatamente (paralelo con hide)
+      );
+    });
   }
-  document.addEventListener('astro:page-load', initProjects);
-  document.addEventListener('DOMContentLoaded', initProjects);
+
+  // Event listener para cambios de filtro
+  document.addEventListener('filter-changed', handleFilterChange);
+
+  // Cleanup on navigation (View Transitions)
+  document.addEventListener('astro:before-swap', () => {
+    if (filterTimeline) {
+      filterTimeline.kill();
+      filterTimeline = null;
+    }
+  });
+
+  // ==================== MODAL: Abrir/Cerrar ====================
+  function initializeModal() {
+    const overlay = document.getElementById('project-overlay') as HTMLElement | null;
+    const overlayBg = document.getElementById('overlay-bg') as HTMLElement | null;
+    const grid = document.getElementById('projects-grid') as HTMLElement | null;
+
+    if (!overlay || !overlayBg || !grid) {
+      console.warn('[Projects] Modal elements not found');
+      return;
+    }
+
+    // Store references to event handlers para poder limpiarlos
+    const modalHandlers = {
+      gridClick: null as ((e: Event) => void) | null,
+      overlayBgClick: null as ((e: Event) => void) | null,
+      overlayClick: null as ((e: Event) => void) | null,
+      keydown: null as ((e: Event) => void) | null,
+    };
+
+    // Abrir modal
+    const openProjectModal = (slug: string) => {
+      const wrapper = overlay.querySelector(
+        `[data-slug="${slug}"]`
+      ) as HTMLElement | null;
+      if (!wrapper) return;
+
+      overlay.classList.remove('pointer-events-none');
+      gsap.to(overlay, { opacity: 1, duration: 0.3 });
+
+      wrapper.classList.remove('hidden');
+      gsap.fromTo(
+        wrapper,
+        { scale: 0.9, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.2)' }
+      );
+    };
+
+    // Cerrar modal
+    const closeProjectModal = () => {
+      const visibleWrapper = overlay.querySelector(
+        '.project-detail-wrapper:not(.hidden)'
+      ) as HTMLElement | null;
+      if (!visibleWrapper) return;
+
+      gsap.to(visibleWrapper, {
+        scale: 0.9,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => {
+          visibleWrapper.classList.add('hidden');
+          gsap.to(overlay, {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: () => {
+              overlay.classList.add('pointer-events-none');
+            },
+          });
+        },
+      });
+    };
+
+    // Click handlers para abrir/cerrar
+    modalHandlers.gridClick = (e) => {
+      const card = (e.target as HTMLElement).closest(
+        '[data-project-slug]'
+      ) as HTMLElement | null;
+      if (card) {
+        const slug = card.getAttribute('data-project-slug');
+        if (slug) openProjectModal(slug);
+      }
+    };
+    grid.addEventListener('click', modalHandlers.gridClick);
+
+    modalHandlers.overlayBgClick = closeProjectModal;
+    overlayBg.addEventListener('click', modalHandlers.overlayBgClick);
+
+    // Close button (X) en ProjectCard
+    modalHandlers.overlayClick = (e) => {
+      const closeBtn = (e.target as HTMLElement).closest('.close-modal-btn');
+      if (closeBtn) {
+        closeProjectModal();
+      }
+    };
+    overlay.addEventListener('click', modalHandlers.overlayClick);
+
+    // ESC key para cerrar modal
+    modalHandlers.keydown = (e) => {
+      const keyEvent = e as KeyboardEvent;
+      if (keyEvent.key === 'Escape') {
+        const visibleWrapper = overlay.querySelector(
+          '.project-detail-wrapper:not(.hidden)'
+        ) as HTMLElement | null;
+        if (visibleWrapper) {
+          closeProjectModal();
+        }
+      }
+    };
+    document.addEventListener('keydown', modalHandlers.keydown);
+
+    // Cleanup on navigation (View Transitions)
+    const cleanup = () => {
+      if (modalHandlers.gridClick) grid.removeEventListener('click', modalHandlers.gridClick);
+      if (modalHandlers.overlayBgClick) overlayBg.removeEventListener('click', modalHandlers.overlayBgClick);
+      if (modalHandlers.overlayClick) overlay.removeEventListener('click', modalHandlers.overlayClick);
+      if (modalHandlers.keydown) document.removeEventListener('keydown', modalHandlers.keydown);
+    };
+    document.addEventListener('astro:before-swap', cleanup);
+  }
+
+  // Initialize modal on page load
+  initializeModal();
 </script>
 
 <style>
@@ -81,5 +297,36 @@ allProjects.sort(
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Grid responsive con reorganización automática */
+  #projects-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 2rem !important;
+  }
+
+  /* Media queries específicas para override de tailwind */
+  @media (max-width: 767px) {
+    #projects-grid {
+      grid-template-columns: repeat(1, 1fr) !important;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #projects-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    #projects-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  /* Elemento oculto - no ocupa espacio en el grid */
+  .project-thumbnail-trigger.hidden {
+    display: none !important;
   }
 </style>

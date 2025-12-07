@@ -117,7 +117,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
               {
                 keySkills.map((skill) => (
                   <li class="flex items-start gap-x-2">
-                    <IconPointFilled className="h-3 w-3 flex-shrink-0 text-accent-magenta mt-1" />
+                    <IconPointFilled className="h-3 w-3 flex-shrink-0 text-text-primary mt-1" />
                     <span class="text-xs text-text-secondary">{skill}</span>
                   </li>
                 ))
@@ -127,7 +127,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
           <!-- Tech Stack -->
           {
             techStack && techStack.length > 0 && (
-              <div class="border-t border-border mt-5 pt-4">
+              <div class="mt-5 border-t border-border pt-4">
                 <h4 class="text-text-secondary/60 mb-3 font-sans text-[10px] font-bold uppercase tracking-widest">
                   Tecnologías
                 </h4>
