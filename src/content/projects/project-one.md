@@ -10,7 +10,7 @@ images:
 keyFeatures:
   - 'Arquitectura Limpia (Clean Architecture)'
   - 'Autenticación y Autorización JWT'
-techStack: ['React', 'Astro', 'TypeScript']
+techStack: ['React', 'Astro', 'TypeScript', 'Vite']
 publishDate: 2024-05-20
 repoUrl: 'https://github.com/tu-usuario'
 ---

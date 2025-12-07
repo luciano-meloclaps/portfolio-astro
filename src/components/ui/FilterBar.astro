@@ -1,0 +1,281 @@
+---
+import FilterChip from '@/components/ui/FilterChip.astro';
+import { techIconMap } from '@/config/tech-icon-map';
+import { techColorMap } from '@/config/tech-colors';
+import { normalizeTechName } from '@/lib/normalizeTech';
+
+interface Props {
+  availableTechs: string[];
+  sectionId?: string;
+}
+
+const { availableTechs, sectionId = 'projects' } = Astro.props;
+---
+
+<div class="filter-bar-wrapper space-y-4">
+  <!-- Etiqueta + Chips Container --> 
+  <div class="flex flex-col gap-3 sm:gap-4">
+    <!-- Label -->
+    <label
+      class="block font-mono text-sm font-light uppercase tracking-normal text-text-secondary"
+    >
+      Filtrar por:
+    </label>
+
+    <!-- Chips Container -->
+    <div
+      class="filter-chips-container flex flex-wrap gap-2 sm:gap-3"
+      role="group"
+      aria-label="Filtros de tecnología"
+      data-filter-section={sectionId}
+    >
+      {
+        availableTechs.map((tech) => {
+          const normalizedTech = normalizeTechName(tech);
+          const Icon = techIconMap[normalizedTech] || null;
+
+          return (
+            <FilterChip
+              Icon={Icon}
+              name={normalizedTech}
+              label={normalizedTech === 'dotnet' ? '.NET' : tech}
+              sectionId={sectionId}
+              iconClass=""
+            />
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <!-- Counter + Clear Button -->
+  <div
+    class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="font-mono text-xs text-text-secondary">
+      <span
+        id="filter-counter-text"
+        data-section={sectionId}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        Mostrando todos los proyectos
+      </span>
+    </div>
+
+    <button
+      id="filter-clear-btn"
+      class="hidden font-mono text-xs text-text-primary transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-1"
+      aria-label="Limpiar todos los filtros"
+      title="Limpiar todos los filtros"
+      data-section={sectionId}
+    >
+      Limpiar filtros
+    </button>
+  </div>
+
+  <!-- Separator line (aesthetic) -->
+  <div
+    class="bg-border/50 h-px opacity-0 transition-opacity duration-300"
+    id="filter-line"
+  >
+  </div>
+</div>
+
+<style>
+  .filter-bar-wrapper {
+    position: relative;
+    z-index: 10;
+  }
+
+  .filter-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  #filter-line {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-text-primary),
+      transparent
+    );
+  }
+
+  #filter-line.active {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+  import { normalizeTechName } from '@/lib/normalizeTech';
+  import { techColorMap } from '@/config/tech-colors';
+
+  function initFilterBar() {
+    // Query todos los chips en este FilterBar
+    const filterChipsContainer = document.querySelector(
+      '.filter-chips-container'
+    );
+    if (!filterChipsContainer) return;
+
+    const sectionId = filterChipsContainer.getAttribute('data-filter-section');
+    const filterChips = filterChipsContainer.querySelectorAll(
+      '[data-filter-name][data-filter-section]'
+    ) as NodeListOf<HTMLButtonElement>;
+    const clearBtn = document.getElementById('filter-clear-btn');
+    const filterLine = document.getElementById('filter-line');
+
+    /**
+     * FUNCIÓN CENTRAL: Actualizar color del chip cuando cambia estado
+     * Usa techColorMap centralizado desde src/config/tech-colors.ts
+     */
+    function updateChipColor(chip: HTMLButtonElement) {
+      const techName =
+        chip.getAttribute('data-filter-name')?.toLowerCase() || '';
+      const normalizedName = normalizeTechName(techName);
+      const color = techColorMap[normalizedName] || '#61DAFB';
+      chip.style.setProperty('--chip-color', color);
+    }
+
+    /**
+     * FUNCIÓN CENTRAL: Manejo de toggle de chips
+     * Invocada por click en chip O por removeX button
+     * OPTIMIZADO: Zero requestAnimationFrame lag
+     */
+    function toggleChip(chip: HTMLButtonElement) {
+      const isActive = chip.getAttribute('data-filter-active') === 'true';
+      const newState = String(!isActive);
+
+      chip.setAttribute('data-filter-active', newState);
+      chip.setAttribute('aria-pressed', newState);
+
+      // Aplicar color si está activo
+      updateChipColor(chip);
+
+      // OPTIMIZADO: Dispatch INMEDIATAMENTE sin requestAnimationFrame
+      // El main thread puede manejar esto sin bloqueo
+      updateFilterUI();
+    }
+
+    /**
+     * LISTENER: Click en chip
+     */
+    filterChips.forEach((chip) => {
+      // Inicializar color
+      updateChipColor(chip);
+
+      chip.addEventListener('click', (e) => {
+        // Prevenir si fue click en removeX (manejado por su propio listener)
+        if ((e.target as HTMLElement).closest('[data-remove-x]')) {
+          return;
+        }
+
+        toggleChip(chip);
+      });
+
+      // Remove button (✕)
+      const removeX = chip.querySelector('[data-remove-x]');
+      if (removeX) {
+        removeX.addEventListener('click', (e) => {
+          e.stopPropagation();
+          chip.setAttribute('data-filter-active', 'false');
+          chip.setAttribute('aria-pressed', 'false');
+          updateChipColor(chip);
+          updateFilterUI();
+        });
+      }
+    });
+
+    /**
+     * LISTENER: Clear button
+     */
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        filterChips.forEach((chip) => {
+          chip.setAttribute('data-filter-active', 'false');
+          chip.setAttribute('aria-pressed', 'false');
+          updateChipColor(chip);
+        });
+        updateFilterUI();
+      });
+    }
+
+    /**
+     * FUNCIÓN: Actualizar UI (counter, clear button, line)
+     * Se invoca DESPUÉS de cualquier cambio de estado
+     */
+    function updateFilterUI() {
+      if (!filterChipsContainer) return;
+
+      const activeChips = filterChipsContainer.querySelectorAll(
+        '[data-filter-active="true"]'
+      ) as NodeListOf<HTMLElement>;
+      const counterText = document.getElementById('filter-counter-text');
+
+      // Update counter text
+      if (
+        counterText &&
+        counterText.getAttribute('data-section') === sectionId
+      ) {
+        if (activeChips.length === 0) {
+          counterText.textContent = 'Mostrando todos los proyectos';
+          if (filterLine) filterLine.classList.remove('active');
+        } else {
+          const activeNames = Array.from(activeChips)
+            .map((c) => c.getAttribute('data-filter-name'))
+            .join(', ');
+          counterText.textContent = `Filtros activos: ${activeNames}`;
+          if (filterLine) filterLine.classList.add('active');
+        }
+      }
+
+      // Show/hide clear button
+      if (clearBtn && clearBtn.getAttribute('data-section') === sectionId) {
+        if (activeChips.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+
+      // DISPATCH: Evento customizado para Projects.astro
+      // Este es el evento que Projects escucha para filtrar tarjetas
+      // NORMALIZAR los nombres antes de enviar
+      const activeNames = Array.from(activeChips)
+        .map((c) => c.getAttribute('data-filter-name'))
+        .filter((name): name is string => !!name)
+        .map((name) => normalizeTechName(name));
+
+      const event = new CustomEvent('filter-changed', {
+        detail: {
+          activeTechs: activeNames,
+          section: sectionId,
+        },
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Inicializar colores en carga
+    // Inicializar colores y estado en carga
+    filterChips.forEach((chip) => {
+      updateChipColor(chip);
+      chip.setAttribute('data-filter-active', 'false');
+      chip.setAttribute('aria-pressed', 'false');
+    });
+    // Disparar evento inicial para sincronizar el grid
+    updateFilterUI();
+  }
+
+  // Initialize on page load
+  document.addEventListener('astro:page-load', initFilterBar);
+  document.addEventListener('DOMContentLoaded', initFilterBar);
+
+  // Cleanup before navigation (View Transitions)
+  // Previene memory leaks de event listeners acumulados
+  document.addEventListener('astro:before-swap', () => {
+    // Los listeners se limpiarán automáticamente cuando el DOM se reemplace
+    // Pero podemos hacer cleanup explícito si es necesario
+  });
+</script>

@@ -1,5 +1,6 @@
-// Este objeto mapea el nombre de una tecnología (en minúsculas) a su color de marca oficial.
+// Este objeto mapea el nombre de una tecnología (NORMALIZADA) a su color de marca oficial.
 // Es nuestra "fuente de verdad". Añadir una nueva tecnología es tan fácil como añadir una nueva línea aquí.
+// IMPORTANTE: Las claves deben estar NORMALIZADAS (usa la función normalizeTechName)
 export const techColorMap: Record<string, string> = {
   react: '#61DAFB',
   astro: '#FF5D01',
@@ -8,10 +9,12 @@ export const techColorMap: Record<string, string> = {
   html: '#E34F26',
   css: '#1572B6',
   tailwind: '#06B6D4',
-  dotnet: '#512BD4',
+  dotnet: '#512BD4', // Normalizado: '.NET', 'ASP.NET' -> 'dotnet'
   csharp: '#239120',
   git: '#F05032',
   figma: '#F24E1E',
+  vite: '#646CFF',
+  mysql: '#00758F', // MySQL oficial color
   // Añade más tecnologías y sus colores aquí...
 };
 // Un color por defecto para tecnologías que no estén en el mapa.

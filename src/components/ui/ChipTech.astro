@@ -11,6 +11,9 @@ interface Props {
 
 const { Icon, name, label, iconClass } = Astro.props;
 
+// 'name' debe ser la forma NORMALIZADA de la tecnología (ej: 'dotnet' no '.NET')
+// 'label' es lo que se muestra al usuario (ej: '.NET')
+// Usar name.toLowerCase() para lookup en techColorMap
 const color = techColorMap[name.toLowerCase()] || defaultTechColor;
 ---
 

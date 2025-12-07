@@ -4,8 +4,9 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
 import StatusBadge from '@/components/ui/StatusBadge.astro';
-import ChipTech from '@/components/ui/ChipTech.astro'; // Importamos ChipTech
-import { techIconMap } from '@/config/tech-icon-map'; // Importamos el mapa de iconos
+import ChipTech from '@/components/ui/ChipTech.astro';
+import { techIconMap } from '@/config/tech-icon-map';
+import { normalizeTechName } from '@/lib/normalizeTech';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -16,11 +17,15 @@ const { title, tagline, cover, status, techStack } = project.data;
 
 // Limitamos a 3 o 4 tecnologías para que la tarjeta no crezca demasiado
 const visibleTechs = techStack.slice(0, 3);
+
+// Pasar techStack como data-tech JSON para filtrado
+const techStackJson = JSON.stringify(techStack || []);
 ---
 
 <div
   class="project-thumbnail-trigger group h-full cursor-pointer"
   data-project-slug={project.slug}
+  data-tech={techStackJson}
   role="button"
   aria-label={`Ver detalles de ${title}`}
 >
@@ -63,10 +68,10 @@ const visibleTechs = techStack.slice(0, 3);
       <div class="mb-6 flex flex-wrap gap-2">
         {
           visibleTechs.map((tech) => {
-            const Icon = techIconMap[tech.toLowerCase()];
-            // Usamos una versión simplificada del ChipTech si es necesario,
-            // o el componente tal cual.
-            return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+            const normalizedTech = normalizeTechName(tech);
+            const Icon = techIconMap[normalizedTech];
+            const displayLabel = normalizedTech === 'dotnet' ? '.NET' : tech;
+            return Icon ? <ChipTech Icon={Icon} name={normalizedTech} label={displayLabel} /> : null;
           })
         }
         {
@@ -78,7 +83,9 @@ const visibleTechs = techStack.slice(0, 3);
         }
       </div>
 
-      <div class="mt-auto flex items-center justify-between border-t border-border pt-4">
+      <div
+        class="mt-auto flex items-center justify-between border-t border-border pt-4"
+      >
         <StatusBadge status={status} />
       </div>
     </div>

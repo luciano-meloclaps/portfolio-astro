@@ -6,7 +6,7 @@ const CHARS = 'ABCD&/*E_?%$%6%^&FGHIJ+=)(^][{}K%LMNOPQRST#UVWX$YZ01!23456789';
 /**
  * Función reutilizable para animar texto con efecto Scramble.
  * OPTIMIZADO: Evita actualizaciones innecesarias del DOM.
- * 
+ *
  * @param element - El elemento DOM a animar.
  * @param newText - El texto final que debe quedar escrito.
  * @param duration - Duración en segundos.
@@ -66,7 +66,7 @@ export const scrambleText = (
 /**
  * Función para limpiar y resetear un elemento de texto.
  * Se usa para garantizar estado limpio antes de nuevas animaciones.
- * 
+ *
  * @param element - El elemento a limpiar
  * @param targetText - El texto final deseado
  */

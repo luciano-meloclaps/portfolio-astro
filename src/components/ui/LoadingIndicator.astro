@@ -1,0 +1,101 @@
+---
+/**
+ * LoadingIndicator.astro
+ * Micro loading spinner para operaciones que tardan > 200ms
+ * Aparece y desaparece automáticamente
+ */
+
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const { id = 'loading-indicator', class: className = '' } = Astro.props;
+---
+
+<div
+  id={id}
+  class:list={[
+    'pointer-events-none fixed inset-0 z-50 flex items-center justify-center',
+    'opacity-0 transition-opacity duration-300',
+    className,
+  ]}
+  aria-hidden="true"
+>
+  <div class="relative h-12 w-12">
+    <svg
+      class="h-full w-full animate-spin"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      />
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  #loading-indicator {
+    color: var(--color-text-primary);
+  }
+</style>
+
+<script>
+  /**
+   * Auto-hide loading indicator después de que GSAP timeline se complete
+   */
+  function initLoadingIndicator() {
+    const indicator = document.getElementById('loading-indicator');
+    if (!indicator) return;
+
+    // Variable para tracking de si hay timeline activo
+    let showTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // Escuchar cambios de filtro
+    document.addEventListener('filter-changed', () => {
+      // Mostrar después de 200ms si timeline todavía está corriendo
+      showTimer = setTimeout(() => {
+        indicator.classList.add('opacity-100');
+        indicator.classList.remove('opacity-0');
+      }, 200);
+
+      // Observar GSAP para saber cuándo se completa
+      // Este es un approach simple, alternativa es usar MutationObserver
+      const hideTimer = setTimeout(() => {
+        indicator.classList.add('opacity-0');
+        indicator.classList.remove('opacity-100');
+      }, 400); // 200ms delay + 200ms duration de animación
+
+      // Cleanup timers on navigation
+      const cleanup = () => {
+        if (showTimer) clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+      document.addEventListener('astro:before-swap', cleanup, { once: true });
+    });
+  }
+
+  initLoadingIndicator();
+</script>
