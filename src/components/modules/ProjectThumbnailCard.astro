@@ -71,7 +71,13 @@ const techStackJson = JSON.stringify(techStack || []);
             const normalizedTech = normalizeTechName(tech);
             const Icon = techIconMap[normalizedTech];
             const displayLabel = normalizedTech === 'dotnet' ? '.NET' : tech;
-            return Icon ? <ChipTech Icon={Icon} name={normalizedTech} label={displayLabel} /> : null;
+            return Icon ? (
+              <ChipTech
+                Icon={Icon}
+                name={normalizedTech}
+                label={displayLabel}
+              />
+            ) : null;
           })
         }
         {

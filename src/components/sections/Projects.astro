@@ -87,7 +87,7 @@ const availableTechs = Array.from(
   function handleFilterChange(event: Event) {
     const customEvent = event as CustomEvent;
     const { activeTechs } = customEvent.detail as { activeTechs: string[] };
-    
+
     // activeTechs ya viene normalizado desde FilterBar, no re-normalizar
     const cards = document.querySelectorAll('[data-project-slug][data-tech]');
 
@@ -97,7 +97,9 @@ const availableTechs = Array.from(
     }
 
     // Crear nuevo timeline para esta operación de filtrado
-    filterTimeline = gsap.timeline({ defaults: { duration: 0.15, ease: 'power2.inOut' } });
+    filterTimeline = gsap.timeline({
+      defaults: { duration: 0.15, ease: 'power2.inOut' },
+    });
 
     const cardsToShow: HTMLElement[] = [];
     const cardsToHide: HTMLElement[] = [];
@@ -107,19 +109,21 @@ const availableTechs = Array.from(
       const el = card as HTMLElement;
       const techStr = el.getAttribute('data-tech');
       let show = true;
-      
+
       if (techStr && activeTechs && activeTechs.length > 0) {
         try {
           const projectTechs = JSON.parse(techStr);
           const normalizedProjectTechs = normalizeTechArray(projectTechs);
           // AND logic - acumulativo
-          show = activeTechs.every((tech: string) => normalizedProjectTechs.includes(tech));
+          show = activeTechs.every((tech: string) =>
+            normalizedProjectTechs.includes(tech)
+          );
         } catch (e) {
           console.error('Error parsing tech stack:', techStr, e);
           show = true;
         }
       }
-      
+
       if (show) {
         cardsToShow.push(el);
       } else {
@@ -152,7 +156,7 @@ const availableTechs = Array.from(
       el.style.display = '';
       el.style.pointerEvents = 'auto';
       el.style.cursor = 'pointer';
-      
+
       filterTimeline!.to(
         el,
         {
@@ -178,8 +182,12 @@ const availableTechs = Array.from(
 
   // ==================== MODAL: Abrir/Cerrar ====================
   function initializeModal() {
-    const overlay = document.getElementById('project-overlay') as HTMLElement | null;
-    const overlayBg = document.getElementById('overlay-bg') as HTMLElement | null;
+    const overlay = document.getElementById(
+      'project-overlay'
+    ) as HTMLElement | null;
+    const overlayBg = document.getElementById(
+      'overlay-bg'
+    ) as HTMLElement | null;
     const grid = document.getElementById('projects-grid') as HTMLElement | null;
 
     if (!overlay || !overlayBg || !grid) {
@@ -278,10 +286,14 @@ const availableTechs = Array.from(
 
     // Cleanup on navigation (View Transitions)
     const cleanup = () => {
-      if (modalHandlers.gridClick) grid.removeEventListener('click', modalHandlers.gridClick);
-      if (modalHandlers.overlayBgClick) overlayBg.removeEventListener('click', modalHandlers.overlayBgClick);
-      if (modalHandlers.overlayClick) overlay.removeEventListener('click', modalHandlers.overlayClick);
-      if (modalHandlers.keydown) document.removeEventListener('keydown', modalHandlers.keydown);
+      if (modalHandlers.gridClick)
+        grid.removeEventListener('click', modalHandlers.gridClick);
+      if (modalHandlers.overlayBgClick)
+        overlayBg.removeEventListener('click', modalHandlers.overlayBgClick);
+      if (modalHandlers.overlayClick)
+        overlay.removeEventListener('click', modalHandlers.overlayClick);
+      if (modalHandlers.keydown)
+        document.removeEventListener('keydown', modalHandlers.keydown);
     };
     document.addEventListener('astro:before-swap', cleanup);
   }
