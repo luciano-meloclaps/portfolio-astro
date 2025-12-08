@@ -19,61 +19,61 @@
 const TECH_ALIASES: Record<string, string> = {
   // Node.js variations
   'node.js': 'nodejs',
-  'nodejs': 'nodejs',
-  'node': 'nodejs',
+  nodejs: 'nodejs',
+  node: 'nodejs',
 
   // .NET variations
   '.net': 'dotnet',
-  'dotnet': 'dotnet',
+  dotnet: 'dotnet',
   'asp.net': 'dotnet',
-  'aspnet': 'dotnet',
+  aspnet: 'dotnet',
   'c#': 'csharp',
-  'csharp': 'csharp',
+  csharp: 'csharp',
 
   // React
-  'react': 'react',
-  'reactjs': 'react',
+  react: 'react',
+  reactjs: 'react',
   'react.js': 'react',
 
   // TypeScript
-  'typescript': 'typescript',
-  'ts': 'typescript',
+  typescript: 'typescript',
+  ts: 'typescript',
 
   // JavaScript
-  'javascript': 'javascript',
-  'js': 'javascript',
+  javascript: 'javascript',
+  js: 'javascript',
 
   // Astro
-  'astro': 'astro',
+  astro: 'astro',
 
   // CSS/Tailwind
-  'css': 'css',
-  'tailwind': 'tailwind',
-  'tailwindcss': 'tailwind',
+  css: 'css',
+  tailwind: 'tailwind',
+  tailwindcss: 'tailwind',
 
   // Docker
-  'docker': 'docker',
+  docker: 'docker',
 
   // Git
-  'git': 'git',
-  'github': 'github',
+  git: 'git',
+  github: 'github',
 
   // Databases
-  'postgresql': 'postgresql',
-  'postgres': 'postgresql',
-  'mysql': 'mysql',
+  postgresql: 'postgresql',
+  postgres: 'postgresql',
+  mysql: 'mysql',
 
   // Tools
-  'vite': 'vite',
-  'figma': 'figma',
+  vite: 'vite',
+  figma: 'figma',
 
   // Cloud
-  'aws': 'aws',
-  'azure': 'azure',
+  aws: 'aws',
+  azure: 'azure',
 
   // HTML
-  'html': 'html',
-  'html5': 'html',
+  html: 'html',
+  html5: 'html',
 };
 
 /**
@@ -94,11 +94,7 @@ export function normalizeTechName(techName: string): string {
  * @returns Array normalizado sin duplicados
  */
 export function normalizeTechArray(techs: string[]): string[] {
-  return Array.from(new Set(
-    techs
-      .map(normalizeTechName)
-      .filter(Boolean)
-  ));
+  return Array.from(new Set(techs.map(normalizeTechName).filter(Boolean)));
 }
 
 /**

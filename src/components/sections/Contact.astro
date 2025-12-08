@@ -5,6 +5,7 @@
 // de una manera rica, estructurada y profesional.
 import Card from '@/components/ui/Card.astro';
 import ContactForm from '@/components/modules/ContactForm.astro';
+import FormModal from '@/components/ui/FormModal.astro';
 import Button from '@/components/ui/Button.astro';
 import StatusChip from '@/components/ui/StatusChip.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
@@ -25,10 +26,10 @@ import {
       subtitle="Colaboremos en tu próximo proyecto. Si tienes una pregunta, una propuesta o simplemente quieres saludar, me encantaría saber de ti."
     />
 
-    <div class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start">
+    <div class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 md:items-stretch">
       <!-- COLUMNA IZQUIERDA: INFORMACIÓN Y ESTADO -->
-      <div class="space-y-8">
-        <Card>
+      <div class="flex flex-col gap-8">
+        <Card class="flex flex-col">
           <h3 class="font-bold text-text-primary">Contacto Directo</h3>
           <div class="mt-6 space-y-4">
             <div class="flex items-center gap-x-3 text-sm text-text-secondary">
@@ -46,7 +47,7 @@ import {
           </div>
         </Card>
 
-        <Card>
+        <Card class="flex flex-col">
           <h3 class="font-bold text-text-primary">Conecta Conmigo</h3>
           <div class="mt-6 flex flex-wrap gap-4">
             <Button
@@ -68,9 +69,9 @@ import {
           </div>
         </Card>
 
-        <Card>
+        <Card class="flex flex-col flex-1">
           <h3 class="font-bold text-text-primary">Disponibilidad Actual</h3>
-          <p class="mt-2 text-sm text-text-secondary">
+          <p class="mt-2 flex-1 text-sm text-text-secondary">
             Abierto a oportunidades freelance y de tiempo completo. Típicamente
             respondo dentro de 24 horas.
           </p>
@@ -85,13 +86,16 @@ import {
         </Card>
       </div>
 
-      <!-- COLUMNA DERECHA: FORMULARIO -->
-      <Card class="md:col-span-1">
+      <!-- COLUMNA DERECHA: FORMULARIO (Card con flex-col para alineación perfecta) -->
+      <Card class="flex flex-col">
         <h3 class="mb-6 font-bold text-text-primary">Enviar un Mensaje</h3>
         <ContactForm />
       </Card>
     </div>
   </div>
+
+  <!-- Modal de Feedback del Formulario -->
+  <FormModal />
 </section>
 
 <!-- Coreografía de Entrada "Flotante" con GSAP -->
