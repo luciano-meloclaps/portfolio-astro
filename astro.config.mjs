@@ -8,5 +8,11 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   // Añade la URL de tu sitio web final aquí para el sitemap.
   site: 'https://www.ejemplo.com',
-  integrations: [react(), tailwind(), sitemap()], // <-- Añade sitemap() aquí
+  integrations: [react(), tailwind(), sitemap()],
+  
+  // Image service: usar 'noop' para evitar dependencia de Sharp
+  // Las imágenes se sirven sin transformación (mejor performance)
+  image: {
+    service: { entrypoint: 'astro/assets/services/noop' },
+  },
 });

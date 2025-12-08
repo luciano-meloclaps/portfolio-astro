@@ -1,0 +1,317 @@
+---
+/**
+ * FormModal.astro
+ * ===============
+ * Modal de feedback para envío de formulario de contacto
+ * Soporta estados: éxito y error
+ * Accesible: focus management, keyboard navigation, ARIA labels
+ */
+
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const { id = 'form-modal', class: className = '' } = Astro.props;
+---
+
+<!-- Modal Overlay -->
+<div
+  id={id}
+  class:list={[
+    'pointer-events-none fixed inset-0 z-[200] flex items-center justify-center px-4',
+    'opacity-0 transition-opacity duration-300',
+    className,
+  ]}
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  aria-labelledby="modal-title"
+>
+  <!-- Backdrop -->
+  <div
+    class="absolute inset-0 bg-background/60 backdrop-blur-md transition-opacity duration-300"
+    id="modal-backdrop"
+    aria-hidden="true"
+  >
+  </div>
+
+  <!-- Modal Content -->
+  <div
+    class="relative w-full max-w-md rounded-md border border-border bg-panel p-8 shadow-2xl"
+    id="modal-content"
+  >
+    <!-- Success State -->
+    <div id="modal-success" class="hidden text-center">
+      <!-- Success Icon -->
+      <div class="mb-6 flex justify-center">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10"
+        >
+          <svg
+            class="h-8 w-8 text-emerald-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <h2 id="modal-title" class="mb-3 text-xl font-bold text-text-primary">
+        ¡Mensaje Enviado!
+      </h2>
+      <p class="mb-6 text-sm text-text-secondary">
+        Gracias por tu contacto. Te responderé a la brevedad.
+      </p>
+
+      <!-- Close Button -->
+      <button
+        class="close-modal-btn inline-flex items-center justify-center gap-x-2 rounded-small border border-border bg-text-primary/5 px-4 py-2 text-sm font-medium text-text-primary transition-all duration-200 hover:bg-text-primary/10 hover:border-text-primary/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-panel focus-visible:ring-text-primary"
+        id="modal-close-btn"
+        type="button"
+        aria-label="Cerrar modal"
+      >
+        Continuar
+      </button>
+    </div>
+
+    <!-- Error State -->
+    <div id="modal-error" class="hidden text-center">
+      <!-- Error Icon -->
+      <div class="mb-6 flex justify-center">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-rose-500/10"
+        >
+          <svg
+            class="h-8 w-8 text-rose-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <h2 id="modal-title" class="mb-3 text-xl font-bold text-text-primary">
+        Algo Salió Mal
+      </h2>
+      <p class="mb-2 text-sm text-text-secondary">
+        No pudimos enviar tu mensaje. Por favor, intenta de nuevo más tarde.
+      </p>
+      <p class="mb-6 text-xs text-text-secondary opacity-75">
+        Si el problema persiste, contáctame directamente a través de los canales de comunicación.
+      </p>
+
+      <!-- Close Button -->
+      <button
+        class="close-modal-btn inline-flex items-center justify-center gap-x-2 rounded-small border border-border bg-text-primary/5 px-4 py-2 text-sm font-medium text-text-primary transition-all duration-200 hover:bg-text-primary/10 hover:border-text-primary/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-panel focus-visible:ring-text-primary"
+        id="modal-close-btn-error"
+        type="button"
+        aria-label="Cerrar modal"
+      >
+        Intentar de Nuevo
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  #form-modal {
+    --transition-duration: 300ms;
+  }
+
+  #form-modal.active {
+    pointer-events: auto;
+  }
+
+  #form-modal.active #modal-content {
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+</style>
+
+<script>
+  /**
+   * FormModal initialization
+   * Handles accessibility, focus management, and keyboard navigation
+   */
+  function initFormModal(): void {
+    const modal = document.getElementById('form-modal') as HTMLElement | null;
+    if (!modal) return;
+
+    const successState = document.getElementById(
+      'modal-success'
+    ) as HTMLElement | null;
+    const errorState = document.getElementById(
+      'modal-error'
+    ) as HTMLElement | null;
+
+    if (!successState || !errorState) return;
+
+    // Modal state
+    let isOpen = false;
+    let previousActiveElement: HTMLElement | null = null;
+    let closeClickHandler: (() => void) | null = null;
+    let escapeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+    let tabKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+
+    /**
+     * Open modal with specified state
+     */
+    function openModal(state: 'success' | 'error'): void {
+      previousActiveElement = document.activeElement as HTMLElement;
+
+      // Show appropriate state
+      successState!.classList.toggle('hidden', state !== 'success');
+      errorState!.classList.toggle('hidden', state !== 'error');
+
+      // Set modal as active
+      isOpen = true;
+      modal!.classList.add('active');
+      modal!.classList.remove('opacity-0');
+      modal!.classList.add('opacity-100');
+      modal!.classList.remove('pointer-events-none');
+      modal!.setAttribute('aria-hidden', 'false');
+
+      // Focus close button with small delay for browser to process visibility change
+      const closeBtn = modal!.querySelector(
+        '.close-modal-btn'
+      ) as HTMLElement | null;
+      if (closeBtn) {
+        requestAnimationFrame(() => closeBtn.focus());
+      }
+    }
+
+    /**
+     * Close modal with animation
+     */
+    function closeModal(): void {
+      isOpen = false;
+      modal!.classList.remove('active');
+      modal!.classList.add('opacity-0');
+      modal!.classList.remove('opacity-100');
+
+      // Wait for animation to complete before hiding
+      setTimeout(() => {
+        modal!.classList.add('pointer-events-none');
+        modal!.setAttribute('aria-hidden', 'true');
+
+        // Restore focus to previous element
+        if (previousActiveElement?.focus) {
+          previousActiveElement.focus();
+        }
+      }, 300);
+    }
+
+    /**
+     * Set up event listeners
+     */
+    const closeButtons = modal!.querySelectorAll(
+      '.close-modal-btn'
+    ) as NodeListOf<HTMLElement>;
+
+    closeClickHandler = () => closeModal();
+    closeButtons.forEach((btn) => {
+      btn.addEventListener('click', closeClickHandler!);
+    });
+
+    escapeKeyHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        e.preventDefault();
+        closeModal();
+      }
+    };
+
+    tabKeyHandler = (e: KeyboardEvent) => {
+      if (!isOpen || e.key !== 'Tab') return;
+
+      const focusableElements = Array.from(
+        modal!.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ) as HTMLElement[];
+
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement as HTMLElement;
+
+      if (e.shiftKey) {
+        // Shift + Tab: move to previous
+        if (activeElement === firstElement) {
+          lastElement.focus();
+          e.preventDefault();
+        }
+      } else {
+        // Tab: move to next
+        if (activeElement === lastElement) {
+          firstElement.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', escapeKeyHandler);
+    document.addEventListener('keydown', tabKeyHandler);
+
+    // Cleanup function for View Transitions
+    const cleanup = () => {
+      closeButtons.forEach((btn) => {
+        if (closeClickHandler) {
+          btn.removeEventListener('click', closeClickHandler);
+        }
+      });
+      if (escapeKeyHandler) {
+        document.removeEventListener('keydown', escapeKeyHandler);
+      }
+      if (tabKeyHandler) {
+        document.removeEventListener('keydown', tabKeyHandler);
+      }
+    };
+
+    document.addEventListener('astro:before-swap', cleanup);
+
+    // Export global API for ContactForm
+    (window as any).formModal = {
+      open: openModal,
+      close: closeModal,
+      isOpen: () => isOpen,
+    };
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFormModal);
+  } else {
+    initFormModal();
+  }
+
+  // Reinitialize after View Transitions
+  document.addEventListener('astro:page-load', initFormModal);
+</script>
