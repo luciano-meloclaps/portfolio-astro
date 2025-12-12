@@ -1,29 +1,64 @@
 // src/config/tech-icon-map.ts
 import {
   IconBrandReact,
-  IconBrandAstro,
   IconBrandTypescript,
-  IconBrandTailwind,
-  IconHexagons,
-  IconBrandGit,
-  IconBrandDocker,
-  IconBrandGithub,
+  IconBrandJavascript,
+  IconBrandHtml5,
+  IconBrandCss3,
   IconBrandMysql,
+  IconBrandGit,
+  IconBrandFigma,
+  IconDatabase,
+  IconLockPassword,
+  IconBrandAstro,
+  IconBrandTailwind,
+  IconBrandDocker,
   IconBrandVite,
-  IconBrandNodejs,
+  IconBrandGithub,
+  IconTerminal2, // Fallback
 } from '@tabler/icons-react';
 
-// Un mapa central para asociar un string de tecnología con su componente de icono.
-// IMPORTANTE: Las claves deben estar NORMALIZADAS (usa la función normalizeTechName)
-export const techIconMap: Record<string, astroHTML.JSX.Element> = {
+// IMPORTAMOS LOS ICONOS CUSTOM
+import IconDotNet from '@/components/icons/IconDotNet';
+import IconCSharp from '@/components/icons/IconCSharp';
+
+export const DefaultIcon = IconTerminal2;
+
+export const techIconMap: Record<string, any> = {
+  // --- LENGUAJES & FRAMEWORKS ---
   react: IconBrandReact,
   astro: IconBrandAstro,
   typescript: IconBrandTypescript,
+  ts: IconBrandTypescript,
+  javascript: IconBrandJavascript,
+  js: IconBrandJavascript,
+  html: IconBrandHtml5,
+  html5: IconBrandHtml5,
+  css: IconBrandCss3,
   tailwind: IconBrandTailwind,
-  dotnet: IconHexagons, // Normalizado: '.NET', 'ASP.NET' -> 'dotnet'
+  'tailwind css': IconBrandTailwind,
+
+  // AQUÍ LA INTEGRACIÓN:
+  '.net': IconDotNet,
+  dotnet: IconDotNet,
+  'asp.net': IconDotNet,
+  'asp.net core': IconDotNet,
+
+  'c#': IconCSharp,
+  csharp: IconCSharp,
+  'c-sharp': IconCSharp,
+
+  // --- HERRAMIENTAS & PLATAFORMAS ---
+  mysql: IconBrandMysql,
+  sql: IconDatabase,
   git: IconBrandGit,
   github: IconBrandGithub,
-  mysql: IconBrandMysql,
+  docker: IconBrandDocker,
   vite: IconBrandVite,
-  aws: IconHexagons, // Usamos un icono genérico para la nube
+  figma: IconBrandFigma,
+
+  // --- CONCEPTOS ---
+  'entity framework': IconDatabase,
+  'ef core': IconDatabase,
+  jwt: IconLockPassword,
 };

@@ -4,12 +4,7 @@
  * Función única responsable de normalizar nombres de tecnología
  * para garantizar consistencia en todo el sistema.
  *
- * Resuelve variaciones como:
- * - "Node.js" → "nodejs"
- * - ".NET" → "dotnet"
- * - "ASP.NET" → "dotnet"
- * - "typescript" → "typescript"
- *
+
  * USO:
  * import { normalizeTechName } from '@/lib/normalizeTech';
  * const normalized = normalizeTechName('Node.js'); // 'nodejs'

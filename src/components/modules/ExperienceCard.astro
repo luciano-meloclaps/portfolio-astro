@@ -3,7 +3,9 @@
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
 import ChipTech from '@/components/ui/ChipTech.astro';
+import TechChip from '@/components/ui/TechChip.astro';
 import { techIconMap } from '@/config/tech-icon-map';
+import { normalizeTechName } from '@/lib/normalizeTech';
 import {
   IconPointFilled,
   IconChevronDown,
@@ -108,8 +110,16 @@ const formatDate = (date: Date) => new Date(date).getFullYear();
                 </h4>
                 <div class="mt-4 flex flex-wrap gap-2">
                   {techStack.map((tech) => {
-                    const Icon = techIconMap[tech.toLowerCase()];
-                    return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+                    const normalizedTech = normalizeTechName(tech);
+                    const Icon = techIconMap[normalizedTech];
+                    return Icon ? (
+                      <TechChip
+                        Icon={Icon}
+                        name={normalizedTech}
+                        label={tech}
+                        mode="static"
+                      />
+                    ) : null;
                   })}
                 </div>
               </div>

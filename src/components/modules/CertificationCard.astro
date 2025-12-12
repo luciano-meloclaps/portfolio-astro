@@ -4,7 +4,9 @@ import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
 import ChipTech from '@/components/ui/ChipTech.astro';
 import CategoryBadge from '@/components/ui/CategoryBadge.astro';
+import TechChip from '@/components/ui/TechChip.astro';
 import { techIconMap } from '@/config/tech-icon-map';
+import { normalizeTechName } from '@/lib/normalizeTech';
 import {
   IconCertificate,
   IconCalendar,
@@ -133,8 +135,16 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
                 </h4>
                 <div class="flex flex-wrap gap-2">
                   {techStack.map((tech) => {
-                    const Icon = techIconMap[tech.toLowerCase()];
-                    return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+                    const normalizedTech = normalizeTechName(tech);
+                    const Icon = techIconMap[normalizedTech];
+                    return Icon ? (
+                      <TechChip
+                        Icon={Icon}
+                        name={normalizedTech}
+                        label={tech}
+                        mode="static"
+                      />
+                    ) : null;
                   })}
                 </div>
               </div>

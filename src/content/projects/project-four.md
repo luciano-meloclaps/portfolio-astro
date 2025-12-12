@@ -12,7 +12,7 @@ keyFeatures:
   - 'Integración con múltiples pasarelas de pago'
   - 'Sistema de recomendaciones IA'
   - 'Análisis de comportamiento de usuario'
-techStack: ['React', 'TypeScript', 'MySQL']
+techStack: ['React', 'TypeScript', 'MySQL', 'C#']
 publishDate: 2024-03-10
 repoUrl: 'https://github.com/tu-usuario'
 ---

@@ -1,10 +1,10 @@
 ---
-// src/components/modules/ProjectThumbnailCard.astro
+// filepath: src/components/modules/ProjectThumbnailCard.astro
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
 import StatusBadge from '@/components/ui/StatusBadge.astro';
-import ChipTech from '@/components/ui/ChipTech.astro';
+import TechChip from '@/components/ui/TechChip.astro';
 import { techIconMap } from '@/config/tech-icon-map';
 import { normalizeTechName } from '@/lib/normalizeTech';
 
@@ -12,13 +12,12 @@ interface Props {
   project: CollectionEntry<'projects'>;
   index: number;
 }
+
 const { project, index } = Astro.props;
 const { title, tagline, cover, status, techStack } = project.data;
 
-// Limitamos a 3 o 4 tecnologías para que la tarjeta no crezca demasiado
+// Limitamos a 3 tecnologías visibles
 const visibleTechs = techStack.slice(0, 3);
-
-// Pasar techStack como data-tech JSON para filtrado
 const techStackJson = JSON.stringify(techStack || []);
 ---
 
@@ -64,22 +63,25 @@ const techStackJson = JSON.stringify(techStack || []);
         {tagline}
       </p>
 
-      <!-- NUEVO: Tech Stack en el Thumbnail -->
+      <!-- Tech Stack - REFACTORIZADO: Usa TechChip en modo static -->
       <div class="mb-6 flex flex-wrap gap-2">
         {
           visibleTechs.map((tech) => {
             const normalizedTech = normalizeTechName(tech);
             const Icon = techIconMap[normalizedTech];
             const displayLabel = normalizedTech === 'dotnet' ? '.NET' : tech;
+
             return Icon ? (
-              <ChipTech
+              <TechChip
                 Icon={Icon}
                 name={normalizedTech}
                 label={displayLabel}
+                mode="static"
               />
             ) : null;
           })
         }
+
         {
           techStack.length > 3 && (
             <span class="self-center text-xs text-text-secondary">

@@ -5,6 +5,8 @@ import Card from '@/components/ui/Card.astro';
 import Button from '@/components/ui/Button.astro';
 import StatusBadge from '@/components/ui/StatusBadge.astro';
 import ChipTech from '@/components/ui/ChipTech.astro';
+import TechChip from '@/components/ui/TechChip.astro';
+import { normalizeTechName } from '@/lib/normalizeTech';
 import { techIconMap } from '@/config/tech-icon-map';
 import {
   IconPointFilled,
@@ -178,7 +180,7 @@ const hasHiddenFeatures = hiddenFeatures.length > 0;
             }
           </div>
 
-          <!-- TECNOLOGÍAS -->
+          <!-- TECNOLOGÍAS - REFACTORIZADO -->
           <div class="stagger-item">
             <h4
               class="font-main text-text-secondary/60 mb-5 text-xs font-bold uppercase tracking-widest"
@@ -188,134 +190,142 @@ const hasHiddenFeatures = hiddenFeatures.length > 0;
             <div class="flex flex-wrap gap-2">
               {
                 techStack.map((tech) => {
-                  const Icon = techIconMap[tech.toLowerCase()];
-                  return Icon ? <ChipTech Icon={Icon} name={tech} /> : null;
+                  const normalizedTech = normalizeTechName(tech);
+                  const Icon = techIconMap[normalizedTech];
+                  return Icon ? (
+                    <TechChip
+                      Icon={Icon}
+                      name={normalizedTech}
+                      label={tech}
+                      mode="static"
+                    />
+                  ) : null;
                 })
               }
             </div>
           </div>
-        </div>
 
-        <div
-          class="stagger-item mt-12 flex flex-wrap justify-start gap-4 border-t border-border pt-8"
-        >
-          {
-            repoUrl && (
-              <Button
-                href={repoUrl}
-                target="_blank"
-                variant="primary"
-                class="w-full justify-center sm:w-auto"
-              >
-                <IconBrandGithub className="icon-base" /> Ver Código
-              </Button>
-            )
-          }
-          {
-            figmaUrl && (
-              <Button
-                href={figmaUrl}
-                target="_blank"
-                variant="secondary"
-                class="w-full justify-center sm:w-auto"
-              >
-                <IconBrandFigma className="icon-base" /> Diseño Figma
-              </Button>
-            )
-          }
+          <div
+            class="stagger-item mt-12 flex flex-wrap justify-start gap-4 border-t border-border pt-8"
+          >
+            {
+              repoUrl && (
+                <Button
+                  href={repoUrl}
+                  target="_blank"
+                  variant="primary"
+                  class="w-full justify-center sm:w-auto"
+                >
+                  <IconBrandGithub className="icon-base" /> Ver Código
+                </Button>
+              )
+            }
+            {
+              figmaUrl && (
+                <Button
+                  href={figmaUrl}
+                  target="_blank"
+                  variant="secondary"
+                  class="w-full justify-center sm:w-auto"
+                >
+                  <IconBrandFigma className="icon-base" /> Diseño Figma
+                </Button>
+              )
+            }
+          </div>
         </div>
       </div>
     </div>
   </Card>
-</div>
 
-<script>
-  import gsap from 'gsap';
+  <script>
+    import gsap from 'gsap';
 
-  function initCardInteractions(card: HTMLElement) {
-    // 1. Carrusel
-    const track = card.querySelector('.carousel-track') as HTMLElement;
-    const prevButton = card.querySelector('.carousel-prev');
-    const nextButton = card.querySelector('.carousel-next');
-    const dots = card.querySelectorAll('.carousel-dot');
+    function initCardInteractions(card: HTMLElement) {
+      // 1. Carrusel
+      const track = card.querySelector('.carousel-track') as HTMLElement;
+      const prevButton = card.querySelector('.carousel-prev');
+      const nextButton = card.querySelector('.carousel-next');
+      const dots = card.querySelectorAll('.carousel-dot');
 
-    if (track) {
-      let currentIndex = 0;
-      const slides = card.querySelectorAll('.carousel-slide');
-      const maxIndex = slides.length - 1;
-      const updateSlide = () => {
-        gsap.to(track, {
-          xPercent: -100 * currentIndex,
-          duration: 0.6,
-          ease: 'power3.out',
-        });
-        dots.forEach((dot, i) => {
-          if (i === currentIndex) dot.setAttribute('data-active', 'true');
-          else dot.removeAttribute('data-active');
-        });
-      };
-      updateSlide();
-      prevButton?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currentIndex = currentIndex > 0 ? currentIndex - 1 : maxIndex;
+      if (track) {
+        let currentIndex = 0;
+        const slides = card.querySelectorAll('.carousel-slide');
+        const maxIndex = slides.length - 1;
+        const updateSlide = () => {
+          gsap.to(track, {
+            xPercent: -100 * currentIndex,
+            duration: 0.6,
+            ease: 'power3.out',
+          });
+          dots.forEach((dot, i) => {
+            if (i === currentIndex) dot.setAttribute('data-active', 'true');
+            else dot.removeAttribute('data-active');
+          });
+        };
         updateSlide();
-      });
-      nextButton?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currentIndex = currentIndex < maxIndex ? currentIndex + 1 : 0;
-        updateSlide();
-      });
-      dots.forEach((dot) => {
-        dot.addEventListener('click', (e) => {
+        prevButton?.addEventListener('click', (e) => {
           e.stopPropagation();
-          currentIndex = parseInt(
-            (e.currentTarget as HTMLElement).dataset.index || '0'
-          );
+          currentIndex = currentIndex > 0 ? currentIndex - 1 : maxIndex;
           updateSlide();
         });
-      });
+        nextButton?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          currentIndex = currentIndex < maxIndex ? currentIndex + 1 : 0;
+          updateSlide();
+        });
+        dots.forEach((dot) => {
+          dot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentIndex = parseInt(
+              (e.currentTarget as HTMLElement).dataset.index || '0'
+            );
+            updateSlide();
+          });
+        });
+      }
+
+      // 2. Expansión
+      const toggleBtn = card.querySelector('.features-toggle');
+      const hiddenContainer = card.querySelector('.hidden-features-container');
+      const toggleText = card.querySelector('.toggle-text');
+      const toggleIcon = card.querySelector('.features-toggle svg');
+
+      if (toggleBtn && hiddenContainer) {
+        let isExpanded = false;
+        const originalText = toggleText?.textContent || 'Ver más';
+
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          isExpanded = !isExpanded;
+
+          if (isExpanded) {
+            gsap.to(hiddenContainer, {
+              height: 'auto',
+              opacity: 1,
+              duration: 0.3,
+              ease: 'power2.out',
+            });
+            gsap.to(toggleIcon, { rotation: 180, duration: 0.3 });
+            if (toggleText) toggleText.textContent = 'Ver menos';
+          } else {
+            gsap.to(hiddenContainer, {
+              height: 0,
+              opacity: 0,
+              duration: 0.25,
+              ease: 'power2.inOut',
+            });
+            gsap.to(toggleIcon, { rotation: 0, duration: 0.25 });
+            if (toggleText) toggleText.textContent = originalText;
+          }
+        });
+      }
     }
 
-    // 2. Expansión
-    const toggleBtn = card.querySelector('.features-toggle');
-    const hiddenContainer = card.querySelector('.hidden-features-container');
-    const toggleText = card.querySelector('.toggle-text');
-    const toggleIcon = card.querySelector('.features-toggle svg');
-
-    if (toggleBtn && hiddenContainer) {
-      let isExpanded = false;
-      const originalText = toggleText?.textContent || 'Ver más';
-
-      toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        isExpanded = !isExpanded;
-
-        if (isExpanded) {
-          gsap.to(hiddenContainer, {
-            height: 'auto',
-            opacity: 1,
-            duration: 0.3,
-            ease: 'power2.out',
-          });
-          gsap.to(toggleIcon, { rotation: 180, duration: 0.3 });
-          if (toggleText) toggleText.textContent = 'Ver menos';
-        } else {
-          gsap.to(hiddenContainer, {
-            height: 0,
-            opacity: 0,
-            duration: 0.25,
-            ease: 'power2.inOut',
-          });
-          gsap.to(toggleIcon, { rotation: 0, duration: 0.25 });
-          if (toggleText) toggleText.textContent = originalText;
-        }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.project-full-card').forEach((card) => {
+        initCardInteractions(card as HTMLElement);
       });
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.project-full-card').forEach((card) => {
-      initCardInteractions(card as HTMLElement);
     });
-  });
-</script>
+  </script>
+</div>
