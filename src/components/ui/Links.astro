@@ -1,31 +1,33 @@
 ---
 // src/components/ui/Links.astro
-const navLinks = [
-  { href: '#about', label: 'About' },
-  { href: '#projects', label: 'Projects' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#contact', label: 'Contact' },
+const links = [
+  { name: 'Acerca', href: '#about' },
+  { name: 'Proyectos', href: '#projects' },
+  { name: 'Carrera', href: '#career' },
+  { name: 'Contacto', href: '#contact' },
 ];
 
 interface Props {
-  ulClass?: string; // Clases para el contenedor <ul>
-  aClass?: string; // Clases para cada enlace <a>
+  ulClass?: string;
+  aClass?: string;
 }
+
 const { ulClass, aClass } = Astro.props;
 ---
 
-<ul class:list={['flex items-center gap-x-6', ulClass]}>
+<ul class:list={['flex items-center gap-x-8', ulClass]}>
   {
-    navLinks.map((link) => (
+    links.map((link) => (
       <li>
         <a
           href={link.href}
           class:list={[
-            'font-sans text-sm font-normal uppercase tracking-normal text-text-secondary transition-colors hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-text-primary',
+            // Base: Fuente técnica, transición suave
+            'font-sans text-sm uppercase tracking-wider text-text-secondary transition-all duration-300 ease-out hover:text-text-primary',
             aClass,
           ]}
         >
-          {link.label}
+          {link.name}
         </a>
       </li>
     ))
