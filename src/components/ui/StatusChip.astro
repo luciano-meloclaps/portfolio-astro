@@ -30,7 +30,7 @@ const variantConfig: Record<
   positive: {
     text: 'text-emerald-600 dark:text-emerald-400',
     dot: 'bg-emerald-500',
-    glow: 'shadow-emerald-500/20', // Glow sutil del mismo color
+    glow: 'shadow-emerald-500/20',
   },
   warning: {
     text: 'text-amber-600 dark:text-amber-400',
@@ -58,10 +58,7 @@ const theme = variantConfig[variant];
     'inline-flex select-none items-center justify-between gap-x-3 rounded-small px-3 py-1.5 transition-all duration-300',
 
     // ESTÉTICA GLASS CONSISTENTE CON NAVBAR:
-    // - bg-panel/20: Transparencia light
-    // - dark:bg-panel/10: Transparencia dark
-    // - backdrop-filter: blur variable CSS
-    // - border: 1px solid var(--border-light/dark): Border marcado
+
     'bg-panel/20 dark:bg-panel/10 border border-border',
     'backdrop-blur-[var(--blur-base)]',
 
