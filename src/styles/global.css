@@ -33,7 +33,12 @@
 
     /* Sombras y Bordes (Light Theme) */
     --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-    --border-light: rgba(0, 0, 0, 0.22); /* Refinado: balance visual con dark mode */
+    --border-light: rgba(
+      0,
+      0,
+      0,
+      0.22
+    ); /* Refinado: balance visual con dark mode */
 
     /* Gradientes Light Theme */
     --gradient-light-primary: rgba(129, 76, 120, 0.25);
@@ -45,7 +50,12 @@
     --color-panel-bg: rgba(255, 255, 255, 0.25);
     --color-text-primary: #1a1a1a;
     --color-text-secondary: #666666;
-    --color-border: rgba(0, 0, 0, 0.22); /* Match con --border-light para total homogeneidad */
+    --color-border: rgba(
+      0,
+      0,
+      0,
+      0.22
+    ); /* Match con --border-light para total homogeneidad */
     --color-grid-line: rgba(0, 0, 0, 0.05);
     --color-accent-magenta: #814c78;
     --color-glow-border: rgba(0, 0, 0, 0.8);
