@@ -15,21 +15,11 @@ import Layout from '@/layouts/Layout.astro';
 
 <Layout title="[Tu Nombre] | Portfolio Profesional">
   <main>
-    <!-- 
-      SECUENCIA NARRATIVA CORRECTA:
-      Cada sección es un "hermano" del siguiente, no un "hijo".
-    -->
     <Hero />
     <About />
     <Projects />
     <Career />
-    <Certifications />
-    <div class="flex gap-4">
-      <Badge text="Full Time" variant="accent" />
-      <Badge text="Contract" variant="accent" />
-    </div>
     <Contact />
     <Footer />
-    <!-- Aquí irán las futuras secciones como <Contact /> -->
   </main>
 </Layout>
