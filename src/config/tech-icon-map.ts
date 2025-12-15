@@ -13,6 +13,7 @@ import {
   IconBrandAstro,
   IconBrandTailwind,
   IconBrandDocker,
+  IconBrandBootstrap,
   IconBrandVite,
   IconBrandGithub,
   IconTerminal2, // Fallback
@@ -61,4 +62,7 @@ export const techIconMap: Record<string, any> = {
   'entity framework': IconDatabase,
   'ef core': IconDatabase,
   jwt: IconLockPassword,
+
+  // --- LIBRERIAS ---
+  bootstrap: IconBrandBootstrap,
 };

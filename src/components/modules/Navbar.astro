@@ -10,25 +10,27 @@ import { IconMenu, IconX } from '@tabler/icons-react';
   class="pointer-events-auto fixed left-1/2 top-5 z-[100] w-auto -translate-x-1/2 -translate-y-full opacity-0"
   aria-label="Cabecera del sitio"
 >
+  <!-- CONTENEDO-->
   <nav
     id="navbar-container"
-    class="glass-panel flex items-center gap-x-8 rounded-medium border border-border px-6 py-3 shadow-lg md:px-12"
+    class="glass-panel flex min-w-[180px] items-center gap-x-8 rounded-medium border border-border px-10 py-3 shadow-lg transition-all duration-300 md:min-w-0 md:px-16"
   >
-    <!-- 
-      NAVEGACIÓN DE ESCRITORIO (ESTILO CLEAN)
-      Aquí aplicamos la tipografía fina que te gustó.
-    -->
+    <!-- Navegación de Escritorio -->
     <div class="hidden items-center md:flex">
       <Links
         aClass="text-sm font-light tracking-widest text-text-secondary hover:text-text-primary hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] dark:hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"
       />
     </div>
 
-    <!-- Separador vertical sutil (Opcional, para separar nav de controles) -->
+    <!-- Separador (Solo Desktop) -->
     <div class="hidden h-4 w-px bg-border md:block"></div>
 
-    <!-- Controles -->
-    <div class="flex items-center gap-x-2">
+    <!-- 
+      CONTROLES (TEMA + MENÚ)
+    -->
+    <div
+      class="flex w-full items-center justify-between md:w-auto md:justify-start md:gap-x-2"
+    >
       <ThemeToggle />
 
       <!-- Botón de Menú Móvil -->
@@ -38,10 +40,10 @@ import { IconMenu, IconX } from '@tabler/icons-react';
         aria-label="Abrir o cerrar menú"
       >
         <div id="icon-menu" class="block">
-          <IconMenu className="h-6 w-6" strokeWidth={1} />
+          <IconMenu className="h-6 w-6" strokeWidth={1.0} />
         </div>
         <div id="icon-close" class="hidden">
-          <IconX className="h-6 w-6" strokeWidth={1} />
+          <IconX className="h-6 w-6" strokeWidth={1.0} />
         </div>
       </button>
     </div>

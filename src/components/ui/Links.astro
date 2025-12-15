@@ -1,9 +1,9 @@
 ---
 // src/components/ui/Links.astro
 const links = [
-  { name: 'Acerca', href: '#about' },
+  { name: 'Sobre mi', href: '#about' },
   { name: 'Proyectos', href: '#projects' },
-  { name: 'Carrera', href: '#career' },
+  { name: 'Trayectoria', href: '#career' },
   { name: 'Contacto', href: '#contact' },
 ];
 
@@ -22,8 +22,7 @@ const { ulClass, aClass } = Astro.props;
         <a
           href={link.href}
           class:list={[
-            // Base: Fuente técnica, transición suave
-            'font-sans text-sm uppercase tracking-wider text-text-secondary transition-all duration-300 ease-out hover:text-text-primary',
+            'whitespace-nowrap font-sans text-sm uppercase tracking-wider text-text-secondary transition-all duration-300 ease-out hover:text-text-primary',
             aClass,
           ]}
         >

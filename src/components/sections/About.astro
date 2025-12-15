@@ -7,14 +7,14 @@ import TechChip from '@/components/ui/TechChip.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
 import { techIconMap } from '@/config/tech-icon-map';
 
-import { IconSchema, IconPalette, IconSitemap } from '@tabler/icons-react';
+import { IconPackages, IconSitemap, IconBrain } from '@tabler/icons-react';
 ---
 
 <section id="about" class="py-24 md:py-32">
   <div class="container-narrow about-section-content space-y-8">
     <SectionTitle
       title="Sobre Mí"
-      subtitle="Desarrollador Full Stack apasionado por crear experiencias digitales excepcionales."
+      subtitle="Cómo pienso, cómo trabajo y un poco más sobre quién soy."
     />
 
     <Card padding="none" class="overflow-hidden">
@@ -23,58 +23,52 @@ import { IconSchema, IconPalette, IconSitemap } from '@tabler/icons-react';
 
     <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
       <Card class="md:col-span-2">
-        <h2 class="text-h3 font-bold text-text-primary">
-          Filosofía de Ingeniería
-        </h2>
+        <h2 class="text-h3 font-bold text-text-primary">Perfil</h2>
         <div
           class="prose prose-invert mt-6 max-w-none space-y-4 text-text-secondary"
           style="font-weight: 300;"
         >
           <p>
-            Creo firmemente que el código es una forma de arte funcional. Mi
-            enfoque combina la precisión técnica con una sensibilidad estética
-            refinada. No solo escribo software; construyo sistemas escalables,
-            mantenibles y performantes que resuelven problemas reales.
+            Técnico Universitario en Programación y Desarrollador Fullstack. Mi
+            enfoque se centra en el desarrollo de <strong
+              >SPAs (Single Page Applications)</strong
+            >
+            escalables, fusionando la robustez del backend en <strong
+              >.NET</strong
+            > bajo patrones de <strong>Clean Architecture</strong> con una ingeniería
+            de frontend performante en <strong>React</strong>.
           </p>
           <p>
-            Me especializo en el ecosistema JavaScript y .NET, buscando siempre
-            el equilibrio perfecto entre una excelente experiencia de
-            desarrollador y una inmejorable experiencia de usuario final.
+            Especialista en lógica de componentes reutilizables y sistemas de
+            diseño. Potencio el ciclo de desarrollo integrando herramientas de <strong
+              >IA</strong
+            > para la optimización de algoritmos y la entrega de soluciones de software
+            eficientes y mantenibles.
           </p>
         </div>
       </Card>
 
       <div class="space-y-8">
-        <StatCard value="8+" label="Años de Experiencia" />
-        <StatCard value="50+" label="Proyectos Completados" />
+        <StatCard value="10+" label="Proyectos de todo tipo" />
+        <StatCard value="3+" label="Años Programando" />
       </div>
     </div>
 
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <Card>
         <div class="flex items-center gap-x-4 text-xl">
-          <IconSchema
+          <IconPackages
             className="icon-base text-text-secondary"
             strokeWidth={1.0}
           />
-          <h3 class="text-lg font-bold text-text-primary">Arquitectura</h3>
+          <h3 class="text-lg font-bold text-text-primary">
+            Arquitectura Backend
+          </h3>
         </div>
         <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
-          Diseño de sistemas robustos utilizando Clean Architecture y principios
-          SOLID para garantizar escalabilidad.
-        </p>
-      </Card>
-      <Card>
-        <div class="flex items-center gap-x-4 text-xl">
-          <IconPalette
-            className="icon-base text-text-secondary"
-            strokeWidth={1.0}
-          />
-          <h3 class="text-lg font-bold text-text-primary">Diseño UI/UX</h3>
-        </div>
-        <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
-          Creación de interfaces intuitivas y accesibles con un enfoque "Pixel
-          Perfect" y atención al detalle.
+          Desarrollo de APIs RESTful escalables aplicando Clean Architecture.
+          Manejo de datos con Entity Framework Core y MySQL, asegurando la
+          protección mediante Token JWT.
         </p>
       </Card>
       <Card>
@@ -83,11 +77,30 @@ import { IconSchema, IconPalette, IconSitemap } from '@tabler/icons-react';
             className="icon-base text-text-secondary"
             strokeWidth={1.0}
           />
-          <h3 class="text-lg font-bold text-text-primary">Patrones</h3>
+          <h3 class="text-lg font-bold text-text-primary">
+            Ingeniería Frontend
+          </h3>
         </div>
         <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
-          Aplicación de patrones de diseño probados para resolver problemas
-          complejos de forma elegante.
+          Traducción fiel de diseños de Figma a interfaces modernas en React,
+          JavaScript y TypeScript. Implementación ágil de estilos utilizando
+          frameworks como TailwindCSS y Bootstrap.
+        </p>
+      </Card>
+      <Card>
+        <div class="flex items-center gap-x-4 text-xl">
+          <IconBrain
+            className="icon-base text-text-secondary"
+            strokeWidth={1.0}
+          />
+          <h3 class="text-lg font-bold text-text-primary">
+            Inteligencia Artificial
+          </h3>
+        </div>
+        <p class="mt-4 text-sm text-text-secondary" style="font-weight: 300;">
+          Potenciación del flujo de desarrollo mediante la integración de LLMs y
+          Agentes. Respaldo académico activo a través de la Tecnicatura en
+          Inteligencia Artificial y varios cursos.
         </p>
       </Card>
     </div>
@@ -108,12 +121,10 @@ import { IconSchema, IconPalette, IconSitemap } from '@tabler/icons-react';
           <div class="flex flex-wrap justify-center gap-2 md:justify-start">
             <TechChip Icon={techIconMap['react']} name="React" />
             <TechChip Icon={techIconMap['astro']} name="Astro" />
-            <TechChip Icon={techIconMap['typescript']} name="TypeScript" />
-            <TechChip Icon={techIconMap['tailwind']} name="Tailwind" />
-
-            <!-- AHORA SÍ: Usamos las claves que coinciden con tech-colors.ts -->
             <TechChip Icon={techIconMap['.net']} name=".NET" />
+            <TechChip Icon={techIconMap['typescript']} name="TypeScript" />
             <TechChip Icon={techIconMap['c#']} name="C#" />
+            <TechChip Icon={techIconMap['javascript']} name="Javascript" />
           </div>
         </div>
 
@@ -123,14 +134,25 @@ import { IconSchema, IconPalette, IconSitemap } from '@tabler/icons-react';
             Herramientas & Plataformas
           </h4>
           <div class="flex flex-wrap justify-center gap-2 md:justify-start">
-            <TechChip Icon={techIconMap['git']} name="Git" />
             <TechChip Icon={techIconMap['github']} name="GitHub" />
-            <TechChip Icon={techIconMap['docker']} name="Docker" />
             <TechChip Icon={techIconMap['vite']} name="Vite" />
             <TechChip Icon={techIconMap['figma']} name="Figma" />
             <TechChip Icon={techIconMap['mysql']} name="MySQL" />
+            <TechChip Icon={techIconMap['tailwind']} name="Tailwind" />
+            <TechChip Icon={techIconMap['bootstrap']} name="Bootstrap" />
           </div>
         </div>
+
+        {
+          /*     <!-- Columna Librerias -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-text-primary">Librerias</h4>
+          <div class="flex flex-wrap justify-center gap-2 md:justify-start">
+            <TechChip Icon={techIconMap['tailwind']} name="Tailwind" />
+            <TechChip Icon={techIconMap['bootstrap']} name="Bootstrap" />
+          </div>
+        </div>*/
+        }
       </div>
     </Card>
   </div>
