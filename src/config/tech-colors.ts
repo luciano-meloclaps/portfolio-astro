@@ -8,8 +8,8 @@ export const techColorMap: Record<string, string> = {
   astro: '#FF5D01',
   typescript: '#3178C6',
   ts: '#3178C6', // Alias alineado con icon-map
-  javascript: '#F7DF1E', // Ajustado al amarillo oficial JS (más legible)
-  js: '#F7DF1E', // Alias alineado con icon-map
+  javascript: '#cfc91f', // Ajustado al amarillo oficial JS (más legible)
+  js: '#cfc91f', // Alias alineado con icon-map
   html: '#E34F26',
   css: '#1572B6',
   tailwind: '#06B6D4',
@@ -25,17 +25,19 @@ export const techColorMap: Record<string, string> = {
 
   // --- BASES DE DATOS ---
   mysql: '#4479A1',
-  sql: '#003B57',
+  sql: '#2ca10c',
 
   // --- HERRAMIENTAS & PLATAFORMAS ---
   git: '#F05032',
-  github: '#75808F', // Gris acero (funciona en light/dark)
+  github: '#82868b', // Gris acero (funciona en light/dark)
   gitlab: '#FC6D26', // Naranja oficial GitLab
   docker: '#2496ED',
   figma: '#F24E1E',
 
   // --- LIBRERÍAS & CONCEPTOS ---
   bootstrap: '#7952B3', // Violeta oficial Bootstrap
-  'entity framework': '#512BD4', // Usamos el violeta de .NET
-  jwt: '#D63AFF', // Pink/Purple distintivo para JWT
+  'entity framework': '#8e7b57', // Usamos el violeta de .NET
+  jwt: '#b1170f', // Pink/Purple distintivo para JWT
+  trello: '#0052CC',
+  'framer motion': '#d3c65d',
 };
