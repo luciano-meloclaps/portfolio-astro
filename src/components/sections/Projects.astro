@@ -1,4 +1,5 @@
 ---
+// src/components/sections/Projects.astro
 import { getCollection } from 'astro:content';
 import ProjectThumbnailCard from '../modules/ProjectThumbnailCard.astro';
 import ProjectCard from '../modules/ProjectCard.astro';
@@ -6,21 +7,34 @@ import SectionTitle from '@/components/ui/SectionTitle.astro';
 import FilterBar from '@/components/ui/FilterBar.astro';
 import LoadingIndicator from '@/components/ui/LoadingIndicator.astro';
 
+import { PROJECT_FILTERS } from '@/config/filter-list';
+import { normalizeTechName } from '@/lib/normalizeTech';
+
 const allProjects = await getCollection('projects');
 allProjects.sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 );
 
-// Extraer todas las tecnologías únicas disponibles
-const availableTechs = Array.from(
-  new Set(allProjects.flatMap((p) => p.data.techStack || []).filter(Boolean))
-).sort();
+// --- LÓGICA DE FILTRADO ROBUSTA (TYPE-SAFE) ---
+
+const usedTechsInProjects = new Set(
+  allProjects
+    .flatMap((p) => p.data.techStack ?? [])
+    .filter((t): t is string => typeof t === 'string' && t.length > 0)
+    .map((t) => normalizeTechName(t))
+);
+
+const activeFilters: string[] = PROJECT_FILTERS.filter(
+  (tech): tech is string => {
+    return typeof tech === 'string' && usedTechsInProjects.has(tech);
+  }
+);
 ---
 
 <section id="projects" class="relative py-24 md:py-32">
   <div class="container-narrow projects-section-content space-y-16">
-    <!-- CENTRADO -->
-    <div class="flex w-full justify-center">
+    <!-- Título -->
+    <div class="flex w-full flex-col items-center justify-center">
       <SectionTitle
         title="Proyectos"
         subtitle="Código en acción. Soluciones reales a problemas reales."
@@ -28,15 +42,16 @@ const availableTechs = Array.from(
       />
     </div>
 
-    <!-- FILTER BAR -->
+    <!-- BARRA DE FILTROS -->
     {
-      availableTechs.length > 0 && (
+      activeFilters.length > 0 && (
         <div class="filter-bar-wrapper">
-          <FilterBar availableTechs={availableTechs} sectionId="projects" />
+          <FilterBar availableTechs={activeFilters} sectionId="projects" />
         </div>
       )
     }
 
+    <!-- Grilla de Proyectos -->
     <div id="projects-grid" class="grid grid-cols-1 gap-8 md:grid-cols-2">
       {
         allProjects.map((project, index) => (
@@ -46,10 +61,10 @@ const availableTechs = Array.from(
     </div>
   </div>
 
-  <!-- Loading Indicator (aparece durante filtrado pesado) -->
-  <LoadingIndicator />
+  <!-- Loading Indicator -->
+  {/* * <LoadingIndicator />/} */}
 
-  <!-- Overlay para vista detallada de proyectos -->
+  <!-- Overlay Modal -->
   <div
     id="project-overlay"
     class="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 opacity-0"
@@ -81,22 +96,17 @@ const availableTechs = Array.from(
   import gsap from 'gsap';
   import { normalizeTechArray } from '@/lib/normalizeTech';
 
-  // Reuse timeline instance para evitar crear nuevas en cada filter
   let filterTimeline: gsap.core.Timeline | null = null;
 
   function handleFilterChange(event: Event) {
     const customEvent = event as CustomEvent;
     const { activeTechs } = customEvent.detail as { activeTechs: string[] };
-
-    // activeTechs ya viene normalizado desde FilterBar, no re-normalizar
     const cards = document.querySelectorAll('[data-project-slug][data-tech]');
 
-    // Cancelar timeline anterior si está en progreso
     if (filterTimeline) {
       filterTimeline.kill();
     }
 
-    // Crear nuevo timeline para esta operación de filtrado
     filterTimeline = gsap.timeline({
       defaults: { duration: 0.15, ease: 'power2.inOut' },
     });
@@ -104,7 +114,6 @@ const availableTechs = Array.from(
     const cardsToShow: HTMLElement[] = [];
     const cardsToHide: HTMLElement[] = [];
 
-    // Primera pasada: determinar qué cards mostrar/ocultar
     cards.forEach((card) => {
       const el = card as HTMLElement;
       const techStr = el.getAttribute('data-tech');
@@ -114,7 +123,6 @@ const availableTechs = Array.from(
         try {
           const projectTechs = JSON.parse(techStr);
           const normalizedProjectTechs = normalizeTechArray(projectTechs);
-          // AND logic - acumulativo
           show = activeTechs.every((tech: string) =>
             normalizedProjectTechs.includes(tech)
           );
@@ -131,7 +139,6 @@ const availableTechs = Array.from(
       }
     });
 
-    // Animar salida (hide) de cards
     cardsToHide.forEach((el) => {
       filterTimeline!.to(
         el,
@@ -146,11 +153,10 @@ const availableTechs = Array.from(
             el.style.cursor = 'default';
           },
         },
-        0 // Start immediatamente en timeline
+        0
       );
     });
 
-    // Animar entrada (show) de cards
     cardsToShow.forEach((el) => {
       el.classList.remove('hidden');
       el.style.display = '';
@@ -164,15 +170,13 @@ const availableTechs = Array.from(
           scale: 1,
           duration: 0.15,
         },
-        0 // Start inmediatamente (paralelo con hide)
+        0
       );
     });
   }
 
-  // Event listener para cambios de filtro
   document.addEventListener('filter-changed', handleFilterChange);
 
-  // Cleanup on navigation (View Transitions)
   document.addEventListener('astro:before-swap', () => {
     if (filterTimeline) {
       filterTimeline.kill();
@@ -180,22 +184,16 @@ const availableTechs = Array.from(
     }
   });
 
-  // ==================== MODAL: Abrir/Cerrar ====================
+  // --- LÓGICA DEL MODAL ---
   function initializeModal() {
-    const overlay = document.getElementById(
-      'project-overlay'
-    ) as HTMLElement | null;
-    const overlayBg = document.getElementById(
-      'overlay-bg'
-    ) as HTMLElement | null;
-    const grid = document.getElementById('projects-grid') as HTMLElement | null;
+    const overlay = document.getElementById('project-overlay');
+    const overlayBg = document.getElementById('overlay-bg');
+    const grid = document.getElementById('projects-grid');
 
     if (!overlay || !overlayBg || !grid) {
-      console.warn('[Projects] Modal elements not found');
       return;
     }
 
-    // Store references to event handlers para poder limpiarlos
     const modalHandlers = {
       gridClick: null as ((e: Event) => void) | null,
       overlayBgClick: null as ((e: Event) => void) | null,
@@ -203,7 +201,6 @@ const availableTechs = Array.from(
       keydown: null as ((e: Event) => void) | null,
     };
 
-    // Abrir modal
     const openProjectModal = (slug: string) => {
       const wrapper = overlay.querySelector(
         `[data-slug="${slug}"]`
@@ -221,7 +218,6 @@ const availableTechs = Array.from(
       );
     };
 
-    // Cerrar modal
     const closeProjectModal = () => {
       const visibleWrapper = overlay.querySelector(
         '.project-detail-wrapper:not(.hidden)'
@@ -246,7 +242,6 @@ const availableTechs = Array.from(
       });
     };
 
-    // Click handlers para abrir/cerrar
     modalHandlers.gridClick = (e) => {
       const card = (e.target as HTMLElement).closest(
         '[data-project-slug]'
@@ -261,7 +256,6 @@ const availableTechs = Array.from(
     modalHandlers.overlayBgClick = closeProjectModal;
     overlayBg.addEventListener('click', modalHandlers.overlayBgClick);
 
-    // Close button (X) en ProjectCard
     modalHandlers.overlayClick = (e) => {
       const closeBtn = (e.target as HTMLElement).closest('.close-modal-btn');
       if (closeBtn) {
@@ -270,7 +264,6 @@ const availableTechs = Array.from(
     };
     overlay.addEventListener('click', modalHandlers.overlayClick);
 
-    // ESC key para cerrar modal
     modalHandlers.keydown = (e) => {
       const keyEvent = e as KeyboardEvent;
       if (keyEvent.key === 'Escape') {
@@ -284,7 +277,6 @@ const availableTechs = Array.from(
     };
     document.addEventListener('keydown', modalHandlers.keydown);
 
-    // Cleanup on navigation (View Transitions)
     const cleanup = () => {
       if (modalHandlers.gridClick)
         grid.removeEventListener('click', modalHandlers.gridClick);
@@ -298,7 +290,6 @@ const availableTechs = Array.from(
     document.addEventListener('astro:before-swap', cleanup);
   }
 
-  // Initialize modal on page load
   initializeModal();
 </script>
 
@@ -311,14 +302,12 @@ const availableTechs = Array.from(
     scrollbar-width: none;
   }
 
-  /* Grid responsive con reorganización automática */
   #projects-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
     gap: 2rem !important;
   }
 
-  /* Media queries específicas para override de tailwind */
   @media (max-width: 767px) {
     #projects-grid {
       grid-template-columns: repeat(1, 1fr) !important;
@@ -337,7 +326,6 @@ const availableTechs = Array.from(
     }
   }
 
-  /* Elemento oculto - no ocupa espacio en el grid */
   .project-thumbnail-trigger.hidden {
     display: none !important;
   }

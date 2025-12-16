@@ -16,7 +16,10 @@ import {
   IconBrandBootstrap,
   IconBrandVite,
   IconBrandGithub,
-  IconTerminal2, // Fallback
+  IconTerminal2,
+  IconBrandSass,
+  IconSql,
+  IconBrandGitlab,
 } from '@tabler/icons-react';
 
 // IMPORTAMOS LOS ICONOS CUSTOM
@@ -32,37 +35,29 @@ export const techIconMap: Record<string, any> = {
   typescript: IconBrandTypescript,
   ts: IconBrandTypescript,
   javascript: IconBrandJavascript,
-  js: IconBrandJavascript,
-  html: IconBrandHtml5,
-  html5: IconBrandHtml5,
-  css: IconBrandCss3,
-  tailwind: IconBrandTailwind,
-  'tailwind css': IconBrandTailwind,
-
-  // AQUÍ LA INTEGRACIÓN:
   '.net': IconDotNet,
-  dotnet: IconDotNet,
-  'asp.net': IconDotNet,
-  'asp.net core': IconDotNet,
-
   'c#': IconCSharp,
-  csharp: IconCSharp,
-  'c-sharp': IconCSharp,
+
+  // --Pseudolenguajes --
+  html: IconBrandHtml5,
+  sass: IconBrandSass,
+  css: IconBrandCss3,
+
+  //Librerias
+  tailwind: IconBrandTailwind,
+  bootstrap: IconBrandBootstrap,
 
   // --- HERRAMIENTAS & PLATAFORMAS ---
   mysql: IconBrandMysql,
-  sql: IconDatabase,
+  sql: IconSql,
   git: IconBrandGit,
   github: IconBrandGithub,
+  gitlab: IconBrandGitlab,
   docker: IconBrandDocker,
   vite: IconBrandVite,
   figma: IconBrandFigma,
 
   // --- CONCEPTOS ---
   'entity framework': IconDatabase,
-  'ef core': IconDatabase,
   jwt: IconLockPassword,
-
-  // --- LIBRERIAS ---
-  bootstrap: IconBrandBootstrap,
 };

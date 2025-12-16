@@ -99,8 +99,9 @@ const { availableTechs, sectionId = 'projects' } = Astro.props;
     const counterText = document.getElementById('filter-counter-text');
 
     const updateUI = () => {
+      // Usamos la clase segura js-filter-chip
       const activeChips = container.querySelectorAll(
-        '[data-filter-active="true"]'
+        '.js-filter-chip[data-filter-active="true"]'
       );
 
       if (counterText) {
@@ -108,11 +109,9 @@ const { availableTechs, sectionId = 'projects' } = Astro.props;
           counterText.textContent = 'Mostrando todos los proyectos';
           filterLine?.classList.remove('active');
         } else {
-          // CORRECCIÓN: Usamos data-filter-label para tener el nombre bonito (.NET) y lo pasamos a Mayúsculas
           const names = Array.from(activeChips)
             .map((c) => c.getAttribute('data-filter-label')?.toUpperCase())
             .join(', ');
-
           counterText.textContent = `FILTROS ACTIVOS: ${names}`;
           filterLine?.classList.add('active');
         }
@@ -133,7 +132,9 @@ const { availableTechs, sectionId = 'projects' } = Astro.props;
 
     container.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
-      const chip = target.closest('.filter-chip');
+      // Buscamos la clase segura
+      const chip = target.closest('.js-filter-chip');
+
       if (!chip) return;
 
       const isActive = chip.getAttribute('data-filter-active') === 'true';
@@ -150,7 +151,7 @@ const { availableTechs, sectionId = 'projects' } = Astro.props;
     });
 
     clearBtn?.addEventListener('click', () => {
-      container.querySelectorAll('.filter-chip').forEach((c) => {
+      container.querySelectorAll('.js-filter-chip').forEach((c) => {
         c.setAttribute('data-filter-active', 'false');
         c.setAttribute('aria-pressed', 'false');
       });
