@@ -18,8 +18,11 @@ import {
   IconBrandGithub,
   IconTerminal2,
   IconBrandSass,
-  IconSql,
   IconBrandGitlab,
+  IconBrandPython,
+  IconBrandTrello,
+  IconFileTypeSql,
+  IconBrandFramerMotion,
 } from '@tabler/icons-react';
 
 // IMPORTAMOS LOS ICONOS CUSTOM
@@ -37,6 +40,7 @@ export const techIconMap: Record<string, any> = {
   javascript: IconBrandJavascript,
   '.net': IconDotNet,
   'c#': IconCSharp,
+  python: IconBrandPython,
 
   // --Pseudolenguajes --
   html: IconBrandHtml5,
@@ -46,16 +50,18 @@ export const techIconMap: Record<string, any> = {
   //Librerias
   tailwind: IconBrandTailwind,
   bootstrap: IconBrandBootstrap,
+  'framer motion': IconBrandFramerMotion,
 
   // --- HERRAMIENTAS & PLATAFORMAS ---
   mysql: IconBrandMysql,
-  sql: IconSql,
+  sql: IconFileTypeSql,
   git: IconBrandGit,
   github: IconBrandGithub,
   gitlab: IconBrandGitlab,
   docker: IconBrandDocker,
   vite: IconBrandVite,
   figma: IconBrandFigma,
+  trello: IconBrandTrello,
 
   // --- CONCEPTOS ---
   'entity framework': IconDatabase,

@@ -11,29 +11,26 @@ const TECH_ALIASES: Record<string, string> = {
   'asp.net': '.net',
   'asp.net core': '.net',
   aspnet: '.net',
-
-  // C# -> 'c#'
-  csharp: 'c#',
-  'c-sharp': 'c#',
-
-  // JavaScript -> 'javascript'
-  js: 'javascript',
-  'vanilla js': 'javascript',
-
-  // TypeScript -> 'typescript'
-  ts: 'typescript',
-
-  // Estilos
-  'tailwind css': 'tailwind',
-  tailwindcss: 'tailwind',
-  'styled-components': 'react', // Opcional: agrupar bajo React o dejar pasar si tienes icono
-
-  // Bases de Datos
   'ef core': 'entity framework',
   entityframework: 'entity framework',
 
-  // HTML
+  // Lenguajes
+  csharp: 'c#',
+  'c-sharp': 'c#',
+  javascripts: 'javascript',
+  typescript: 'typescript',
+
+  // Pseudolenguajes
   html5: 'html',
+  css3: 'css',
+
+  // Herramientas
+  sql: 'sql',
+  trello: 'trello',
+
+  // Librerías
+  'framer-motion': 'framer motion',
+  tailwind: 'tailwind',
 };
 
 export function normalizeTechName(techName: string): string {
