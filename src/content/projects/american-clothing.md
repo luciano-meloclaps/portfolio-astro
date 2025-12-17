@@ -2,11 +2,12 @@
 title: 'American Clothing'
 tagline: 'E-commerce Full-Stack con arquitectura Database-First y sistema de diseño modular.'
 status: 'Completed'
-cover: '@/assets/images/banderaArg.jpg'
+cover: '@/assets/images/projects/american-clothing/american-clothing-landing-hero.webp'
 description: 'Plataforma de comercio electrónico transaccional de alta complejidad. El sistema integra gestión de inventario en tiempo real, dashboard analítico, checkout seguro y un módulo de seguridad robusto con Autenticación y Autorización basada en roles (RBAC) para tres niveles de usuario, todo fundamentado en una estrategia de persistencia Database-First para garantizar la integridad referencial.'
 images:
-  - '@/assets/images/banderaArg.jpg'
-  - '@/assets/images/banderaArg.jpg'
+  - '@/assets/images/projects/american-clothing/american-clothing-landing-hero.webp'
+  - '@/assets/images/projects/american-clothing/american-clothing-auth-login.webp'
+  - '@/assets/images/projects/american-clothing/american-clothing-about-section.webp'
 keyFeatures:
   - 'Persistencia relacional Database-First'
   - 'Seguridad RBAC (Roles y Permisos)'
