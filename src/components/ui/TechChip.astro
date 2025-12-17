@@ -27,20 +27,23 @@ const color = techColorMap[name.toLowerCase()] || defaultTechColor;
 const displayLabel = label || name;
 const Tag = mode === 'filter' ? 'button' : 'div';
 
-// --- CLASES BASE (Estructura) ---
+// --- CLASES BASE ---
+// relative overflow-hidden: Mantiene el brillo dentro de los bordes.
 const baseClasses = [
   'relative overflow-hidden inline-flex items-center gap-x-2 rounded-sm border bg-clip-padding px-3 py-1.5 backdrop-blur-xl transition-all duration-300 ease-out',
   className,
 ];
 
-// --- CLASES MODO FILTRO (Interactivo) ---
+// --- CLASES MODO FILTRO ---
+// cursor-pointer: Indica interactividad.
 const filterClasses = [
   'filter-chip js-filter-chip group select-none cursor-pointer',
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   'active:scale-95',
 ];
 
-// --- CLASES MODO ESTÁTICO (Informativo) ---
+// --- CLASES MODO ESTÁTICO ---
+// cursor-default: Indica que es solo información.
 const staticClasses = ['cursor-default'];
 
 const classes =
@@ -54,22 +57,33 @@ const classes =
   style={{ '--chip-color': color } as any}
   {...restProps}
 >
-  <!-- Capa de Brillo (Pointer Events None para no bloquear click) -->
+  <!-- 
+    CAPA DE BRILLO (SHINE)
+    pointer-events-none: CRÍTICO. El click debe pasar a través de esto.
+  -->
   <div class="shine-effect pointer-events-none absolute inset-0 z-0"></div>
 
-  <!-- Contenido Principal -->
+  <!-- 
+    CONTENIDO
+    pointer-events-none: CRÍTICO. El click debe pasar a través del texto hacia el botón.
+    z-10: Para estar visualmente encima del brillo.
+  -->
   <span class="pointer-events-none relative z-10 flex items-center gap-x-2">
     {
       Icon && (
         <Icon class:list={['icon-base h-4 w-4', iconClass]} strokeWidth={1.5} />
       )
     }
-    <span class="font-sans text-xs font-light uppercase tracking-wider"
-      >{displayLabel}</span
-    >
+    <span class="font-sans text-xs font-light uppercase tracking-wider">
+      {displayLabel}
+    </span>
   </span>
 
-  <!-- Indicador de Cierre (Solo Filtros) -->
+  <!-- 
+    INDICADOR DE CIERRE (Solo Filtros)
+    pointer-events-none: El click en la X también debe activar el botón padre 
+    (o manejarse en el padre si se requiere lógica distinta, pero aquí es seguro).
+  -->
   {
     mode === 'filter' && (
       <span
@@ -84,19 +98,21 @@ const classes =
 
 <style>
   /* =========================================
-     ESTILOS MODO ESTÁTICO (Cards)
+     MODO ESTÁTICO (Cards)
      ========================================= */
+  /* Diseño plano, limpio, sin interacción */
   div:not(.filter-chip) {
     color: var(--chip-color);
     border-color: var(--chip-color);
+    /* Fondo sutil (10% opacidad) */
     background-color: color-mix(in srgb, var(--chip-color), transparent 90%);
   }
 
   /* =========================================
-     ESTILOS MODO FILTRO (Botones)
+     MODO FILTRO (Botones Interactivos)
      ========================================= */
 
-  /* 1. Estado INACTIVO (Ghost) */
+  /* 1. ESTADO INACTIVO (Ghost / Desactivado) */
   .filter-chip[data-filter-active='false'] {
     color: var(--color-text-secondary);
     border-color: rgba(128, 128, 128, 0.2);
@@ -104,41 +120,47 @@ const classes =
     opacity: 0.8;
   }
 
-  /* Ajuste Light Mode: Mayor contraste */
+  /* Ajuste Light Mode: Un poco de fondo para contraste */
   :global(html:not(.dark)) .filter-chip[data-filter-active='false'] {
     background-color: rgba(0, 0, 0, 0.04);
     border-color: rgba(0, 0, 0, 0.15);
   }
 
-  /* 2. Estado HOVER (Preview) */
+  /* 2. ESTADO HOVER (Preview) */
+  /* Al pasar el mouse sobre un inactivo, mostramos cómo se vería activo */
   .filter-chip[data-filter-active='false']:hover {
     color: var(--chip-color);
     border-color: var(--chip-color);
+    /* Mismo fondo que el estático */
     background-color: color-mix(in srgb, var(--chip-color), transparent 90%);
     opacity: 1;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  /* 3. Estado ACTIVO (Selected) */
+  /* 3. ESTADO ACTIVO (Seleccionado) */
   .filter-chip[data-filter-active='true'] {
     color: var(--chip-color);
     border-color: var(--chip-color);
+    /* EXACTAMENTE el mismo fondo que el estático para consistencia */
     background-color: color-mix(in srgb, var(--chip-color), transparent 90%);
     opacity: 1;
+    /* Sombra Neon Sutil */
     box-shadow: 0 0 8px color-mix(in srgb, var(--chip-color), transparent 40%);
   }
 
+  /* Hover sobre Activo: Un poco más de brillo */
   .filter-chip[data-filter-active='true']:hover {
     box-shadow: 0 0 12px color-mix(in srgb, var(--chip-color), transparent 30%);
   }
 
+  /* Mostrar X al estar activo */
   .filter-chip[data-filter-active='true'] .remove-x {
     display: inline-block;
   }
 
   /* =========================================
-     ANIMACIÓN SHINY (Universal)
+     ANIMACIÓN SHINY (Solo en Filtros)
      ========================================= */
   .shine-effect::before {
     content: '';
@@ -157,8 +179,9 @@ const classes =
     transition: none;
   }
 
+  /* El brillo corre en hover SIEMPRE que sea un filtro */
   .filter-chip:hover .shine-effect::before {
-    animation: shine-anim 0.7s ease-in-out;
+    animation: shine-anim 0.6s ease-in-out;
   }
 
   @keyframes shine-anim {

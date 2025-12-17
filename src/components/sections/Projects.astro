@@ -5,7 +5,6 @@ import ProjectThumbnailCard from '../modules/ProjectThumbnailCard.astro';
 import ProjectCard from '../modules/ProjectCard.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
 import FilterBar from '@/components/ui/FilterBar.astro';
-import LoadingIndicator from '@/components/ui/LoadingIndicator.astro';
 
 import { PROJECT_FILTERS } from '@/config/filter-list';
 import { normalizeTechName } from '@/lib/normalizeTech';
@@ -15,8 +14,6 @@ allProjects.sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 );
 
-// --- LÓGICA DE FILTRADO ROBUSTA (TYPE-SAFE) ---
-
 const usedTechsInProjects = new Set(
   allProjects
     .flatMap((p) => p.data.techStack ?? [])
@@ -24,25 +21,21 @@ const usedTechsInProjects = new Set(
     .map((t) => normalizeTechName(t))
 );
 
-const activeFilters: string[] = PROJECT_FILTERS.filter(
-  (tech): tech is string => {
-    return typeof tech === 'string' && usedTechsInProjects.has(tech);
-  }
+const activeFilters = PROJECT_FILTERS.filter((tech) =>
+  usedTechsInProjects.has(tech)
 );
 ---
 
 <section id="projects" class="relative py-24 md:py-32">
   <div class="container-narrow projects-section-content space-y-16">
-    <!-- Título -->
     <div class="flex w-full flex-col items-center justify-center">
       <SectionTitle
-        title="Proyectos"
-        subtitle="Código en acción. Soluciones reales a problemas reales."
+        title="// Proyectos"
+        subtitle="Una selección de casos de estudio técnicos y creativos."
         class="items-center text-center"
       />
     </div>
 
-    <!-- BARRA DE FILTROS -->
     {
       activeFilters.length > 0 && (
         <div class="filter-bar-wrapper">
@@ -51,7 +44,6 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
       )
     }
 
-    <!-- Grilla de Proyectos -->
     <div id="projects-grid" class="grid grid-cols-1 gap-8 md:grid-cols-2">
       {
         allProjects.map((project, index) => (
@@ -61,33 +53,38 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
     </div>
   </div>
 
-  <!-- Loading Indicator -->
-  {/* * <LoadingIndicator />/} */}
-
-  <!-- Overlay Modal -->
+  <!-- OVERLAY MODAL -->
   <div
     id="project-overlay"
-    class="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 opacity-0"
+    class="pointer-events-none fixed inset-0 z-[9999] opacity-0"
     aria-hidden="true"
   >
     <div
-      class="bg-background/90 absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
+      class="bg-background/95 absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
       id="overlay-bg"
     >
     </div>
+
     <div
-      class="no-scrollbar relative flex h-full max-h-screen w-full items-center justify-center overflow-y-auto py-10"
+      class="no-scrollbar fixed inset-0 overflow-y-auto overscroll-contain"
+      style="-webkit-overflow-scrolling: touch;"
     >
-      {
-        allProjects.map((project) => (
-          <div
-            class="project-detail-wrapper hidden w-full justify-center"
-            data-slug={project.slug}
-          >
-            <ProjectCard project={project} />
-          </div>
-        ))
-      }
+      <div
+        class="flex min-h-full items-center justify-center p-4 text-center sm:p-6"
+      >
+        {
+          allProjects.map((project) => (
+            <div
+              class="project-detail-wrapper relative hidden w-full max-w-5xl text-left"
+              data-slug={project.slug}
+            >
+              <div class="pointer-events-auto relative">
+                <ProjectCard project={project} />
+              </div>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
@@ -96,6 +93,7 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
   import gsap from 'gsap';
   import { normalizeTechArray } from '@/lib/normalizeTech';
 
+  // --- LÓGICA DE FILTRADO ---
   let filterTimeline: gsap.core.Timeline | null = null;
 
   function handleFilterChange(event: Event) {
@@ -103,9 +101,7 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
     const { activeTechs } = customEvent.detail as { activeTechs: string[] };
     const cards = document.querySelectorAll('[data-project-slug][data-tech]');
 
-    if (filterTimeline) {
-      filterTimeline.kill();
-    }
+    if (filterTimeline) filterTimeline.kill();
 
     filterTimeline = gsap.timeline({
       defaults: { duration: 0.15, ease: 'power2.inOut' },
@@ -127,16 +123,11 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
             normalizedProjectTechs.includes(tech)
           );
         } catch (e) {
-          console.error('Error parsing tech stack:', techStr, e);
           show = true;
         }
       }
-
-      if (show) {
-        cardsToShow.push(el);
-      } else {
-        cardsToHide.push(el);
-      }
+      if (show) cardsToShow.push(el);
+      else cardsToHide.push(el);
     });
 
     cardsToHide.forEach((el) => {
@@ -149,63 +140,43 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
           onComplete: () => {
             el.classList.add('hidden');
             el.style.display = 'none';
-            el.style.pointerEvents = 'none';
-            el.style.cursor = 'default';
           },
         },
         0
       );
     });
-
     cardsToShow.forEach((el) => {
       el.classList.remove('hidden');
       el.style.display = '';
-      el.style.pointerEvents = 'auto';
-      el.style.cursor = 'pointer';
-
-      filterTimeline!.to(
-        el,
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.15,
-        },
-        0
-      );
+      filterTimeline!.to(el, { opacity: 1, scale: 1, duration: 0.15 }, 0);
     });
   }
 
   document.addEventListener('filter-changed', handleFilterChange);
-
   document.addEventListener('astro:before-swap', () => {
-    if (filterTimeline) {
-      filterTimeline.kill();
-      filterTimeline = null;
-    }
+    if (filterTimeline) filterTimeline.kill();
   });
 
-  // --- LÓGICA DEL MODAL ---
+  // --- LÓGICA DEL MODAL (BODY FREEZE + NO JUMP FIX) ---
   function initializeModal() {
     const overlay = document.getElementById('project-overlay');
     const overlayBg = document.getElementById('overlay-bg');
     const grid = document.getElementById('projects-grid');
 
-    if (!overlay || !overlayBg || !grid) {
-      return;
-    }
+    if (!overlay || !overlayBg || !grid) return;
 
-    const modalHandlers = {
-      gridClick: null as ((e: Event) => void) | null,
-      overlayBgClick: null as ((e: Event) => void) | null,
-      overlayClick: null as ((e: Event) => void) | null,
-      keydown: null as ((e: Event) => void) | null,
-    };
+    let scrollPosition = 0;
 
     const openProjectModal = (slug: string) => {
-      const wrapper = overlay.querySelector(
-        `[data-slug="${slug}"]`
-      ) as HTMLElement | null;
+      const wrapper = overlay.querySelector(`[data-slug="${slug}"]`);
       if (!wrapper) return;
+
+      // 1. Guardar posición y congelar
+      scrollPosition = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPosition}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'scroll';
 
       overlay.classList.remove('pointer-events-none');
       gsap.to(overlay, { opacity: 1, duration: 0.3 });
@@ -213,81 +184,78 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
       wrapper.classList.remove('hidden');
       gsap.fromTo(
         wrapper,
-        { scale: 0.9, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.2)' }
+        { scale: 0.95, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: 'back.out(1.1)' }
       );
     };
 
     const closeProjectModal = () => {
       const visibleWrapper = overlay.querySelector(
         '.project-detail-wrapper:not(.hidden)'
-      ) as HTMLElement | null;
+      );
       if (!visibleWrapper) return;
 
       gsap.to(visibleWrapper, {
-        scale: 0.9,
+        scale: 0.95,
         opacity: 0,
-        duration: 0.3,
+        y: 20,
+        duration: 0.25,
         ease: 'power2.in',
         onComplete: () => {
           visibleWrapper.classList.add('hidden');
           gsap.to(overlay, {
             opacity: 0,
-            duration: 0.3,
+            duration: 0.2,
             onComplete: () => {
               overlay.classList.add('pointer-events-none');
+
+              // --- FIX DEL SALTO (JUMP) ---
+              // 1. Desactivar scroll suave globalmente
+              const html = document.documentElement;
+              const originalScrollBehavior = html.style.scrollBehavior;
+              html.style.scrollBehavior = 'auto';
+
+              // 2. Restaurar propiedades del body
+              document.body.style.position = '';
+              document.body.style.top = '';
+              document.body.style.width = '';
+              document.body.style.overflowY = '';
+
+              // 3. Restaurar posición instantáneamente (sin animación)
+              window.scrollTo(0, scrollPosition);
+
+              // 4. Reactivar scroll suave (en el siguiente frame)
+              requestAnimationFrame(() => {
+                html.style.scrollBehavior = originalScrollBehavior;
+              });
             },
           });
         },
       });
     };
 
-    modalHandlers.gridClick = (e) => {
-      const card = (e.target as HTMLElement).closest(
-        '[data-project-slug]'
-      ) as HTMLElement | null;
-      if (card) {
-        const slug = card.getAttribute('data-project-slug');
-        if (slug) openProjectModal(slug);
-      }
-    };
-    grid.addEventListener('click', modalHandlers.gridClick);
+    grid.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement).closest('[data-project-slug]');
+      if (card) openProjectModal(card.getAttribute('data-project-slug')!);
+    });
 
-    modalHandlers.overlayBgClick = closeProjectModal;
-    overlayBg.addEventListener('click', modalHandlers.overlayBgClick);
-
-    modalHandlers.overlayClick = (e) => {
-      const closeBtn = (e.target as HTMLElement).closest('.close-modal-btn');
-      if (closeBtn) {
+    overlay.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.id === 'overlay-bg' ||
+        target.classList.contains('overflow-y-auto') ||
+        target.classList.contains('min-h-full')
+      ) {
         closeProjectModal();
       }
-    };
-    overlay.addEventListener('click', modalHandlers.overlayClick);
-
-    modalHandlers.keydown = (e) => {
-      const keyEvent = e as KeyboardEvent;
-      if (keyEvent.key === 'Escape') {
-        const visibleWrapper = overlay.querySelector(
-          '.project-detail-wrapper:not(.hidden)'
-        ) as HTMLElement | null;
-        if (visibleWrapper) {
-          closeProjectModal();
-        }
+      if (target.closest('.close-modal-btn')) {
+        closeProjectModal();
       }
-    };
-    document.addEventListener('keydown', modalHandlers.keydown);
+    });
 
-    const cleanup = () => {
-      if (modalHandlers.gridClick)
-        grid.removeEventListener('click', modalHandlers.gridClick);
-      if (modalHandlers.overlayBgClick)
-        overlayBg.removeEventListener('click', modalHandlers.overlayBgClick);
-      if (modalHandlers.overlayClick)
-        overlay.removeEventListener('click', modalHandlers.overlayClick);
-      if (modalHandlers.keydown)
-        document.removeEventListener('keydown', modalHandlers.keydown);
-    };
-    document.addEventListener('astro:before-swap', cleanup);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeProjectModal();
+    });
   }
 
   initializeModal();
@@ -307,25 +275,16 @@ const activeFilters: string[] = PROJECT_FILTERS.filter(
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
     gap: 2rem !important;
   }
-
   @media (max-width: 767px) {
     #projects-grid {
       grid-template-columns: repeat(1, 1fr) !important;
     }
   }
-
-  @media (min-width: 768px) and (max-width: 1023px) {
+  @media (min-width: 768px) {
     #projects-grid {
       grid-template-columns: repeat(2, 1fr) !important;
     }
   }
-
-  @media (min-width: 1024px) {
-    #projects-grid {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-  }
-
   .project-thumbnail-trigger.hidden {
     display: none !important;
   }
