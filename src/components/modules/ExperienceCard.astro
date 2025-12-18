@@ -1,164 +1,274 @@
 ---
-// src/components/ui/ExperienceCard.astro
+// src/components/modules/ExperienceCard.astro
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
-import ChipTech from '@/components/ui/ChipTech.astro';
 import TechChip from '@/components/ui/TechChip.astro';
-import { techIconMap } from '@/config/tech-icon-map';
+import StatusChip from '@/components/ui/StatusChip.astro';
 import { normalizeTechName } from '@/lib/normalizeTech';
+import { techIconMap } from '@/config/tech-icon-map';
 import {
+  IconBriefcase,
+  IconSchool,
+  IconCalendar,
+  IconMapPin,
   IconPointFilled,
   IconChevronDown,
-  IconFileText,
-} from '@tabler/icons-react'; // Importamos IconFileText
+  IconClock,
+} from '@tabler/icons-react';
 
 interface Props {
   experience: CollectionEntry<'career'>;
 }
+
 const { experience } = Astro.props;
 const {
+  type,
   title,
   entity,
   location,
   startDate,
   endDate,
   contractType,
+  description,
   achievements,
   techStack,
 } = experience.data;
 
-const formatDate = (date: Date) => new Date(date).getFullYear();
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('es-ES', {
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+};
+
+const dateString = `${formatDate(startDate)} — ${endDate ? formatDate(endDate) : 'Presente'}`;
+const isWork = type === 'Work';
+const TypeIcon = isWork ? IconBriefcase : IconSchool;
+
+// Colores unificados al Magenta/Primary
+const accentColor = 'text-accent-magenta';
+const iconBgClass = 'bg-accent-magenta/10 border-accent-magenta/20';
+
+const INITIAL_VISIBLE_COUNT = 2;
+const visibleAchievements = achievements.slice(0, INITIAL_VISIBLE_COUNT);
+const hiddenAchievements = achievements.slice(INITIAL_VISIBLE_COUNT);
+const hasHidden = hiddenAchievements.length > 0;
 ---
 
-<div class="experience-card-wrapper group cursor-pointer">
-  <Card padding="lg" class="relative overflow-hidden">
-    <div class="halo-effect"></div>
+<div class="experience-card-wrapper group w-full cursor-pointer">
+  <Card
+    padding="none"
+    class="hover:border-accent-magenta/40 relative flex flex-col overflow-hidden border border-border bg-background shadow-lg ring-1 ring-white/5 transition-colors duration-300 hover:shadow-xl"
+  >
+    <div class="halo-effect pointer-events-none"></div>
 
-    <div class="relative z-10 flex flex-col">
-      <!-- Encabezado de la Tarjeta -->
-      <div class="flex items-start justify-between">
-        <div>
-          <h3 class="text-xl font-bold text-text-primary">{title}</h3>
-          <p class="mt-2 text-sm text-text-secondary">
-            {entity} &bull; {location}
-          </p>
-          <p class="text-text-secondary/70 mt-1 text-xs">
-            {formatDate(startDate)} - {
-              endDate ? formatDate(endDate) : 'Presente'
-            }
-          </p>
+    <div class="relative z-10 p-6 md:p-8">
+      <!-- HEADER -->
+      <div class="mb-6 flex flex-col gap-4">
+        <div class="flex items-start gap-4">
+          <!-- Icono -->
+          <div
+            class={`rounded-md border p-3 shrink-0 transition-colors group-hover:bg-accent-magenta/20 ${iconBgClass} ${accentColor}`}
+          >
+            <TypeIcon className="h-6 w-6" strokeWidth={1.5} />
+          </div>
+
+          <div class="flex flex-col">
+            <h3
+              class="text-xl font-bold leading-tight tracking-tight text-text-primary transition-colors duration-300 group-hover:text-accent-magenta md:text-2xl"
+            >
+              {title}
+            </h3>
+
+            <!-- 
+              FIX UBICACIÓN: 
+              Ahora vive aquí, junto a la entidad.
+              Se ve mucho más ordenado y no rompe el layout móvil.
+            -->
+            <div class="mt-1 flex flex-wrap items-center gap-2">
+              <span
+                class="text-text-primary/80 text-sm font-medium md:text-base"
+              >
+                {entity}
+              </span>
+
+              <!-- Separador -->
+              <span
+                class="hidden h-1 w-1 rounded-full bg-border sm:inline-block"
+              ></span>
+
+              <!-- Ubicación -->
+              <div
+                class="flex items-center gap-1 font-mono text-xs text-text-secondary"
+              >
+                <IconMapPin className="h-3.5 w-3.5" strokeWidth={1.5} />
+                <span>{location}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
+        <!-- Metadatos (Chips) -->
+        <div class="mt-1 flex flex-wrap items-center gap-3">
+          <StatusChip
+            Icon={IconCalendar}
+            label="Periodo"
+            value={dateString}
+            variant="neutral"
+            class="!bg-background/50 pointer-events-none"
+          />
+          {
+            contractType && (
+              <StatusChip
+                Icon={IconClock}
+                label="Tipo"
+                value={contractType}
+                variant="purple"
+                class="!bg-background/50 pointer-events-none"
+              />
+            )
+          }
+          <!-- Eliminamos la ubicación de aquí abajo para limpiar el layout -->
+        </div>
+      </div>
+
+      <div
+        class="bg-border/50 group-hover:bg-accent-magenta/30 mb-6 h-px w-full transition-colors"
+      >
+      </div>
+
+      <!-- BODY -->
+      <div class="features-section">
         {
-          /* 
-          LA SOLUCIÓN: Usamos ChipTech para el tipo de contrato.
-          - `name="contract"`: Usamos una clave para buscar el color en `techColorMap`.
-          - `label={contractType}`: El texto real del contrato.
-          - `Icon={IconFileText}`: Un icono genérico para "contrato".
-          - `class="!px-2 !py-0.5"`: Ajustamos el padding para que sea un chip más pequeño.
-        */
+          description && (
+            <p class="mb-6 text-sm font-light leading-relaxed text-text-secondary md:text-base">
+              {description}
+            </p>
+          )
         }
+
+        <h4
+          class="font-main mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-secondary"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-accent-magenta"></span>
+          {isWork ? 'Impacto Clave' : 'Hitos Académicos'}
+        </h4>
+
+        <ul class="space-y-3">
+          {
+            visibleAchievements.map((item) => (
+              <li class="flex items-start gap-3">
+                <IconPointFilled className="mt-1 h-4 w-4 flex-shrink-0 text-accent-magenta/60 transition-colors group-hover:text-accent-magenta" />
+                <span class="text-sm font-light leading-relaxed text-text-secondary transition-colors group-hover:text-text-primary">
+                  {item}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
         {
-          contractType && (
-            <ChipTech
-              Icon={IconFileText}
-              name="contract"
-              label={contractType}
-              class="!px-2 !py-0.5"
-            />
+          hasHidden && (
+            <>
+              <div class="hidden-features-container h-0 overflow-hidden opacity-0">
+                <ul class="mt-3 space-y-3">
+                  {hiddenAchievements.map((item) => (
+                    <li class="flex items-start gap-3">
+                      <IconPointFilled className="mt-1 h-4 w-4 flex-shrink-0 text-accent-magenta/60 transition-colors group-hover:text-accent-magenta" />
+                      <span class="text-sm font-light leading-relaxed text-text-secondary transition-colors group-hover:text-text-primary">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div class="features-toggle group-hover:text-accent-magenta/80 relative z-10 mt-4 flex items-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-accent-magenta transition-colors">
+                <span class="toggle-text">Ver más detalles</span>
+                <IconChevronDown className="toggle-icon w-4 h-4 transition-transform duration-300" />
+              </div>
+            </>
           )
         }
       </div>
 
-      <!-- Botón de Despliegue -->
-      <button
-        class="details-toggle mt-4 flex items-center gap-x-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
-      >
-        <span>{achievements.length} Logros Clave</span>
-        <IconChevronDown
-          className="h-4 w-4 transition-transform duration-300"
-        />
-      </button>
-
-      <!-- Contenido Desplegable (sin cambios) -->
-      <div class="details-container max-h-0 overflow-hidden">
-        <div class="details-content pt-6">
-          <div class="border-t border-border pt-6">
-            <h4
-              class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary"
-            >
-              Logros Clave
-            </h4>
-            <ul class="mt-4 space-y-3">
-              {
-                achievements.map((achievement) => (
-                  <li class="flex items-start gap-x-3">
-                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/50 mt-1" />
-                    <span class="text-sm text-text-secondary">
-                      {achievement}
-                    </span>
-                  </li>
-                ))
-              }
-            </ul>
+      <!-- FOOTER -->
+      {
+        techStack && techStack.length > 0 && (
+          <div class="border-border/50 mt-8 border-t pt-6">
+            <div class="flex flex-wrap gap-2">
+              {techStack.map((tech) => {
+                const normalizedTech = normalizeTechName(tech);
+                const Icon = techIconMap[normalizedTech];
+                return Icon ? (
+                  <TechChip
+                    Icon={Icon}
+                    name={normalizedTech}
+                    label={tech}
+                    mode="static"
+                  />
+                ) : null;
+              })}
+            </div>
           </div>
-          {
-            techStack && techStack.length > 0 && (
-              <div class="mt-6">
-                <h4 class="font-sans text-sm font-bold uppercase tracking-wider text-text-secondary">
-                  Stack Tecnológico
-                </h4>
-                <div class="mt-4 flex flex-wrap gap-2">
-                  {techStack.map((tech) => {
-                    const normalizedTech = normalizeTechName(tech);
-                    const Icon = techIconMap[normalizedTech];
-                    return Icon ? (
-                      <TechChip
-                        Icon={Icon}
-                        name={normalizedTech}
-                        label={tech}
-                        mode="static"
-                      />
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            )
-          }
-        </div>
-      </div>
+        )
+      }
     </div>
   </Card>
 </div>
-<!-- 3. El script de GSAP para la expansión. Es idéntico en espíritu al de ProjectCard. -->
+
 <script>
   import gsap from 'gsap';
-  document
-    .querySelectorAll('.experience-card-wrapper')
-    .forEach((cardWrapper) => {
-      const toggle = cardWrapper.querySelector('.details-toggle');
-      const container = cardWrapper.querySelector('.details-container');
-      const content = cardWrapper.querySelector('.details-content');
-      const chevron = cardWrapper.querySelector('.details-toggle svg');
-      let isVisible = false;
 
-      if (!toggle || !container || !content || !chevron) return;
+  function initExpCardInteractions(cardWrapper: HTMLElement) {
+    const hiddenContainer = cardWrapper.querySelector(
+      '.hidden-features-container'
+    );
+    const toggleText = cardWrapper.querySelector('.toggle-text');
+    const toggleIcon = cardWrapper.querySelector('.toggle-icon');
 
-      const tl = gsap.timeline({ paused: true });
-      tl.to(container, {
-        maxHeight: () => content.scrollHeight,
-        duration: 0.8,
-        ease: 'power3.inOut',
-      });
+    if (!hiddenContainer) return;
 
-      // La lógica de click ahora se aplica a todo el `cardWrapper`, no solo al botón.
-      cardWrapper.addEventListener('click', (e) => {
-        // Prevenimos que el clic en un enlace dentro de la tarjeta la active.
-        if (e.target instanceof HTMLElement && e.target.closest('a')) return;
+    let isExpanded = false;
+    const originalText = toggleText?.textContent || 'Ver más detalles';
 
-        isVisible = !isVisible;
-        gsap.to(chevron, { rotation: isVisible ? 180 : 0, duration: 0.4 });
-        isVisible ? tl.play() : tl.reverse();
-      });
+    cardWrapper.addEventListener('click', (e) => {
+      const selection = window.getSelection();
+      if (selection && selection.toString().length > 0) return;
+
+      isExpanded = !isExpanded;
+
+      if (isExpanded) {
+        gsap.to(hiddenContainer, {
+          height: 'auto',
+          opacity: 1,
+          duration: 0.4,
+          ease: 'power2.out',
+        });
+        if (toggleIcon) gsap.to(toggleIcon, { rotation: 180, duration: 0.3 });
+        if (toggleText) toggleText.textContent = 'Ver menos';
+      } else {
+        gsap.to(hiddenContainer, {
+          height: 0,
+          opacity: 0,
+          duration: 0.3,
+          ease: 'power2.inOut',
+        });
+        if (toggleIcon) gsap.to(toggleIcon, { rotation: 0, duration: 0.3 });
+        if (toggleText) toggleText.textContent = originalText;
+      }
     });
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('.experience-card-wrapper').forEach((card) => {
+      initExpCardInteractions(card as HTMLElement);
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.experience-card-wrapper').forEach((card) => {
+      initExpCardInteractions(card as HTMLElement);
+    });
+  });
 </script>
