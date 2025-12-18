@@ -1,45 +1,61 @@
 ---
-// src/sections/Career.astro
+// src/components/sections/Career.astro
 import { getCollection, type CollectionEntry } from 'astro:content';
 import ExperienceCard from '@/components/modules/ExperienceCard.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
 
-const allCareerItems: CollectionEntry<'career'>[] =
-  await getCollection('career');
+const allCareerItems: CollectionEntry<'career'>[] = await getCollection('career');
 allCareerItems.sort(
   (a, b) => b.data.startDate.valueOf() - a.data.startDate.valueOf()
 );
 ---
 
-<section id="experience" class="py-24 md:py-32">
-  <div class="container-narrow career-section-content space-y-16">
-    <SectionTitle
-      title="TRAYECTORIA"
-      subtitle="El camino recorrido: formación, trabajos y evolución profesional."
-    />
+<section id="career" class="py-24 md:py-32 relative">
+  <div class="container-narrow career-section-content space-y-20">
+    
+    <div class="flex w-full flex-col items-center justify-center">
+      <SectionTitle
+        title="TRAYECTORIA"
+        subtitle="El camino recorrido: formación, trabajos y evolución profesional."
+        class="items-center text-center"
+      />
+    </div>
 
     <div class="relative">
+      <!-- 
+        LÍNEA DE TIEMPO (FIXED)
+        - w-0.5: 2px de grosor.
+        - bg-border: Color sólido.
+        - left-[19px]: Calculado para centrar con el punto de 16px (16/2 + padding).
+      -->
       <div
-        class="timeline-line absolute bottom-4 left-1/2 top-4 w-px -translate-x-1/2 bg-border"
+        class="timeline-line absolute left-[19px] md:left-6 top-4 bottom-0 w-0.5 -translate-x-1/2 bg-border opacity-60"
       >
       </div>
 
-      <div class="space-y-16">
+      <div class="space-y-12">
         {
-          allCareerItems.map((item, index) => (
-            <div class="timeline-item relative flex items-center">
-              <div class="timeline-node absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-border bg-background" />
-              <div
-                class:list={[
-                  'w-full px-4 md:w-[calc(50%-2rem)]',
-                  {
-                    'md:ml-auto md:pl-0': index % 2 !== 0,
-                    'md:pr-0': index % 2 === 0,
-                  },
-                ]}
-              >
+          allCareerItems.map((item) => (
+            <div class="timeline-item flex gap-6 md:gap-10">
+              
+              <!-- COLUMNA IZQUIERDA (Línea y Punto) -->
+              <div class="relative flex flex-col items-center w-10 md:w-12 shrink-0">
+                <!-- 
+                  PUNTO (NODO)
+                  - w-4 h-4 (16px).
+                  - top-8: Alineado con el título.
+                  - z-10: Sobre la línea.
+                  - bg-background: Centro vacío.
+                  - border-text-primary: Borde sólido del color del texto.
+                -->
+                <div class="relative z-10 top-8 w-4 h-4 rounded-full bg-background border-2 border-text-primary shadow-[0_0_10px_rgba(0,0,0,0.2)]"></div>
+              </div>
+
+              <!-- COLUMNA DERECHA (Tarjeta) -->
+              <div class="flex-1 pb-8">
                 <ExperienceCard experience={item} />
               </div>
+              
             </div>
           ))
         }
@@ -57,28 +73,35 @@ allCareerItems.sort(
     const section = document.querySelector('.career-section-content');
     if (!section) return;
 
-    const line = section.querySelector('.timeline-line') as HTMLElement;
+    const line = section.querySelector('.timeline-line');
     const items = gsap.utils.toArray('.timeline-item') as HTMLElement[];
 
-    gsap.set([line, ...items], { autoAlpha: 0 });
+    gsap.set(line, { scaleY: 0, transformOrigin: "top center" });
+    gsap.set(items, { autoAlpha: 0, x: -20 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: 'top 60%',
+        start: 'top 75%',
+        toggleActions: 'play none none reverse'
       },
     });
 
     tl.to(line, {
-      autoAlpha: 1,
       scaleY: 1,
       duration: 1.5,
-      from: { scaleY: 0 },
-      ease: 'power2.out',
-    }).to(
+      ease: 'power2.inOut',
+    })
+    .to(
       items,
-      { autoAlpha: 1, y: 0, stagger: 0.3, from: { y: 50 }, ease: 'power3.out' },
-      '-=1.0'
+      { 
+        autoAlpha: 1, 
+        x: 0, 
+        stagger: 0.2, 
+        duration: 0.8,
+        ease: 'power2.out' 
+      },
+      '-=1.2'
     );
   }
 
