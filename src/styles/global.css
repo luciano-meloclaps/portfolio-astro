@@ -1,14 +1,13 @@
-/* --- 1. DIRECTIVAS DE TAILWIND E IMPORTACIÓN DE FUENTES --- */
+/* src/styles/global.css */
 @import url('https://fonts.googleapis.com/css2?family=Tomorrow:wght@200;300;400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* --- 2. DEFINICIÓN DE VARIABLES GLOBALES (TOKENS DE DISEÑO) --- */
 @layer base {
   :root {
-    /* Tipografía */
+    /* --- TIPOGRAFÍA --- */
     --font-main: 'Tomorrow';
     --font-size-xxs: 0.6875rem;
     --font-size-xs: 0.75rem;
@@ -20,75 +19,50 @@
     --font-size-h2: 2.25rem;
     --font-size-h1: 3.75rem;
 
-    /* Geometría y Espaciado */
+    /* --- GEOMETRÍA --- */
     --radius-small: 5px;
     --radius-medium: 3px;
     --radius-large: 0px;
     --radius-pill: 9999px;
 
-    /* Efectos Visuales */
+    /* --- EFECTOS --- */
     --blur-base: 12px;
-    --blur-gradient-light: 40px;
-    --blur-gradient-dark: 60px;
-
-    /* Sombras y Bordes (Light Theme) */
     --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-    --border-light: rgba(
-      0,
-      0,
-      0,
-      0.22
-    ); /* Refinado: balance visual con dark mode */
+    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
-    /* Gradientes Light Theme */
-    --gradient-light-primary: rgba(129, 76, 120, 0.25);
-    --gradient-light-secondary: rgba(100, 150, 200, 0.18);
-    --gradient-light-opacity: 0.75;
+    /* --- COLORES (CANALES RGB PUROS) --- */
 
-    /* Paleta de Colores (Tema Claro) */
-    --color-background: #f0f0f0;
-    --color-panel-bg: rgba(255, 255, 255, 0.25);
-    --color-text-primary: #1a1a1a;
-    --color-text-secondary: #666666;
-    --color-border: rgba(
-      0,
-      0,
-      0,
-      0.22
-    ); /* Match con --border-light para total homogeneidad */
-    --color-grid-line: rgba(0, 0, 0, 0.05);
-    --color-glow-border: rgba(0, 0, 0, 0.8);
+    /* MODO CLARO (Light) */
+    --color-background: 240 240 240;
+    --color-panel-bg: 255 255 255;
+    --color-text-primary: 26 26 26;
+    --color-text-secondary: 102 102 102;
+    --color-border: 0 0 0;
+    --color-grid-line: 0 0 0;
   }
 
   .dark {
-    /* Sombras y Bordes (Dark Theme) */
-    --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --border-dark: #91949757; /* Sincronizado con --color-border */
-
-    /* Paleta Oscura */
-    --color-background: #1f2225;
-    --color-panel-bg: rgba(31, 34, 37, 0.25);
-    --color-text-primary: #eaeaea;
-    --color-text-secondary: #919497;
-    --color-border: #91949757;
-    --color-grid-line: rgba(240, 242, 255, 0.05);
-    --color-glow-border: rgba(255, 255, 255, 0.8);
+    /* MODO OSCURO (Dark) */
+    --color-background: 31 34 37;
+    --color-panel-bg: 31 34 37;
+    --color-text-primary: 234 234 234;
+    --color-text-secondary: 145 148 151;
+    --color-border: 145 148 151;
+    --color-grid-line: 255 255 255;
   }
 }
 
-/* --- 3. APLICACIÓN DE ESTILOS GLOBALES --- */
 @layer base {
   body {
-    background-color: var(--color-background);
-    color: var(--color-text-primary);
-    font-family:
-      var(--font-main), sans-serif; /* La fuente de respaldo se mantiene aquí por seguridad */
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-text-primary));
+    font-family: var(--font-main), sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden; /* Previene scroll horizontal */
   }
 }
 
-/* --- 4. COMPONENTES DE LAYOUT GLOBALES --- */
 @layer components {
   .container-wide {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
@@ -96,20 +70,25 @@
   .container-narrow {
     @apply mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8;
   }
+
   .glass-panel {
-    background: var(--color-panel-bg);
+    background-color: rgb(var(--color-panel-bg) / 0.25);
     backdrop-filter: blur(var(--blur-base));
     -webkit-backdrop-filter: blur(var(--blur-base));
+    border: 1px solid rgb(var(--color-border) / 0.22);
     box-shadow: var(--shadow-light);
-    border: 1px solid var(--border-light);
   }
+
   .dark .glass-panel {
     box-shadow: var(--shadow-dark);
-    border: 1px solid var(--border-dark);
+    border: 1px solid rgb(var(--color-border) / 0.22);
   }
+
+  /* HALO EFFECT */
   .group:hover .halo-effect {
     opacity: 1;
   }
+
   .halo-effect {
     content: '';
     position: absolute;
@@ -119,12 +98,12 @@
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
     box-shadow:
-      inset 0 0 0 1.5px var(--color-text-primary),
-      0 0 25px 0 var(--color-text-primary);
+      inset 0 0 0 1.5px rgb(var(--color-text-primary) / 0.5),
+      0 0 25px 0 rgb(var(--color-text-primary) / 0.2);
   }
 }
 
-/* --- 5. SISTEMA DE ATMÓSFERAS LIGHT/DARK (NUEVO) --- */
+/* --- UTILIDADES DE ATMÓSFERA (Opcional para Hero) --- */
 .light-atmosphere {
   display: block;
 }

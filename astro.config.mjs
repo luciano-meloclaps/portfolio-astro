@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // Añade la URL de tu sitio web final aquí para el sitemap.
-  site: 'https://www.ejemplo.com',
+  site: 'https://portfolio-luciano-roan.vercel.app/',
   integrations: [react(), tailwind(), sitemap()],
 
   // Image service: usar 'noop' para evitar dependencia de Sharp
