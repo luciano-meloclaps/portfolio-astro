@@ -12,17 +12,17 @@ interface Props {
   image?: string;
 }
 
-// CONFIGURACIÓN MAESTRA
-const defaultTitle = 'Luciano Melo Claps | Software Architect & Developer';
+// CONFIGURACIÓN COMPARTIR
+const defaultTitle = 'Luciano Stefano Melo Claps | Software Developer';
 const defaultDescription =
-  'Portfolio de un desarrollador Fullstack especializado en .NET y React. Arquitectura de software y experiencias de usuario de alto rendimiento.';
+  'Portfolio de un Desarrollador Fullstack especializado en .NET y React. Experiencia en desarrollo web, UX/UI, SEO y soluciones a medida.';
 const siteUrl =
   import.meta.env.SITE || 'https://portfolio-luciano-roan.vercel.app';
 
 const {
   title = defaultTitle,
   description = defaultDescription,
-  image = '/og-image.png',
+  image = '/og-image.jpg',
 } = Astro.props;
 
 const ogImageUrl = new URL(image, siteUrl).href;
