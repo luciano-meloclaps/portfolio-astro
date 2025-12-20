@@ -7,14 +7,11 @@ export default {
     extend: {
       // --- SINCRONIZACIÓN DE COLORES (CORREGIDA PARA RGB) ---
       colors: {
-        // La sintaxis mágica: rgb(var(--variable) / <alpha-value>)
-        // Esto permite clases como 'bg-background/50' o 'text-primary/80'
         background: 'rgb(var(--color-background) / <alpha-value>)',
         panel: 'rgb(var(--color-panel-bg) / <alpha-value>)',
         'text-primary': 'rgb(var(--color-text-primary) / <alpha-value>)',
         'text-secondary': 'rgb(var(--color-text-secondary) / <alpha-value>)',
         border: 'rgb(var(--color-border) / <alpha-value>)',
-        'accent-magenta': 'rgb(var(--color-accent-magenta) / <alpha-value>)',
 
         // Agregamos grid-line que la usamos en el Layout
         'grid-line': 'rgb(var(--color-grid-line) / <alpha-value>)',
@@ -60,8 +57,6 @@ export default {
     // --- PLUGIN PARA TIPOGRAFÍA DUAL ---
     function ({ addUtilities }) {
       addUtilities({
-        // Actualizamos esto también para usar la sintaxis RGB si es necesario,
-        // pero generalmente aquí se usa la clase de utilidad de color.
         '.text-stroke': {
           '-webkit-text-stroke': '1px rgb(var(--color-text-secondary))',
           color: 'transparent',

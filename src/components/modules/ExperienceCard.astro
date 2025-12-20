@@ -58,7 +58,7 @@ const hasHidden = hiddenAchievements.length > 0;
 <div class="experience-card-wrapper group w-full cursor-pointer">
   <Card
     padding="none"
-    class="hover:border-accent-magenta/40 relative flex flex-col overflow-hidden border border-border bg-background shadow-lg ring-1 ring-white/5 transition-colors duration-300 hover:shadow-xl"
+    class="hover:border-accent-magenta/40 relative flex flex-col overflow-hidden card-border bg-background shadow-lg ring-1 ring-white/5 transition-colors duration-300 hover:shadow-xl"
   >
     <div class="halo-effect pointer-events-none"></div>
 
@@ -68,7 +68,7 @@ const hasHidden = hiddenAchievements.length > 0;
         <div class="flex items-start gap-4">
           <!-- Icono -->
           <div
-            class={`rounded-md border p-3 shrink-0 transition-colors group-hover:bg-accent-magenta/20 ${iconBgClass} ${accentColor}`}
+            class={`rounded-md card-border p-3 shrink-0 transition-colors group-hover:bg-accent-magenta/20 ${iconBgClass} ${accentColor}`}
           >
             <TypeIcon className="h-6 w-6" strokeWidth={1.5} />
           </div>
