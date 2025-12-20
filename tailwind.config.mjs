@@ -5,19 +5,24 @@ export default {
   safelist: ['text-stroke', 'text-fill'],
   theme: {
     extend: {
-      // --- SINCRONIZACIÓN DE COLORES ---
+      // --- SINCRONIZACIÓN DE COLORES (CORREGIDA PARA RGB) ---
       colors: {
-        background: 'var(--color-background)',
-        panel: 'var(--color-panel-bg)',
-        'text-primary': 'var(--color-text-primary)',
-        'text-secondary': 'var(--color-text-secondary)',
-        border: 'var(--color-border)',
-        'accent-magenta': 'var(--color-accent-magenta)', // <-- AÑADIDO
+        // La sintaxis mágica: rgb(var(--variable) / <alpha-value>)
+        // Esto permite clases como 'bg-background/50' o 'text-primary/80'
+        background: 'rgb(var(--color-background) / <alpha-value>)',
+        panel: 'rgb(var(--color-panel-bg) / <alpha-value>)',
+        'text-primary': 'rgb(var(--color-text-primary) / <alpha-value>)',
+        'text-secondary': 'rgb(var(--color-text-secondary) / <alpha-value>)',
+        border: 'rgb(var(--color-border) / <alpha-value>)',
+        'accent-magenta': 'rgb(var(--color-accent-magenta) / <alpha-value>)',
+
+        // Agregamos grid-line que la usamos en el Layout
+        'grid-line': 'rgb(var(--color-grid-line) / <alpha-value>)',
       },
 
       // --- SINCRONIZACIÓN DE FUENTES ---
       fontFamily: {
-        sans: ['var(--font-main)', 'sans-serif'], // Única fuente de verdad para la pila de fuentes
+        sans: ['var(--font-main)', 'sans-serif'],
       },
 
       // --- SINCRONIZACIÓN DE ESCALA TIPOGRÁFICA ---
@@ -46,7 +51,6 @@ export default {
       },
       boxShadow: {
         base: 'var(--shadow-base)',
-        // CORRECCIÓN: Conectamos a las nuevas variables explícitas
         'inset-light': 'var(--shadow-inset-light)',
         'inset-dark': 'var(--shadow-inset-dark)',
       },
@@ -56,12 +60,19 @@ export default {
     // --- PLUGIN PARA TIPOGRAFÍA DUAL ---
     function ({ addUtilities }) {
       addUtilities({
+        // Actualizamos esto también para usar la sintaxis RGB si es necesario,
+        // pero generalmente aquí se usa la clase de utilidad de color.
         '.text-stroke': {
-          '-webkit-text-stroke': '1px var(--color-text-secondary)',
+          '-webkit-text-stroke': '1px rgb(var(--color-text-secondary))',
+          color: 'transparent',
+        },
+        '.text-stroke-sm': {
+          '-webkit-text-stroke': '0.5px rgb(var(--color-text-primary))',
           color: 'transparent',
         },
         '.text-fill': {
-          color: 'var(--color-text-primary)',
+          '-webkit-text-stroke': '0px',
+          color: 'rgb(var(--color-text-primary))',
         },
       });
     },

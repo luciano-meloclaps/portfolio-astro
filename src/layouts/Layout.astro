@@ -1,10 +1,5 @@
 ---
 // src/layouts/Layout.astro
-// RESPONSABILIDAD:
-// Ser la plantilla maestra y el "marco" de la aplicación. Define la estructura
-// global del documento, las meta etiquetas esenciales para SEO, y los
-// componentes persistentes de la UI como el Header.
-
 import { SEO } from 'astro-seo';
 import '@/styles/global.css';
 import ThemeManager from '@/components/modules/ThemeManager.astro';
@@ -12,77 +7,76 @@ import Navbar from '@/components/modules/Navbar.astro';
 import MobileMenu from '@/components/modules/MobileMenu.astro';
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
+  image?: string;
 }
 
+// CONFIGURACIÓN MAESTRA
+const defaultTitle = 'Luciano Melo Claps | Software Architect & Developer';
+const defaultDescription =
+  'Portfolio de un desarrollador Fullstack especializado en .NET y React. Arquitectura de software y experiencias de usuario de alto rendimiento.';
+const siteUrl =
+  import.meta.env.SITE || 'https://portfolio-luciano-roan.vercel.app';
+
 const {
-  title = 'Luciano Melo Claps | Software Developer',
-  description = 'Portfolio de un desarrollador Fullstack especializado en .NET y React, con un enfoque en arquitectura de software y diseño de experiencias de usuario.',
+  title = defaultTitle,
+  description = defaultDescription,
+  image = '/og-image.png',
 } = Astro.props;
+
+const ogImageUrl = new URL(image, siteUrl).href;
 ---
 
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
-    <!-- Meta etiquetas fundamentales -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- 
-      Componente de SEO:
-      Gestiona automáticamente el título, la descripción, las etiquetas Open Graph
-      (para redes sociales) y más. Es una mejora masiva para el SEO.
-    -->
     <SEO
       title={title}
       description={description}
       openGraph={{
-        basic: {
-          title: title,
-          type: 'website',
-          image: '/og-image.png', // Debes crear esta imagen (1200x630px)
+        basic: { title, type: 'website', image: ogImageUrl },
+        image: {
+          alt: 'Luciano Melo Claps Portfolio',
+          width: 1200,
+          height: 630,
         },
       }}
       twitter={{
         card: 'summary_large_image',
+        title,
+        description,
+        image: ogImageUrl,
       }}
     />
 
-    <!-- Favicon y Fuentes -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- 
-      El ThemeManager DEBE estar en el <head> para prevenir el parpadeo (FOUC).
-      Es un script de bloqueo intencional.
-    -->
     <ThemeManager />
   </head>
-  <body>
-    <!-- 
-      CAPA 1: EL FONDO DE BLUEPRINT FIJO
-      - `fixed inset-0 z-[-1]`: Lo ancla a la pantalla y lo envía al fondo.
-      - `bg-[length:3rem_3rem]`: Controla el tamaño de la cuadrícula.
-    -->
+
+  <body
+    class="selection:bg-accent-magenta/30 overflow-x-hidden bg-background font-sans text-text-primary antialiased selection:text-text-primary"
+  >
+    <!-- GRID GLOBAL -->
     <div
-      class="fixed inset-0 z-[-1] bg-[length:2.5em_2.5rem]"
-      style=`
-        background-image: linear-gradient(var(--color-grid-line) 1px, transparent 1px),
-                      linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
-      `
+      class="pointer-events-none fixed inset-0 z-[-1]"
+      style="
+        background-size: 3rem 3rem;
+        background-image: 
+          linear-gradient(to right, rgb(var(--color-grid-line) / 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgb(var(--color-grid-line) / 0.05) 1px, transparent 1px);
+      "
       aria-hidden="true"
     >
     </div>
 
-    <!-- Componentes de UI Globales -->
     <Navbar />
     <MobileMenu />
 
-    <!-- 
-      CAPA 2: EL CONTENIDO FLOTANTE
-      - El <slot /> renderizará el contenido de cada página.
-    -->
     <slot />
   </body>
-</html>```
+</html>
