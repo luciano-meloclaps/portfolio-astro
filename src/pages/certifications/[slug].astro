@@ -1,0 +1,26 @@
+---
+// src/pages/certifications/[slug].astro
+import { getCollection, getEntryBySlug } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import CertificationCard from '@/components/modules/CertificationCard.astro';
+
+// Genera una página para cada certificación
+export async function getStaticPaths() {
+  const certifications = await getCollection('certifications');
+  return certifications.map((certification) => ({
+    params: { slug: certification.slug },
+    props: { certification },
+  }));
+}
+
+const { certification } = Astro.props;
+---
+
+<Layout title={certification.data.title}>
+  <main class="py-24 md:py-32">
+    <div class="container-narrow">
+      <!-- Renderizamos el componente CertificationCard -->
+      <CertificationCard certification={certification} />
+    </div>
+  </main>
+</Layout>

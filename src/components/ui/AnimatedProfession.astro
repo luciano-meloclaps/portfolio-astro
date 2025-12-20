@@ -7,7 +7,7 @@ interface Props {
 const { class: className } = Astro.props;
 
 const phrases = [
-  { stroke: 'Software', fill: 'DEVELOPER' },
+  { stroke: 'SOFTWARE', fill: 'DEVELOPER' },
   { stroke: 'UX/UI', fill: 'DESIGNER' },
 ];
 ---
@@ -26,9 +26,12 @@ const phrases = [
     class="flex flex-col items-center gap-2 lg:flex-row lg:items-baseline lg:gap-4"
     aria-hidden="true"
   >
-    <!-- Stroke -->
+    <!-- 
+      FIX: Eliminada la clase 'opacity-80'.
+      El stroke debe ser 100% opaco para ser visible en modo light.
+    -->
     <span
-      class="text-stroke-thin text-center opacity-80 lg:text-left"
+      class="text-stroke-thin text-center transition-colors duration-300 lg:text-left"
       data-role="stroke"></span>
 
     <!-- Fill -->
@@ -45,7 +48,7 @@ const phrases = [
 
 <style>
   .text-stroke-thin {
-    -webkit-text-stroke: 0.5px var(--color-text-primary);
+    -webkit-text-stroke: 0.8px rgb(var(--color-text-primary));
     color: transparent;
   }
   :global(.dark) .text-stroke-thin {
@@ -70,7 +73,6 @@ const phrases = [
       const fillEl = wrapper.querySelector('[data-role="fill"]') as HTMLElement;
       const cursorEl = wrapper.querySelector('.cursor-blink');
 
-      // Define las frases a animar (Opción 2: Solo 2 frases, más cinematográfico)
       const phrases = [
         { stroke: 'SOFTWARE', fill: 'DEVELOPER' },
         { stroke: 'UX/UI', fill: 'DESIGNER' },
@@ -78,10 +80,9 @@ const phrases = [
 
       const masterTl = gsap.timeline({ repeat: -1 });
 
-      // Cursor parpadeante independiente - timing estándar terminal
       gsap.to(cursorEl, {
         opacity: 0,
-        duration: 0.5, // Opción 2: Estándar terminal (más elegante)
+        duration: 0.5,
         repeat: -1,
         yoyo: true,
         ease: 'steps(1)',
@@ -91,10 +92,9 @@ const phrases = [
         const stepTl = gsap.timeline({
           repeat: 1,
           yoyo: true,
-          repeatDelay: 1.8, // Opción 2: Pausa noble pero no excesiva
+          repeatDelay: 1.8,
         });
 
-        // Limpiar estado anterior
         stepTl.call(() => {
           strokeEl.innerText = '';
           fillEl.innerText = '';
@@ -107,8 +107,8 @@ const phrases = [
         });
 
         stepTl.set(cursorEl, { opacity: 1 });
-        stepTl.add(scrambleText(strokeEl, phrase.stroke, 1.2), 0); // Opción 2: 1.2s (más cinematográfico)
-        stepTl.add(scrambleText(fillEl, phrase.fill, 1.2), 0.25); // Offset aumentado a 0.25s
+        stepTl.add(scrambleText(strokeEl, phrase.stroke, 1.2), 0);
+        stepTl.add(scrambleText(fillEl, phrase.fill, 1.2), 0.25);
         stepTl.set(cursorEl, { opacity: 0 }, '+=0.1');
 
         masterTl.add(stepTl);
