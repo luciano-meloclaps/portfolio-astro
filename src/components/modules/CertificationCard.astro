@@ -2,9 +2,8 @@
 // src/components/ui/CertificationCard.astro
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
-import ChipTech from '@/components/ui/ChipTech.astro';
-import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import TechChip from '@/components/ui/TechChip.astro';
+import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import { techIconMap } from '@/config/tech-icon-map';
 import { normalizeTechName } from '@/lib/normalizeTech';
 import {
@@ -25,7 +24,6 @@ const {
   issuer,
   category,
   issueDate,
-  expiryDate,
   description,
   keySkills,
   techStack,
@@ -33,19 +31,27 @@ const {
   credentialUrl,
 } = certification.data;
 
-const formatDate = (date: Date) => new Date(date).getFullYear();
-// Generamos un ID único para accesibilidad (ARIA)
+// FIX: Solo mostramos el año de emisión
+const year = new Date(issueDate).getFullYear();
 const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialId || Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<div class="certification-card-wrapper group">
-  <Card padding="none" class="relative overflow-hidden">
-    <div class="halo-effect"></div>
-    <div class="relative z-10 flex flex-col p-6">
+<!-- 
+  WRAPPER: h-full para que ocupe toda la altura de la celda del grid 
+-->
+<div class="certification-card-wrapper group h-full">
+  <Card
+    padding="none"
+    class="hover:border-accent-magenta/40 relative flex h-full flex-col overflow-hidden border border-border bg-background shadow-sm transition-all duration-300 hover:shadow-lg"
+  >
+    <div class="halo-effect pointer-events-none"></div>
+
+    <!-- CONTENIDO FLEXIBLE -->
+    <div class="relative z-10 flex h-full flex-col p-6">
       <!-- Header -->
-      <div class="flex items-center justify-between">
+      <div class="mb-4 flex items-center justify-between">
         <div
-          class="text-text-secondary/70 text-s flex items-center gap-x-2 font-bold uppercase tracking-wider"
+          class="text-text-secondary/70 flex items-center gap-x-2 text-xs font-bold uppercase tracking-wider"
         >
           <IconCertificate className="h-4 w-4" strokeWidth={1.0} />
           <span>{issuer}</span>
@@ -64,30 +70,37 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
         }
       </div>
 
-      <!-- Main Content -->
-      <div class="mt-3">
-        <h3 class="text-xl font-bold leading-tight text-text-primary">
+      <!-- Título y Badges -->
+      <div class="mb-4">
+        <h3
+          class="mb-3 flex min-h-[3.5rem] items-center text-xl font-bold leading-tight text-text-primary"
+        >
           {title}
         </h3>
-        <div class="mt-4 flex flex-wrap items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4">
           <CategoryBadge category={category} />
           <div
             class="flex items-center gap-x-1.5 font-mono text-xs text-text-secondary"
           >
             <IconCalendar className="h-3.5 w-3.5" />
-            <span
-              >{formatDate(issueDate)} - {
-                expiryDate ? formatDate(expiryDate) : 'Indefinido'
-              }</span
-            >
+            <span>{year}</span>
           </div>
         </div>
-        <p class="mt-4 text-sm font-light leading-relaxed text-text-secondary">
+      </div>
+
+      <!-- 
+        DESCRIPCIÓN (FLEX GROW)
+        Esto empuja el botón de "Detalles" hacia abajo, alineándolos todos visualmente.
+      -->
+      <div class="flex-grow">
+        <p
+          class="line-clamp-3 text-sm font-light leading-relaxed text-text-secondary"
+        >
           {description}
         </p>
       </div>
 
-      <!-- Toggle Button (Accessible) -->
+      <!-- Toggle Button (Siempre abajo) -->
       <button
         id={`btn-${uniqueId}`}
         aria-controls={`content-${uniqueId}`}
@@ -159,7 +172,6 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
 <script>
   import gsap from 'gsap';
 
-  // Función de inicialización para soportar View Transitions en el futuro
   function initCertCards() {
     document
       .querySelectorAll('.certification-card-wrapper')
@@ -171,7 +183,6 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
 
         if (!toggle || !container || !content || !chevron) return;
 
-        // Evitamos re-inicializar si ya tiene listeners (buena práctica en SPAs)
         if (toggle.hasAttribute('data-initialized')) return;
         toggle.setAttribute('data-initialized', 'true');
 
@@ -180,33 +191,27 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
         toggle.addEventListener('click', (e) => {
           e.stopPropagation();
           isVisible = !isVisible;
-
-          // Actualizamos ARIA
           toggle.setAttribute('aria-expanded', String(isVisible));
 
-          // Animación GSAP
           if (isVisible) {
             gsap.to(container, {
               maxHeight: content.scrollHeight,
               duration: 0.4,
               ease: 'power2.out',
             });
-            gsap.to(chevron, { rotation: 180, duration: 0.0 });
+            gsap.to(chevron, { rotation: 180, duration: 0.3 });
           } else {
             gsap.to(container, {
               maxHeight: 0,
               duration: 0.3,
               ease: 'power2.in',
             });
-            gsap.to(chevron, { rotation: 0, duration: 0.0 });
+            gsap.to(chevron, { rotation: 0, duration: 0.3 });
           }
         });
       });
   }
 
-  // Ejecutar en carga inicial
-  initCertCards();
-
-  // Si usas View Transitions de Astro, descomenta la siguiente línea:
   document.addEventListener('astro:page-load', initCertCards);
+  document.addEventListener('DOMContentLoaded', initCertCards);
 </script>
