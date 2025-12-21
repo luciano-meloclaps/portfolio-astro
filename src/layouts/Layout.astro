@@ -34,10 +34,16 @@ const ogImageUrl = new URL(image, siteUrl).href;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#000000" />
 
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PRECONNECT + DNS-PREFETCH para proveedores de fuentes y recursos terceros -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
     <!-- SEO + COMPARTIR -->
     <SEO
