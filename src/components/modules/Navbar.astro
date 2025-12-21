@@ -61,14 +61,23 @@ import { IconMenu, IconX } from '@tabler/icons-react';
 
     if (!navbar) return;
 
-    // Animación de entrada
-    gsap.to(navbar, {
-      y: 0,
-      autoAlpha: 1,
-      duration: 1.0,
-      ease: 'power4.out',
-      delay: 0.5,
-    });
+    // Respeta prefers-reduced-motion del usuario
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    // Animación de entrada (composited: usar transform + opacity)
+    if (prefersReducedMotion) {
+      gsap.set(navbar, { autoAlpha: 1, y: 0 });
+    } else {
+      gsap.to(navbar, {
+        y: 0,
+        autoAlpha: 1,
+        duration: 1.0,
+        ease: 'power4.out',
+        delay: 0.5,
+      });
+    }
 
     if (mobileMenuToggle && iconMenu && iconClose) {
       let isNavOpen = false;

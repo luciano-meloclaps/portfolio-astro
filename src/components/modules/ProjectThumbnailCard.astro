@@ -40,7 +40,10 @@ const techStackJson = JSON.stringify(techStack || []);
         alt={`Portada de ${title}`}
         class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         loading={index < 2 ? 'eager' : 'lazy'}
-        widths={[400, 800]}
+        decoding="async"
+        widths={[480, 768]}
+        sizes="(max-width: 768px) 100vw, 50vw"
+        format="webp"
       />
       <div
         class="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"
