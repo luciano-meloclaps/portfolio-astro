@@ -56,6 +56,11 @@ const { title, subtitle, class: className } = Astro.props;
   gsap.registerPlugin(ScrollTrigger);
 
   function initSectionTitles() {
+    // Respeta prefers-reduced-motion del usuario
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
     const wrappers = document.querySelectorAll('.section-title-wrapper');
 
     wrappers.forEach((wrapper) => {
@@ -66,6 +71,14 @@ const { title, subtitle, class: className } = Astro.props;
       const subtitleEl = wrapper.querySelector('[data-role="subtitle"]');
 
       const realTitle = textEl.textContent?.trim() || '';
+
+      if (prefersReducedMotion) {
+        // Degradación elegante: mostrar texto sin animar
+        if (subtitleEl) {
+          gsap.set(subtitleEl, { opacity: 1, y: 0 });
+        }
+        return;
+      }
 
       let currentTl: gsap.core.Timeline | null = null;
 
