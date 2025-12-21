@@ -88,6 +88,11 @@ import {
   import gsap from 'gsap';
 
   document.addEventListener('astro:page-load', () => {
+    // Respeta prefers-reduced-motion del usuario
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
     const elementsToAnimate = [
       '.hero-title',
       '.hero-subtitle',
@@ -95,15 +100,21 @@ import {
       '.hero-buttons',
     ];
 
-    gsap.set(elementsToAnimate, { autoAlpha: 0, y: 30 });
+    if (prefersReducedMotion) {
+      // Degradación elegante: mostrar elementos sin animación
+      gsap.set(elementsToAnimate, { autoAlpha: 1, y: 0 });
+    } else {
+      // Animaciones composited (transform + opacity)
+      gsap.set(elementsToAnimate, { autoAlpha: 0, y: 30 });
 
-    const tl = gsap.timeline({
-      defaults: { duration: 1.4, ease: 'power4.out' },
-    });
+      const tl = gsap.timeline({
+        defaults: { duration: 1.4, ease: 'power4.out' },
+      });
 
-    tl.to('.hero-title', { autoAlpha: 1, y: 0 }, 0.2)
-      .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.2')
-      .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.2')
-      .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=1.1');
+      tl.to('.hero-title', { autoAlpha: 1, y: 0 }, 0.2)
+        .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.2')
+        .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.2')
+        .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=1.1');
+    }
   });
 </script>
