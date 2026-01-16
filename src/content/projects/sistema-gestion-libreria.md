@@ -2,11 +2,10 @@
 title: 'Sistema de Gestión de Librería'
 tagline: 'Sistema de gestión de recursos empresariales con persistencia de datos relacional.'
 status: 'Completed'
-cover: '@/assets/images/banderaArg.jpg'
+cover: '@/assets/images/projects/sistema-gestion-libreria/sistema-libreria.webp'
 description: 'Solución de software para la administración eficiente de inventarios. Desarrollé un sistema robusto en Python con persistencia en SQLite, implementando lógica de negocio compleja para el control de stock, gestión de precios y transacciones, garantizando la integridad referencial y la consistencia de los datos.'
 images:
-  - '@/assets/images/banderaArg.jpg'
-  - '@/assets/images/banderaArg.jpg'
+  - '@/assets/images/projects/sistema-gestion-libreria/sistema-libreria.webp'
 keyFeatures:
   - 'Persistencia de datos con SQLite'
   - 'Lógica de negocio para control de stock'
