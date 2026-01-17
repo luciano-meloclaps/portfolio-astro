@@ -6,11 +6,12 @@ location: 'Remoto. Lima, Perú'
 startDate: 2023-01-01
 endDate: 2024-01-01
 contractType: 'Pasantía / Contrato'
-description: 'Liderazgo técnico y de diseño en un entorno de consultoría ágil. Mi rol abarcó desde la definición de la arquitectura frontend hasta la implementación de sistemas de diseño en Figma, actuando como puente entre los equipos de diseño y desarrollo para garantizar la viabilidad técnica y la fidelidad visual.'
+description: Lideré la integración operativa entre los equipos de Diseño y Desarrollo. Actué como nexo estratégico entre los equipos de Diseño y Desarrollo, garantizando la viabilidad técnica de las interfaces. Gestioné la asignación de tareas y reportes de avance, además de colaborar activamente en el código para acelerar la implementación de componentes complejos.
 achievements:
-  - 'Dirigí el ciclo completo de diseño UI/UX en Figma, reduciendo el re-trabajo en un 40%.'
+  - 'Dirigí el ciclo completo de diseño UI/UX en Figma, optimizando el flujo de entrega a desarrollo.'
   - 'Lideré un equipo de 6 personas con metodologías ágiles (Scrum/Kanban).'
-  - 'Arquitecté un sistema de componentes en React, acelerando el desarrollo en un 80%.'
+  - 'Colaboré en el desarrollo Frontend implementando componentes y variables de diseño en React.'
+  - 'Gestioné la comunicación inter-áreas y la presentación de reportes de métricas a la dirección.'
 techStack:
   - 'React'
   - 'Tailwind'
