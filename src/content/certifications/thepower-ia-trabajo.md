@@ -1,7 +1,7 @@
 ---
 title: 'IA en práctica para el entorno de trabajo'
 issuer: 'ThePower'
-category: 'AI'
+category: 'IA'
 issueDate: 2025-10-01
 description: 'Aplicación estratégica de la Inteligencia Artificial para potenciar la productividad profesional. Enfoque en la optimización de procesos, análisis de datos asistido y comunicación efectiva mediante herramientas generativas.'
 keySkills:

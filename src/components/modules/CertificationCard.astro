@@ -34,15 +34,25 @@ const {
 // FIX: Solo mostramos el año de emisión
 const year = new Date(issueDate).getFullYear();
 const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialId || Math.random().toString(36).substr(2, 9)}`;
+const certSlug = certification.slug;
+
+// CRITICAL: Normalizar categoría en minúscula para coincidir con los filtros
+const normalizedCategory = category.toLowerCase();
 ---
 
 <!-- 
   WRAPPER: h-full para que ocupe toda la altura de la celda del grid 
 -->
-<div class="certification-card-wrapper group h-full">
+<div
+  class="certification-card-wrapper group h-full"
+  data-certification-slug={certSlug}
+  data-category={normalizedCategory}
+  role="button"
+  aria-label={`${title} - ${category}`}
+>
   <Card
     padding="none"
-    class="hover:border-accent-magenta/40 relative flex h-full flex-col overflow-hidden card-border bg-background shadow-sm transition-all duration-300 hover:shadow-lg"
+    class="hover:border-accent-magenta/40 card-border relative flex h-full flex-col overflow-hidden bg-background shadow-sm transition-all duration-300 hover:shadow-lg"
   >
     <div class="halo-effect pointer-events-none"></div>
 
@@ -51,7 +61,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
       <!-- Header -->
       <div class="mb-4 flex items-center justify-between">
         <div
-          class="text-text-secondary/70 flex items-center gap-x-2 text-xs font-bold uppercase tracking-wider"
+          class="flex items-center gap-x-2 text-xs font-bold uppercase tracking-wider text-text-secondary/70"
         >
           <IconCertificate className="h-4 w-4" strokeWidth={1.0} />
           <span>{issuer}</span>
@@ -124,7 +134,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
           <!-- Skills -->
           <div>
             <h4
-              class="text-text-secondary/60 mb-3 font-sans text-[10px] font-bold uppercase tracking-widest"
+              class="mb-3 font-sans text-[10px] font-bold uppercase tracking-widest text-text-secondary/60"
             >
               Competencias Clave
             </h4>
@@ -143,7 +153,7 @@ const uniqueId = `cert-${title.toLowerCase().replace(/\s+/g, '-')}-${credentialI
           {
             techStack && techStack.length > 0 && (
               <div class="mt-5 border-t border-border pt-4">
-                <h4 class="text-text-secondary/60 mb-3 font-sans text-[10px] font-bold uppercase tracking-widest">
+                <h4 class="mb-3 font-sans text-[10px] font-bold uppercase tracking-widest text-text-secondary/60">
                   Tecnologías
                 </h4>
                 <div class="flex flex-wrap gap-2">

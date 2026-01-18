@@ -1,7 +1,7 @@
 ---
 title: 'Curso de Desarrollo con IA'
 issuer: 'BIG School'
-category: 'AI'
+category: 'IA'
 issueDate: 2025-10-01
 description: 'Integración práctica de herramientas de Inteligencia Artificial en el flujo de desarrollo de software. Uso avanzado de LLMs (Claude, ChatGPT, Gemini) para refactorización de código, generación de tests unitarios y automatización de tareas repetitivas.'
 keySkills:

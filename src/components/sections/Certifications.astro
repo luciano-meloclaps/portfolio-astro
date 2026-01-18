@@ -3,21 +3,100 @@
 import { getCollection } from 'astro:content';
 import CertificationCard from '@/components/modules/CertificationCard.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
+import TechChip from '@/components/ui/TechChip.astro';
+import { techIconMap } from '@/config/tech-icon-map';
 
 const allCertifications = await getCollection('certifications');
 allCertifications.sort(
   (a, b) => b.data.issueDate.valueOf() - a.data.issueDate.valueOf()
 );
+
+// Extrae las categorías únicas usadas en certificaciones
+const usedCategories = Array.from(
+  new Set(allCertifications.map((cert) => cert.data.category))
+).sort();
 ---
 
-<section id="certifications" class="py-24 md:py-32">
+<section id="certifications" class="relative py-24 md:py-32">
   <div class="container-narrow certifications-section-content space-y-16">
-    <SectionTitle
-      title="Certificados"
-      subtitle="Credenciales técnicas que validan mi expertise."
-    />
+    <div class="flex w-full flex-col items-center justify-center">
+      <SectionTitle
+        title="Certificados"
+        subtitle="Credenciales técnicas que validan mi expertise."
+        class="items-center text-center"
+      />
+    </div>
 
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    {
+      usedCategories.length > 0 && (
+        <div class="filter-bar-wrapper space-y-4">
+          <label class="block font-mono text-sm font-light uppercase tracking-normal text-text-secondary">
+            Filtrar por:
+          </label>
+
+          <div
+            id="cert-filter-container"
+            class="filter-chips-container flex flex-wrap gap-2 sm:gap-3"
+            role="group"
+            data-filter-section="certifications"
+          >
+            {/* Botón "All" */}
+            <TechChip
+              Icon={null}
+              name="all"
+              label="Todos"
+              mode="filter"
+              data-filter-name="all"
+              data-filter-label="Todos"
+              data-filter-active="true"
+              aria-pressed="true"
+              class="cert-filter-btn"
+            />
+
+            {/* Botones para cada categoría */}
+            {usedCategories.map((category) => {
+              const normalizedCategory = category.toLowerCase();
+              const Icon = techIconMap[normalizedCategory] || null;
+
+              return (
+                <TechChip
+                  Icon={Icon}
+                  name={normalizedCategory}
+                  label={category}
+                  mode="filter"
+                  data-filter-name={normalizedCategory}
+                  data-filter-label={category}
+                  data-filter-active="false"
+                  aria-pressed="false"
+                  class="cert-filter-btn"
+                />
+              );
+            })}
+          </div>
+
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span
+              id="cert-filter-counter-text"
+              class="font-mono text-xs uppercase tracking-wide text-text-secondary"
+            >
+              Mostrando todas las certificaciones
+            </span>
+            <button
+              id="cert-filter-clear-btn"
+              class="hidden cursor-pointer font-mono text-xs uppercase tracking-wide text-text-secondary hover:text-text-primary"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+          <div
+            class="h-px bg-border/50 opacity-0 transition-opacity duration-300"
+            id="cert-filter-line"
+          />
+        </div>
+      )
+    }
+
+    <div id="certifications-grid" class="grid grid-cols-1 gap-8 md:grid-cols-2">
       {
         allCertifications.map((cert) => (
           <CertificationCard certification={cert} />
@@ -28,12 +107,145 @@ allCertifications.sort(
 </section>
 
 <script>
-  // Script de animación de entrada para la sección
   import gsap from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // --- LÓGICA DE FILTRADO Y ESTADO ---
+  let filterTimeline: gsap.core.Timeline | null = null;
+
+  function initCertFilterBar() {
+    const container = document.getElementById('cert-filter-container');
+    if (!container) return;
+
+    const filterLine = document.getElementById('cert-filter-line');
+    const counterText = document.getElementById('cert-filter-counter-text');
+    const clearBtn = document.getElementById('cert-filter-clear-btn');
+    const filterBtns = Array.from(
+      container.querySelectorAll('.cert-filter-btn')
+    ) as HTMLElement[];
+
+    // --- FUNCIONALIDAD DE FILTRADO ---
+    function applyFilter(activeFilterName: string) {
+      const cards = Array.from(
+        document.querySelectorAll('[data-certification-slug][data-category]')
+      ) as HTMLElement[];
+
+      if (filterTimeline) filterTimeline.kill();
+
+      filterTimeline = gsap.timeline({
+        defaults: { duration: 0.15, ease: 'power2.inOut' },
+      });
+
+      const cardsToShow: HTMLElement[] = [];
+      const cardsToHide: HTMLElement[] = [];
+
+      cards.forEach((card) => {
+        const cardCategory = card.getAttribute('data-category') || '';
+        const show =
+          activeFilterName === 'all' || cardCategory === activeFilterName;
+
+        if (show) cardsToShow.push(card);
+        else cardsToHide.push(card);
+      });
+
+      // Animar salida de tarjetas ocultas
+      cardsToHide.forEach((el) => {
+        filterTimeline!.to(
+          el,
+          {
+            opacity: 0,
+            scale: 0.92,
+            duration: 0.12,
+            onComplete: () => {
+              el.classList.add('hidden');
+              el.style.display = 'none';
+            },
+          },
+          0
+        );
+      });
+
+      // Animar entrada de tarjetas visibles
+      cardsToShow.forEach((el) => {
+        el.classList.remove('hidden');
+        el.style.display = '';
+        filterTimeline!.to(el, { opacity: 1, scale: 1, duration: 0.15 }, 0);
+      });
+
+      // Actualizar línea visual
+      if (filterLine) {
+        gsap.to(filterLine, {
+          opacity: activeFilterName !== 'all' ? 1 : 0,
+          duration: 0.3,
+        });
+      }
+    }
+
+    // --- ACTUALIZAR UI (ESTADOS Y ETIQUETAS) ---
+    const updateUI = () => {
+      const activeBtnElement = container!.querySelector(
+        '[data-filter-active="true"]'
+      );
+      const activeFilterName =
+        activeBtnElement?.getAttribute('data-filter-name') || 'all';
+
+      // Actualizar contador
+      if (counterText) {
+        if (activeFilterName === 'all') {
+          counterText.textContent = 'Mostrando todas las certificaciones';
+        } else {
+          const activeLabel =
+            activeBtnElement?.getAttribute('data-filter-label') ||
+            activeFilterName;
+          counterText.textContent = `FILTRO ACTIVO: ${activeLabel}`;
+        }
+      }
+
+      // Mostrar/ocultar botón limpiar
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', activeFilterName === 'all');
+      }
+
+      // Aplicar filtrado
+      applyFilter(activeFilterName);
+    };
+
+    // --- EVENT LISTENERS EN BOTONES ---
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filterName = btn.getAttribute('data-filter-name');
+        if (!filterName) return;
+
+        // Desactivar todos los botones
+        filterBtns.forEach((b) => {
+          b.setAttribute('data-filter-active', 'false');
+          b.setAttribute('aria-pressed', 'false');
+        });
+
+        // Activar el botón clicado
+        btn.setAttribute('data-filter-active', 'true');
+        btn.setAttribute('aria-pressed', 'true');
+
+        updateUI();
+      });
+    });
+
+    // Botón limpiar filtros
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        const allBtn = filterBtns.find(
+          (btn) => btn.getAttribute('data-filter-name') === 'all'
+        );
+        if (allBtn) {
+          allBtn.click();
+        }
+      });
+    }
+  }
+
+  // --- SCROLL ANIMATION PARA ENTRADA INICIAL ---
+  function initScrollAnimation() {
     const section = document.querySelector('.certifications-section-content');
     if (!section) return;
 
@@ -53,5 +265,20 @@ allCertifications.sort(
         });
       },
     });
+  }
+
+  // Inicializar en carga
+  document.addEventListener('DOMContentLoaded', () => {
+    initCertFilterBar();
+    initScrollAnimation();
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    initCertFilterBar();
+  });
+
+  // Limpiar timeline en navegación
+  document.addEventListener('astro:before-swap', () => {
+    if (filterTimeline) filterTimeline.kill();
   });
 </script>
