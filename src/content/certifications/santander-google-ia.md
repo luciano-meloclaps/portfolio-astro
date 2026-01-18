@@ -1,7 +1,7 @@
 ---
 title: 'Inteligencia Artificial Gemini LLM'
 issuer: 'Santander Open Academy'
-category: 'AI'
+category: 'IA'
 issueDate: 2024-08-01
 description: 'Formación intensiva en los fundamentos de la Inteligencia Artificial Generativa. Comprensión profunda de los LLMs (Large Language Models), ingeniería de prompts (Prompt Engineering) y aplicación ética de herramientas de IA para optimizar flujos de trabajo de desarrollo y productividad.'
 keySkills:

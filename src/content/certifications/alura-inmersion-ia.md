@@ -1,7 +1,7 @@
 ---
 title: 'Inmersión IA + Google Gemini'
 issuer: 'Alura'
-category: 'AI'
+category: 'IA'
 issueDate: 2025-09-01
 description: 'Exploración profunda de las capacidades multimodales de Google Gemini. Desarrollo de aplicaciones que integran visión por computadora y procesamiento de lenguaje natural utilizando la API de Gemini.'
 keySkills:

@@ -23,6 +23,11 @@ import {
   IconBrandTrello,
   IconFileTypeSql,
   IconBrandFramerMotion,
+  IconBrain,
+  IconCloud,
+  IconPalette,
+  IconCode,
+  IconUsers,
 } from '@tabler/icons-react';
 
 // IMPORTAMOS LOS ICONOS CUSTOM
@@ -66,4 +71,11 @@ export const techIconMap: Record<string, any> = {
   // --- CONCEPTOS ---
   'entity framework': IconDatabase,
   jwt: IconLockPassword,
+
+  // --- CATEGORÍAS DE CERTIFICACIONES ---
+  ia: IconBrain,
+  cloud: IconCloud,
+  design: IconPalette,
+  development: IconCode,
+  'soft skills': IconUsers,
 };

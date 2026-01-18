@@ -1,7 +1,7 @@
 ---
 title: 'Inteligencia Artificial Generativa'
 issuer: 'Amazon Web Services (AWS)'
-category: 'AI'
+category: 'IA'
 issueDate: 2025-09-01
 description: 'Fundamentos de la IA Generativa en la nube de AWS. Uso de Amazon Bedrock para construir y escalar aplicaciones de IA generativa, entendiendo los modelos fundacionales (FMs) y sus casos de uso empresariales.'
 keySkills:

@@ -40,4 +40,11 @@ export const techColorMap: Record<string, string> = {
   jwt: '#b1170f', // Pink/Purple distintivo para JWT
   trello: '#0052CC',
   'framer motion': '#d3c65d',
+
+  // --- CATEGORÍAS DE CERTIFICACIONES ---
+  ia: '#6366F1', // Indigo vibrante para IA
+  cloud: '#0EA5E9', // Cyan cielo para Cloud
+  design: '#EC4899', // Pink profesional para Design
+  development: '#10B981', // Teal emerald para Development
+  'soft skills': '#F59E0B', // Ámbar gold para Soft Skills
 };

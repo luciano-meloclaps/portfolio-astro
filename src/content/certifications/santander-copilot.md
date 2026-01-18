@@ -1,7 +1,7 @@
 ---
 title: 'Curso Copilot'
 issuer: 'Santander Open Academy'
-category: 'AI'
+category: 'IA'
 issueDate: 2024-01-01
 description: 'Dominio de GitHub Copilot como herramienta de pair programming. Técnicas para acelerar la escritura de código, generar tests y documentar software utilizando asistencia de IA.'
 keySkills:
