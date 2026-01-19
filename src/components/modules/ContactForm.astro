@@ -1,20 +1,18 @@
 ---
 // src/components/modules/ContactForm.astro
 // =========================================
-// Formulario de contacto con validación en tiempo real
+// Formulario de contacto conectado a API Real (Resend)
 // Características:
-// - Validación TypeScript tipada para cada campo
-// - Mensajes de error accesibles (aria-invalid, aria-describedby)
-// - Feedback visual inmediato
-// - Modal de éxito/error con GSAP microinteractions
-// - SEO intacto: HTML semántico, sin atributos bloqueadores
+// - Validación TypeScript tipada
+// - Conexión asíncrona a /api/send-email
+// - Feedback visual y manejo de errores reales
 
 import FormField from '@/components/ui/FormField.astro';
 import { IconSend } from '@tabler/icons-react';
 ---
 
 <!-- Formulario de Contacto -->
-<form id="contact-form" class="space-y-6 flex-1 flex flex-col" novalidate>
+<form id="contact-form" class="flex flex-1 flex-col space-y-6" novalidate>
   <!-- Campo: Nombre -->
   <FormField id="name" label="Nombre *" type="text" required />
 
@@ -31,7 +29,7 @@ import { IconSend } from '@tabler/icons-react';
   <div class="mt-auto pt-6">
     <button
       type="submit"
-      class="w-full relative inline-flex items-center justify-center gap-x-2 px-6 py-3 font-sans text-sm uppercase tracking-wider overflow-hidden border rounded-small transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-95 bg-text-primary text-background border-text-primary hover:bg-transparent hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed"
+      class="relative inline-flex w-full items-center justify-center gap-x-2 overflow-hidden rounded-small border border-text-primary bg-text-primary px-6 py-3 font-sans text-sm uppercase tracking-wider text-background transition-all duration-300 ease-out hover:bg-transparent hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
     >
       <span class="relative z-10 flex items-center justify-center gap-x-2">
         <span id="submit-text">Enviar Mensaje</span>
@@ -43,31 +41,20 @@ import { IconSend } from '@tabler/icons-react';
 
 <script>
   import gsap from 'gsap';
-  import {
-    validateContactForm,
-    validateField,
-  } from '@/lib/formValidation';
+  import { validateContactForm, validateField } from '@/lib/formValidation';
 
-  /**
-   * Field configuration with type-safe validation
-   */
   interface FieldConfig {
     element: HTMLInputElement | HTMLTextAreaElement;
     type: 'name' | 'email' | 'subject' | 'message';
   }
 
-  /**
-   * Inicializar validación en tiempo real del formulario
-   */
   function initContactFormValidation(): void {
     const form = document.getElementById('contact-form') as HTMLFormElement;
     if (!form) return;
 
     const nameField = document.getElementById('name') as HTMLInputElement;
     const emailField = document.getElementById('email') as HTMLInputElement;
-    const subjectField = document.getElementById(
-      'subject'
-    ) as HTMLInputElement;
+    const subjectField = document.getElementById('subject') as HTMLInputElement;
     const messageField = document.getElementById(
       'message'
     ) as HTMLTextAreaElement;
@@ -75,13 +62,17 @@ import { IconSend } from '@tabler/icons-react';
       'button[type="submit"]'
     ) as HTMLButtonElement;
 
-    // Null check all required elements
-    if (!nameField || !emailField || !subjectField || !messageField || !submitBtn) {
+    if (
+      !nameField ||
+      !emailField ||
+      !subjectField ||
+      !messageField ||
+      !submitBtn
+    ) {
       console.error('[ContactForm] Missing required form elements');
       return;
     }
 
-    // Type-safe field configuration
     const fieldConfig: Record<string, FieldConfig> = {
       name: { element: nameField, type: 'name' },
       email: { element: emailField, type: 'email' },
@@ -89,18 +80,9 @@ import { IconSend } from '@tabler/icons-react';
       message: { element: messageField, type: 'message' },
     };
 
-    // Debounce timers per field
     const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-    /**
-     * Mostrar/ocultar mensaje de validación (error o éxito)
-     * Soporta estados: error (rojo) y success (verde)
-     * Utiliza GSAP solo para microinteractions (fade), no para layout
-     *
-     * @param fieldId - ID del campo
-     * @param message - Mensaje de error (rojo) o null para limpiar
-     * @param isValid - true para mostrar estado válido (verde), false para error
-     */
+    // --- FUNCIONES DE UI (Show/Hide Errors) ---
     function showFieldMessage(
       fieldId: string,
       message: string | null,
@@ -121,32 +103,21 @@ import { IconSend } from '@tabler/icons-react';
 
       if (message) {
         fieldElement.setAttribute('aria-invalid', isValid ? 'false' : 'true');
-
         if (isValid) {
-          // Success state: show green message
           helperMessageEl.textContent = message;
           helperMessageEl.classList.remove('hidden');
           errorMessageEl.classList.add('hidden');
-
-          // Set data attribute for CSS styling
           fieldElement.setAttribute('data-valid', 'true');
-
-          // Microinteraction: fade in
           gsap.fromTo(
             helperMessageEl,
             { opacity: 0, y: -5 },
             { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' }
           );
         } else {
-          // Error state: show red message
           errorMessageEl.textContent = message;
           errorMessageEl.classList.remove('hidden');
           helperMessageEl.classList.add('hidden');
-
-          // Remove valid state
           fieldElement.removeAttribute('data-valid');
-
-          // Microinteraction: fade in
           gsap.fromTo(
             errorMessageEl,
             { opacity: 0, y: -5 },
@@ -154,11 +125,8 @@ import { IconSend } from '@tabler/icons-react';
           );
         }
       } else {
-        // Clear all messages
         fieldElement.setAttribute('aria-invalid', 'false');
         fieldElement.removeAttribute('data-valid');
-
-        // Fade out both messages
         gsap.to([errorMessageEl, helperMessageEl], {
           opacity: 0,
           y: -5,
@@ -174,62 +142,66 @@ import { IconSend } from '@tabler/icons-react';
       }
     }
 
-    /**
-     * Validar un campo individual
-     * @param fieldId - ID del campo a validar
-     */
     function validateFieldOnChange(fieldId: keyof typeof fieldConfig): void {
       const config = fieldConfig[fieldId];
       const error = validateField(config.element.value, config.type);
       showFieldMessage(fieldId, error);
     }
 
-    /**
-     * Configurar listeners para validación en tiempo real
-     * - blur: valida y marca campo como "tocado"
-     * - input: valida con debounce de 300ms (después de primer blur)
-     */
+    // --- EVENT LISTENERS ---
     Object.entries(fieldConfig).forEach(([fieldId, config]) => {
       const { element } = config;
-
-      // On blur: validate y mark as touched
       element.addEventListener('blur', () => {
         element.setAttribute('data-touched', 'true');
         validateFieldOnChange(fieldId as keyof typeof fieldConfig);
       });
-
-      // On change: validate (después del blur)
       element.addEventListener('change', () => {
         validateFieldOnChange(fieldId as keyof typeof fieldConfig);
       });
-
-      // On input: debounced validation (solo si fue tocado)
       element.addEventListener('input', () => {
         const existingTimer = debounceTimers.get(fieldId);
         if (existingTimer) clearTimeout(existingTimer);
-
         const newTimer = setTimeout(() => {
           if (element.hasAttribute('data-touched')) {
             validateFieldOnChange(fieldId as keyof typeof fieldConfig);
           }
           debounceTimers.delete(fieldId);
         }, 300);
-
         debounceTimers.set(fieldId, newTimer);
       });
     });
 
     /**
-     * Manejar envío del formulario
-     * - Valida todos los campos
-     * - Muestra errores si existen
-     * - Envía datos si validación pasa
-     * - Abre modal con resultado (éxito/error)
+     * 🚀 FUNCIÓN CRÍTICA ACTUALIZADA
+     * Envía los datos reales al endpoint /api/send-email
      */
+    async function sendFormDataToAPI(formData: {
+      name: string;
+      email: string;
+      subject: string;
+      message: string;
+    }): Promise<{ success: boolean }> {
+      // Llamada real a tu servidor Serverless
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      // Si el servidor (send-email.ts) devuelve error, lanzamos excepción
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al conectar con el servidor');
+      }
+
+      return { success: true };
+    }
+
+    // --- MANEJO DEL SUBMIT ---
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Collect form data
       const formData = {
         name: nameField.value,
         email: emailField.value,
@@ -237,10 +209,8 @@ import { IconSend } from '@tabler/icons-react';
         message: messageField.value,
       };
 
-      // Validate all fields
       const validation = validateContactForm(formData);
 
-      // If validation fails, show errors and return
       if (!validation.isValid) {
         Object.entries(validation.errors).forEach(([fieldId, error]) => {
           showFieldMessage(fieldId, error);
@@ -250,7 +220,6 @@ import { IconSend } from '@tabler/icons-react';
         return;
       }
 
-      // Disable submit button and show loading state
       submitBtn.disabled = true;
       const submitText = submitBtn.querySelector(
         '#submit-text'
@@ -259,82 +228,36 @@ import { IconSend } from '@tabler/icons-react';
       if (submitText) submitText.textContent = 'Enviando...';
 
       try {
-        // Attempt to submit form
-        const response = await simulateFormSubmission(formData);
+        // 🔥 AQUÍ LLAMAMOS A LA NUEVA FUNCIÓN REAL
+        const response = await sendFormDataToAPI(formData);
 
         if (response.success) {
-          // Open success modal
           (window as any).formModal?.open('success');
-
-          // Reset form and clear errors
           form.reset();
           Object.keys(fieldConfig).forEach((fieldId) => {
             showFieldMessage(fieldId, null);
             const field = document.getElementById(fieldId);
             if (field) field.removeAttribute('data-touched');
           });
-        } else {
-          // Open error modal on failure
-          (window as any).formModal?.open('error');
         }
       } catch (error) {
-        console.error('[ContactForm] Submission error:', error);
+        console.error('[ContactForm] Error real de envío:', error);
+        // Si falla, abrimos el modal de error
         (window as any).formModal?.open('error');
       } finally {
-        // Restore submit button state
         submitBtn.disabled = false;
         if (submitText) submitText.textContent = originalText;
       }
     });
 
-    // Cleanup on navigation (View Transitions)
     const cleanup = (): void => {
-      // Clear all pending debounce timers
       debounceTimers.forEach((timer) => clearTimeout(timer));
       debounceTimers.clear();
-
-      // Note: Event listeners are automatically cleaned up when DOM is replaced
-      // by Astro's View Transitions, so explicit removal not needed
     };
 
     document.addEventListener('astro:before-swap', cleanup);
   }
 
-  /**
-   * Simular envío del formulario
-   * En producción, reemplazar con un endpoint real
-   *
-   * @param formData - Datos del formulario validados
-   * @returns Promise con resultado de envío
-   */
-  async function simulateFormSubmission(formData: {
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-  }): Promise<{ success: boolean }> {
-    // Simular delay de red (600ms)
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    // 95% de éxito para testing del error state
-    const success = Math.random() < 0.95;
-
-    // En producción:
-    // const response = await fetch('/api/contact', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData),
-    // });
-    // if (!response.ok) throw new Error('Network error');
-    // return response.json();
-
-    return { success };
-  }
-
-  /**
-   * Initialize form validation on page load
-   * Also reinitialize after View Transitions to ensure proper event binding
-   */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initContactFormValidation);
   } else {

@@ -19,7 +19,8 @@
     "astro-seo": "^0.8.4",
     "gsap": "^3.13.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "resend": "^6.8.0"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
