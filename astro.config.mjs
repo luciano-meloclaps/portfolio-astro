@@ -4,10 +4,13 @@ import tailwind from '@astrojs/tailwind';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 
+import vercel from '@astrojs/vercel';
+
 // https://astro.build/config
 export default defineConfig({
   // Añade la URL de tu sitio web final aquí para el sitemap.
   site: 'https://portfolio-luciano-roan.vercel.app/',
+
   integrations: [react(), tailwind(), sitemap()],
 
   // Image service: usar 'noop' para evitar dependencia de Sharp
@@ -22,4 +25,6 @@ export default defineConfig({
     host: true,
     port: 4321,
   },
+
+  adapter: vercel(),
 });
