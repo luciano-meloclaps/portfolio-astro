@@ -22,13 +22,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     // ENVÍO OFICIAL (PRODUCCIÓN)
     const { data: emailData, error } = await resend.emails.send({
-      // ⬇️ AQUÍ ESTÁ EL CAMBIO CLAVE ⬇️
-      from: 'Luciano <dev@meloclaps.com>',
+      from: 'PortfolioWeb <dev@meloclaps.com>',
       // ⬆️ Si falla, prueba: "Luciano <dev@send.meloclaps.com>"
 
       to: ['meloclapsluciano@gmail.com'], // Tu Gmail donde recibes
       replyTo: email, // Para responderle al cliente
-      subject: `Portfolio: ${subject}`,
+      subject: `Mensaje: ${subject}`,
       html: `
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #6d28d9;">Nuevo mensaje de ${name}</h2>
