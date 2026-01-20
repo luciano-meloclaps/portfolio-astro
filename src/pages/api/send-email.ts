@@ -1,5 +1,5 @@
 // src/pages/api/send-email.ts
-export const prerender = false; // IMPORTANTE: Esto habilita el modo servidor en Vercel
+export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
@@ -8,10 +8,11 @@ const resend = new Resend(import.meta.env.RESEND_API_KEY);
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const data = await request.json();
-    const { name, email, subject, message } = data;
+    // Leemos los datos (Soporta JSON y FormData)
+    const formData = await request.json();
+    const { name, email, subject, message } = formData;
 
-    // Validación simple
+    // Validación de seguridad
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: 'Faltan campos requeridos' }),
@@ -19,19 +20,25 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // ENVÍO DEL EMAIL
+    // ENVÍO OFICIAL (PRODUCCIÓN)
     const { data: emailData, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: ['meloclapsluciano@gmail.com'],
-      replyTo: email, // <--- CORREGIDO (T mayúscula, sin guion bajo)
+      // ⬇️ AQUÍ ESTÁ EL CAMBIO CLAVE ⬇️
+      from: 'Luciano <dev@meloclaps.com>',
+      // ⬆️ Si falla, prueba: "Luciano <dev@send.meloclaps.com>"
+
+      to: ['meloclapsluciano@gmail.com'], // Tu Gmail donde recibes
+      replyTo: email, // Para responderle al cliente
       subject: `Portfolio: ${subject}`,
       html: `
-        <h3>Nuevo mensaje de ${name}</h3>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Mensaje:</strong></p>
-        <blockquote style="border-left: 2px solid #ccc; padding-left: 10px;">
-          ${message}
-        </blockquote>
+        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+          <h2 style="color: #6d28d9;">Nuevo mensaje de ${name}</h2>
+          <p><strong>De:</strong> ${email}</p>
+          <p><strong>Asunto:</strong> ${subject}</p>
+          <hr style="border: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 16px; line-height: 1.5;">${message}</p>
+          <br />
+          <p style="font-size: 12px; color: #888;">Enviado desde meloclaps.com</p>
+        </div>
       `,
     });
 
