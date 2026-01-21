@@ -9,7 +9,7 @@ import vercel from '@astrojs/vercel';
 // https://astro.build/config
 export default defineConfig({
   // Añade la URL de tu sitio web final aquí para el sitemap.
-  site: 'https://portfolio-luciano-roan.vercel.app/',
+  site: 'https://meloclaps.com',
 
   integrations: [react(), tailwind(), sitemap()],
 
