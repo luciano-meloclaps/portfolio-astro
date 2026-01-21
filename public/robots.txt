@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+
+# 1. Permitir que todos los bots (incluyendo IAs) rastreen el sitio
+User-agent: *
+Allow: /
+
+# 2. Evitar que se indexen archivos de configuración o carpetas privadas (si las tuvieras)
+Disallow: /api/
+
+# 3. Indicar la ubicación oficial del mapa del sitio (Sitemap)
+Sitemap: https://meloclaps.com/sitemap-index.xml

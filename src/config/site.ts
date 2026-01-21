@@ -1,11 +1,13 @@
 // src/config/site.ts
 export const SITE_CONFIG = {
   profile: {
+    // Alineado con el SEO Front-loading que configuramos en el Layout
     description:
-      'Arquitecto de software Fullstack, especializado en la intersección de backend (.NET) y frontend (React) con un enfoque en UX/UI.',
-    email: 'meloclapsluciano@gmail.com',
+      'Luciano Stefano Melo Claps — Desarrollador Fullstack especializado en .NET y React. Soluciones de software escalables y UX/UI optimizada.',
+    email: 'dev@meloclaps.com',
     githubUrl: 'https://github.com/luciano-stefano-meloclaps',
     linkedinUrl: 'https://linkedin.com/in/luciano-stefano-melo-claps',
   },
-  copyright: `Copyright © ${new Date().getFullYear()} Luciano Melo Claps. All Rights Reserved.`,
+  // Copyright dinámico y profesional
+  copyright: `Copyright © ${new Date().getFullYear()} Luciano Stefano Melo Claps.`,
 };
