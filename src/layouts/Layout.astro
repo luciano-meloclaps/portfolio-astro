@@ -10,68 +10,113 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  canonicalURL?: string;
 }
 
-// CONFIGURACIÓN COMPARTIR
-const defaultTitle = 'Luciano Stefano Melo Claps | Software Developer';
-const defaultDescription =
-  'Portfolio de un Desarrollador Fullstack especializado en .NET y React. Experiencia en desarrollo web, UX/UI, SEO y soluciones a medida.';
-const siteUrl =
-  import.meta.env.SITE || 'https://portfolio-luciano-roan.vercel.app';
+// CONFIGURACIÓN DE MARCA Y SEO
+const fullName = 'Luciano Stefano Melo Claps';
+const defaultTitle = `${fullName} | Software Developer`;
+const defaultDescription = `${fullName} | Desarrollador Fullstack .NET & React. Soluciones de software escalables, UX/UI y optimización técnica. Conocé mi trayectoria.`;
+
+// URL oficial del activo digital
+const siteUrl = 'https://meloclaps.com';
 
 const {
   title = defaultTitle,
   description = defaultDescription,
   image = '/og-image.jpg',
+  canonicalURL = Astro.url.href,
 } = Astro.props;
 
+// Construcción robusta de la URL de imagen para redes sociales
 const ogImageUrl = new URL(image, siteUrl).href;
+
+//  DEFINICIÓN DE DATOS ESTRUCTURADOS (JSON-LD)
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: fullName,
+  url: siteUrl,
+  image: ogImageUrl,
+  sameAs: [
+    'https://github.com/luciano-stefano-meloclaps',
+    'https://linkedin.com/in/luciano-stefano-melo-claps',
+  ],
+  jobTitle: 'Software Developer',
+  knowsAbout: ['.NET', 'React', 'Astro', 'TypeScript', 'UX/UI Design', 'SEO'],
+  description: defaultDescription,
+};
 ---
 
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#000000" />
+
+    <!-- CANONICAL: Evita el contenido duplicado entre Vercel y tu dominio -->
+    <link rel="canonical" href={canonicalURL} />
 
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- PRECONNECT + DNS-PREFETCH para proveedores de fuentes y recursos terceros -->
+    <!-- RENDIMIENTO: Pre-conexión a recursos críticos -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
-    <!-- SEO + COMPARTIR -->
+    <!-- SEO + OPEN GRAPH + TWITTER -->
     <SEO
       title={title}
       description={description}
+      canonical={canonicalURL}
       openGraph={{
-        basic: { title, type: 'website', image: ogImageUrl },
+        basic: {
+          title: title,
+          type: 'website',
+          image: ogImageUrl,
+          url: canonicalURL,
+        },
         image: {
-          alt: 'Luciano Melo Claps Portfolio',
+          alt: `${fullName} - Software Developer Portfolio`,
           width: 1200,
           height: 630,
+        },
+        optional: {
+          siteName: `${fullName} Portfolio`,
+          locale: 'es_AR',
         },
       }}
       twitter={{
         card: 'summary_large_image',
-        title,
-        description,
+        title: title,
+        description: description,
         image: ogImageUrl,
+      }}
+      extend={{
+        meta: [
+          { name: 'robots', content: 'index, follow' },
+          { name: 'googlebot', content: 'index, follow' },
+        ],
       }}
     />
 
     <ThemeManager />
+
+    <!-- INYECCIÓN DE DATOS ESTRUCTURADOS PARA IA Y GOOGLE -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(personSchema)}
+    />
   </head>
 
   <body
     class="selection:bg-accent-magenta/30 overflow-x-hidden bg-background font-sans text-text-primary antialiased selection:text-text-primary"
   >
-    <!-- GRID GLOBAL -->
+    <!-- GRID GLOBAL DE FONDO -->
     <div
       class="pointer-events-none fixed inset-0 z-[-1]"
       style="
