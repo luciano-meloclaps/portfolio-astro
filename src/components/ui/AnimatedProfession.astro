@@ -18,9 +18,9 @@ const phrases = [
     className,
   ]}
 >
-  <h1 class="sr-only">
-    {phrases.map((p) => `${p.stroke} ${p.fill}`).join(', ')}
-  </h1>
+  <span class="sr-only">
+    Especialista en {phrases.map((p) => `${p.stroke} ${p.fill}`).join(' y ')}
+  </span>
 
   <div
     class="flex flex-col items-center gap-2 lg:flex-row lg:items-baseline lg:gap-4"

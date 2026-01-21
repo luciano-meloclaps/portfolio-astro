@@ -13,26 +13,48 @@ import {
 ---
 
 <section
-  class="selection:bg-accent-magenta/20 hero-section relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden text-gray-900 transition-colors duration-500 selection:text-black dark:text-white"
+  class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden"
 >
-  <!-- ... (Tus capas de atmósfera Light/Dark se mantienen igual, no las toco) ... -->
+  <div
+    class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+  >
+    <!-- Luz Light Mode: Blanco/Gris muy suave -->
+    <div
+      class="absolute h-[800px] w-[800px] rounded-full bg-white/50 opacity-60 blur-[120px] dark:hidden"
+    >
+    </div>
+
+    <!-- Luz Dark Mode: Tu Magenta original, pero sutil -->
+    <div
+      class="bg-accent-magenta/20 absolute hidden h-[600px] w-[600px] rounded-full opacity-50 blur-[150px] dark:block"
+    >
+    </div>
+  </div>
 
   <!-- CONTENIDO PRINCIPAL -->
   <div
-    class="relative z-10 flex w-full max-w-5xl flex-col items-center gap-y-10 px-4 text-center"
+    class="relative z-10 flex w-full max-w-5xl flex-col items-center gap-y-8 px-4 text-center"
   >
-    <!-- Título -->
-    <div class="hero-title drop-shadow-xl dark:drop-shadow-2xl">
+    <!-- H1 SEMÁNTICO -->
+    <h1
+      class="hero-name-container flex flex-row flex-wrap items-center justify-center gap-3 font-mono text-sm uppercase tracking-[0.2em] text-text-secondary opacity-80 md:text-base"
+    >
+      <span>HOLA, SOY</span>
+      <span class="font-normal text-inherit">LUCIANO STEFANO MELO CLAPS</span>
+    </h1>
+
+    <!-- Título Animado -->
+    <div class="hero-title mt-2 drop-shadow-xl dark:drop-shadow-2xl">
       <AnimatedProfession />
     </div>
 
     <!-- Subtítulo -->
     <p
-      class="hero-subtitle max-w-xl text-base font-light leading-relaxed tracking-wide text-gray-600 dark:text-gray-300 md:text-lg"
+      class="hero-subtitle max-w-xl text-base font-light leading-relaxed tracking-wide text-text-secondary md:text-lg"
     >
-      Técnico en Programación. Aplico principios SOLID para desarrollar
-      arquitecturas robustas e interfaces modernas. Mi enfoque asegura sistemas
-      escalables y altamente optimizados
+      Técnico en Programación. Aplico principios <strong>SOLID</strong> para desarrollar
+      arquitecturas robustas e interfaces modernas. Mi enfoque asegura sistemas escalables
+      y altamente optimizados en <strong>.NET</strong> y <strong>React</strong>.
     </p>
 
     <!-- Chips -->
@@ -57,9 +79,7 @@ import {
       />
     </div>
 
-    <!-- 
-      BOTONES SIMÉTRICOS
-    -->
+    <!-- Botones -->
     <div
       class="hero-buttons flex w-full max-w-xs flex-col gap-4 pt-6 sm:max-w-none sm:flex-row sm:justify-center"
     >
@@ -89,12 +109,11 @@ import {
   import gsap from 'gsap';
 
   document.addEventListener('astro:page-load', () => {
-    // Respeta prefers-reduced-motion del usuario
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
-
     const elementsToAnimate = [
+      '.hero-name-container',
       '.hero-title',
       '.hero-subtitle',
       '.hero-chips',
@@ -102,20 +121,17 @@ import {
     ];
 
     if (prefersReducedMotion) {
-      // Degradación elegante: mostrar elementos sin animación
       gsap.set(elementsToAnimate, { autoAlpha: 1, y: 0 });
     } else {
-      // Animaciones composited (transform + opacity)
       gsap.set(elementsToAnimate, { autoAlpha: 0, y: 30 });
-
       const tl = gsap.timeline({
-        defaults: { duration: 1.4, ease: 'power4.out' },
+        defaults: { duration: 1.2, ease: 'power4.out' },
       });
-
-      tl.to('.hero-title', { autoAlpha: 1, y: 0 }, 0.2)
-        .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.2')
-        .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.2')
-        .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=1.1');
+      tl.to('.hero-name-container', { autoAlpha: 1, y: 0 }, 0.2)
+        .to('.hero-title', { autoAlpha: 1, y: 0 }, '-=1.0')
+        .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.0')
+        .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.0')
+        .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=1.0');
     }
   });
 </script>
