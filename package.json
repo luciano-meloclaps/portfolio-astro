@@ -13,6 +13,8 @@
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/tailwind": "^6.0.2",
     "@astrojs/vercel": "^9.0.4",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@tabler/icons-react": "^3.35.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
