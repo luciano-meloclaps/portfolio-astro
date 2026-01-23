@@ -66,12 +66,14 @@ const personSchema = {
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- 
-      ✅ AUDITORÍA DE RENDIMIENTO: 
-      Se eliminaron los preconnects a Google Fonts porque las fuentes 
-      ahora se sirven desde meloclaps.com (Vercel Edge).
-    -->
+    <!-- PERFORMANCE: Preload de la fuente principal -->
+    <link
+      rel="preload"
+      href="/_astro/inter-latin-ext-variable-wghtOnly-normal.B9f8s7d.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <!-- SEO + OPEN GRAPH + TWITTER -->
     <SEO

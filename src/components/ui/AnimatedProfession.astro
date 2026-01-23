@@ -106,9 +106,8 @@ const phrases = [
           });
         });
 
-        stepTl.set(cursorEl, { opacity: 1 });
-        stepTl.add(scrambleText(strokeEl, phrase.stroke, 1.2), 0);
-        stepTl.add(scrambleText(fillEl, phrase.fill, 1.2), 0.25);
+        stepTl.add(scrambleText(strokeEl, phrase.stroke, 0.8), 0);
+        stepTl.add(scrambleText(fillEl, phrase.fill, 0.8), 0.15);
         stepTl.set(cursorEl, { opacity: 0 }, '+=0.1');
 
         masterTl.add(stepTl);

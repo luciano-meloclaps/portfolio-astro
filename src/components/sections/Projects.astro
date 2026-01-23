@@ -60,7 +60,7 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
     aria-hidden="true"
   >
     <div
-      class="bg-background/95 absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
+      class="absolute inset-0 bg-background/95 backdrop-blur-sm transition-opacity duration-300"
       id="overlay-bg"
     >
     </div>
@@ -73,13 +73,14 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
         class="flex min-h-full items-center justify-center p-4 text-center sm:p-6"
       >
         {
-          allProjects.map((project) => (
+          allProjects.map((project, index) => (
             <div
               class="project-detail-wrapper relative hidden w-full max-w-5xl text-left"
               data-slug={project.slug}
             >
               <div class="pointer-events-auto relative">
-                <ProjectCard project={project} />
+                {/* ⚡ FIX: Pasamos el index al componente */}
+                <ProjectCard project={project} index={index} />
               </div>
             </div>
           ))

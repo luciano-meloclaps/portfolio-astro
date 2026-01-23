@@ -20,8 +20,10 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   project: CollectionEntry<'projects'>;
+  index: number; // ⚡ Ahora es obligatorio para el SEO
 }
-const { project } = Astro.props;
+
+const { project, index } = Astro.props;
 const {
   title,
   description,
@@ -32,6 +34,9 @@ const {
   figmaUrl,
   status,
 } = project.data;
+
+// Lógica LCP: Solo el primer proyecto (index 0) carga inmediato
+const isFirstProject = index === 0;
 
 const INITIAL_VISIBLE_COUNT = 2;
 const visibleFeatures = keyFeatures.slice(0, INITIAL_VISIBLE_COUNT);
@@ -47,48 +52,38 @@ const hasHiddenFeatures = hiddenFeatures.length > 0;
     padding="none"
     class="relative flex flex-col overflow-hidden card-border bg-background shadow-2xl ring-1 ring-white/5"
   >
-    <!-- BOTÓN CERRAR -->
     <button
       class="close-modal-btn bg-background/20 hover:bg-background/40 group absolute right-3 top-3 z-50 cursor-pointer rounded-small border border-border p-2 text-text-primary backdrop-blur-md transition-all duration-300 active:scale-95 md:right-4 md:top-4"
       aria-label="Cerrar detalles"
     >
-      <IconX
-        className="h-6 w-6 transition-transform duration-300 group-hover:rotate-90"
-        strokeWidth={1.5}
-      />
+      <IconX className="h-6 w-6 transition-transform duration-300 group-hover:rotate-90" strokeWidth={1.5} />
     </button>
 
     <div class="flex flex-col">
       <!-- CARRUSEL -->
-      <div
-        class="image-carousel group relative aspect-video w-full overflow-hidden border-b border-border bg-panel"
-      >
-       
-<div class="carousel-track flex h-full w-full">
-  {
-    images.map((img, index) => (
-      /* 
-         El contenedor mantiene overflow-hidden y bg-background 
-      */
-      <div class="carousel-slide relative h-full w-full min-w-full flex-shrink-0 overflow-hidden bg-background">
-        <Image
-          src={img}
-          alt={`Captura de pantalla ${index + 1} de ${title}`}
-          class="h-full w-full object-cover object-left-top transition-transform duration-700 md:group-hover:scale-105"
-          loading="lazy"
-          decoding="async"
-          widths={[480, 768, 1088]}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1088px"
-          format="webp"
-        />
-        <!-- Gradiente sutil -->
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
-      </div>
-    ))
-  }
-</div>
+      <div class="image-carousel group relative aspect-video w-full overflow-hidden border-b border-border bg-panel">
+        <div class="carousel-track flex h-full w-full">
+          {
+            images.map((img, imgIndex) => (
+              <div class="carousel-slide relative h-full w-full min-w-full flex-shrink-0 overflow-hidden bg-background">
+                <Image
+                  src={img}
+                  alt={`Captura de pantalla ${imgIndex + 1} de ${title}`}
+                  class="h-full w-full object-cover object-left-top transition-transform duration-700 md:group-hover:scale-105"
+        
+                  loading={isFirstProject && imgIndex === 0 ? "eager" : "lazy"}
+                  decoding={isFirstProject && imgIndex === 0 ? "sync" : "async"}
+                  fetchpriority={isFirstProject && imgIndex === 0 ? "high" : "low"}
+                  widths={[480, 768, 1088]}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1088px"
+                  format="webp"
+                />
+                <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
+              </div>
+            ))
+          }
+        </div>
 
-        <!-- CONTROLES CARRUSEL -->
         {
           images.length > 1 && (
             <>
@@ -96,12 +91,10 @@ const hasHiddenFeatures = hiddenFeatures.length > 0;
                 <button class="carousel-prev bg-background/20 hover:bg-background/40 pointer-events-auto cursor-pointer rounded-small border border-border p-2 text-text-primary backdrop-blur-md transition-all duration-300 active:scale-95">
                   <IconChevronLeft className="w-5 h-5" strokeWidth={1.5} />
                 </button>
-
                 <button class="carousel-next bg-background/20 hover:bg-background/40 pointer-events-auto cursor-pointer rounded-small border border-border p-2 text-text-primary backdrop-blur-md transition-all duration-300 active:scale-95">
                   <IconChevronRight className="w-5 h-5" strokeWidth={1.5} />
                 </button>
               </div>
-
               <div class="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
                 {images.map((_, i) => (
                   <button
@@ -116,126 +109,60 @@ const hasHiddenFeatures = hiddenFeatures.length > 0;
         }
       </div>
 
-      <!-- CONTENIDO -->
-      <div
-        class="content-wrapper relative flex flex-col bg-background p-6 md:p-10"
-      >
+      <!-- CONTENIDO (Sin cambios) -->
+      <div class="content-wrapper relative flex flex-col bg-background p-6 md:p-10">
         <div class="stagger-item mb-8">
           <div class="mb-4 flex items-center justify-between">
             <StatusBadge status={status} />
           </div>
-          <h3
-            class="mb-4 text-3xl font-bold leading-tight tracking-tight text-text-primary md:text-4xl"
-          >
-            {title}
-          </h3>
-          <p
-            class="text-base font-light leading-relaxed text-text-secondary md:text-lg"
-          >
-            {description}
-          </p>
+          <h3 class="mb-4 text-3xl font-bold leading-tight tracking-tight text-text-primary md:text-4xl">{title}</h3>
+          <p class="text-base font-light leading-relaxed text-text-secondary md:text-lg">{description}</p>
         </div>
-
         <div class="my-2 h-px w-full bg-border"></div>
-
         <div class="mt-8 grid flex-grow grid-cols-1 gap-10 md:grid-cols-2">
           <div class="stagger-item features-section">
-            <h4
-              class="font-main mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-primary"
-            >
-              <span class="h-1.5 w-1.5 rounded-full bg-text-primary"></span>
-              CARACTERÍSTICAS CLAVE
+            <h4 class="font-main mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-primary">
+              <span class="h-1.5 w-1.5 rounded-full bg-text-primary"></span>CARACTERÍSTICAS CLAVE
             </h4>
             <ul class="space-y-3">
-              {
-                visibleFeatures.map((feature) => (
-                  <li class="group/item flex items-start gap-x-3">
-                    <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/40 group-hover/item:text-text-primary transition-colors mt-1" />
-                    <span class="text-sm font-light text-text-secondary transition-colors group-hover/item:text-text-primary">
-                      {feature}
-                    </span>
-                  </li>
-                ))
-              }
+              {visibleFeatures.map((feature) => (
+                <li class="group/item flex items-start gap-x-3">
+                  <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/40 group-hover/item:text-text-primary transition-colors mt-1" />
+                  <span class="text-sm font-light text-text-secondary transition-colors group-hover/item:text-text-primary">{feature}</span>
+                </li>
+              ))}
             </ul>
-            {
-              hasHiddenFeatures && (
-                <>
-                  <div class="hidden-features-container h-0 overflow-hidden opacity-0">
-                    <ul class="mt-3 space-y-3">
-                      {hiddenFeatures.map((feature) => (
-                        <li class="group/item flex items-start gap-x-3">
-                          <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/40 group-hover/item:text-text-primary transition-colors mt-1" />
-                          <span class="text-sm font-light text-text-secondary transition-colors group-hover/item:text-text-primary">
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <button class="features-toggle group/btn hover:text-text-primary/80 relative z-10 mt-4 flex cursor-pointer items-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-text-primary transition-colors">
-                    <span class="toggle-text">
-                      Ver {hiddenFeatures.length} más
-                    </span>
-                    <IconChevronDown className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-y-0.5" />
-                  </button>
-                </>
-              )
-            }
+            {hasHiddenFeatures && (
+              <div class="hidden-features-container h-0 overflow-hidden opacity-0">
+                <ul class="mt-3 space-y-3">
+                  {hiddenFeatures.map((feature) => (
+                    <li class="group/item flex items-start gap-x-3">
+                      <IconPointFilled className="h-4 w-4 flex-shrink-0 text-text-secondary/40 group-hover/item:text-text-primary transition-colors mt-1" />
+                      <span class="text-sm font-light text-text-secondary transition-colors group-hover/item:text-text-primary">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button class="features-toggle group/btn hover:text-text-primary/80 relative z-10 mt-4 flex cursor-pointer items-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-text-primary transition-colors">
+                <span class="toggle-text">Ver {hiddenFeatures.length} más</span>
+                <IconChevronDown className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-y-0.5" />
+              </button>
+            )}
           </div>
-
           <div class="stagger-item">
-            <h4
-              class="font-main text-text-secondary/60 mb-5 text-xs font-bold uppercase tracking-widest"
-            >
-              TECNOLOGÍAS
-            </h4>
+            <h4 class="font-main text-text-secondary/60 mb-5 text-xs font-bold uppercase tracking-widest">TECNOLOGÍAS</h4>
             <div class="flex flex-wrap content-start gap-2">
-              {
-                techStack.map((tech) => {
-                  const normalizedTech = normalizeTechName(tech);
-                  const Icon = techIconMap[normalizedTech];
-                  return Icon ? (
-                    <TechChip
-                      Icon={Icon}
-                      name={normalizedTech}
-                      label={tech}
-                      mode="static"
-                    />
-                  ) : null;
-                })
-              }
+              {techStack.map((tech) => {
+                const normalizedTech = normalizeTechName(tech);
+                const Icon = techIconMap[normalizedTech];
+                return Icon ? <TechChip Icon={Icon} name={normalizedTech} label={tech} mode="static" /> : null;
+              })}
             </div>
           </div>
         </div>
-
-        <div
-          class="stagger-item mt-10 flex flex-wrap justify-end gap-4 border-t border-border pt-6"
-        >
-          {
-            repoUrl && (
-              <Button
-                href={repoUrl}
-                target="_blank"
-                variant="primary"
-                class="w-full justify-center sm:w-auto"
-              >
-                <IconBrandGithub className="icon-base" /> Ver Código
-              </Button>
-            )
-          }
-          {
-            figmaUrl && (
-              <Button
-                href={figmaUrl}
-                target="_blank"
-                variant="secondary"
-                class="w-full justify-center sm:w-auto"
-              >
-                <IconBrandFigma className="icon-base" /> Diseño Figma
-              </Button>
-            )
-          }
+        <div class="stagger-item mt-10 flex flex-wrap justify-end gap-4 border-t border-border pt-6">
+          {repoUrl && <Button href={repoUrl} target="_blank" variant="primary" class="w-full justify-center sm:w-auto"><IconBrandGithub className="icon-base" /> Ver Código</Button>}
+          {figmaUrl && <Button href={figmaUrl} target="_blank" variant="secondary" class="w-full justify-center sm:w-auto"><IconBrandFigma className="icon-base" /> Diseño Figma</Button>}
         </div>
       </div>
     </div>
@@ -243,83 +170,79 @@ const hasHiddenFeatures = hiddenFeatures.length > 0;
 
   <script>
     import gsap from 'gsap';
-    function initCardInteractions(card: HTMLElement) {
+
+    function initCard(card: HTMLElement) {
       const track = card.querySelector('.carousel-track') as HTMLElement;
       const prevButton = card.querySelector('.carousel-prev');
       const nextButton = card.querySelector('.carousel-next');
       const dots = card.querySelectorAll('.carousel-dot');
+      
       if (track) {
         let currentIndex = 0;
         const slides = card.querySelectorAll('.carousel-slide');
         const maxIndex = slides.length - 1;
+
         const updateSlide = () => {
-          gsap.to(track, {
-            xPercent: -100 * currentIndex,
-            duration: 0.6,
-            ease: 'power3.out',
-          });
+          gsap.to(track, { xPercent: -100 * currentIndex, duration: 0.6, ease: 'power3.out' });
           dots.forEach((dot, i) => {
             if (i === currentIndex) dot.setAttribute('data-active', 'true');
             else dot.removeAttribute('data-active');
           });
         };
+
         updateSlide();
+
         prevButton?.addEventListener('click', (e) => {
           e.stopPropagation();
           currentIndex = currentIndex > 0 ? currentIndex - 1 : maxIndex;
           updateSlide();
         });
+
         nextButton?.addEventListener('click', (e) => {
           e.stopPropagation();
           currentIndex = currentIndex < maxIndex ? currentIndex + 1 : 0;
           updateSlide();
         });
+
         dots.forEach((dot) => {
           dot.addEventListener('click', (e) => {
             e.stopPropagation();
-            currentIndex = parseInt(
-              (e.currentTarget as HTMLElement).dataset.index || '0'
-            );
+            currentIndex = parseInt((e.currentTarget as HTMLElement).dataset.index || '0');
             updateSlide();
           });
         });
       }
+
+      // Lógica de Toggle Features (GSAP)
       const toggleBtn = card.querySelector('.features-toggle');
       const hiddenContainer = card.querySelector('.hidden-features-container');
-      const toggleText = card.querySelector('.toggle-text');
-      const toggleIcon = card.querySelector('.features-toggle svg');
       if (toggleBtn && hiddenContainer) {
         let isExpanded = false;
-        const originalText = toggleText?.textContent || 'Ver más';
         toggleBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           isExpanded = !isExpanded;
-          if (isExpanded) {
-            gsap.to(hiddenContainer, {
-              height: 'auto',
-              opacity: 1,
-              duration: 0.3,
-              ease: 'power2.out',
-            });
-            gsap.to(toggleIcon, { rotation: 180, duration: 0.3 });
-            if (toggleText) toggleText.textContent = 'Ver menos';
-          } else {
-            gsap.to(hiddenContainer, {
-              height: 0,
-              opacity: 0,
-              duration: 0.25,
-              ease: 'power2.inOut',
-            });
-            gsap.to(toggleIcon, { rotation: 0, duration: 0.25 });
-            if (toggleText) toggleText.textContent = originalText;
-          }
+          gsap.to(hiddenContainer, {
+            height: isExpanded ? 'auto' : 0,
+            opacity: isExpanded ? 1 : 0,
+            duration: 0.3,
+            ease: 'power2.inOut'
+          });
+          const icon = toggleBtn.querySelector('svg');
+          gsap.to(icon, { rotation: isExpanded ? 180 : 0, duration: 0.3 });
+          const text = toggleBtn.querySelector('.toggle-text');
+          if (text) text.textContent = isExpanded ? 'Ver menos' : `Ver ${hiddenContainer.querySelectorAll('li').length} más`;
         });
       }
     }
-    document.addEventListener('DOMContentLoaded', () => {
+
+    // ⚡ SOLUCIÓN AL CARROUSEL: Escuchamos ambos eventos para asegurar carga
+    const initAll = () => {
       document.querySelectorAll('.project-full-card').forEach((card) => {
-        initCardInteractions(card as HTMLElement);
+        initCard(card as HTMLElement);
       });
-    });
+    };
+
+    document.addEventListener('DOMContentLoaded', initAll);
+    document.addEventListener('astro:page-load', initAll);
   </script>
 </div>
