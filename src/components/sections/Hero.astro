@@ -104,7 +104,6 @@ import {
     </div>
   </div>
 </section>
-
 <script>
   import gsap from 'gsap';
 
@@ -123,15 +122,18 @@ import {
     if (prefersReducedMotion) {
       gsap.set(elementsToAnimate, { autoAlpha: 1, y: 0 });
     } else {
-      gsap.set(elementsToAnimate, { autoAlpha: 0, y: 30 });
+      gsap.set(elementsToAnimate, { autoAlpha: 0, y: 20 }); // Reducimos y de 30 a 20 para que el "viaje" sea más corto
+
       const tl = gsap.timeline({
-        defaults: { duration: 1.2, ease: 'power4.out' },
+        // ⚡ OPTIMIZACIÓN: Duración más snappy (1.0s)
+        defaults: { duration: 1.0, ease: 'power4.out' },
       });
-      tl.to('.hero-name-container', { autoAlpha: 1, y: 0 }, 0.2)
-        .to('.hero-title', { autoAlpha: 1, y: 0 }, '-=1.0')
-        .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=1.0')
-        .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=1.0')
-        .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=1.0');
+
+      tl.to('.hero-name-container', { autoAlpha: 1, y: 0 }, 0.05) // ⚡ Inicio casi instantáneo (0.05s)
+        .to('.hero-title', { autoAlpha: 1, y: 0 }, '-=0.85')
+        .to('.hero-subtitle', { autoAlpha: 1, y: 0 }, '-=0.85')
+        .to('.hero-chips', { autoAlpha: 1, y: 0 }, '-=0.85')
+        .to('.hero-buttons', { autoAlpha: 1, y: 0 }, '-=0.85');
     }
   });
 </script>

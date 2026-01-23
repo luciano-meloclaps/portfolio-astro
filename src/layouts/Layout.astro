@@ -2,6 +2,9 @@
 // src/layouts/Layout.astro
 import { SEO } from 'astro-seo';
 import '@/styles/global.css';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+
 import ThemeManager from '@/components/modules/ThemeManager.astro';
 import Navbar from '@/components/modules/Navbar.astro';
 import MobileMenu from '@/components/modules/MobileMenu.astro';
@@ -31,7 +34,7 @@ const {
 // Construcción robusta de la URL de imagen para redes sociales
 const ogImageUrl = new URL(image, siteUrl).href;
 
-//  DEFINICIÓN DE DATOS ESTRUCTURADOS (JSON-LD)
+// DEFINICIÓN DE DATOS ESTRUCTURADOS (JSON-LD)
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -51,22 +54,24 @@ const personSchema = {
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
+    <!-- Prioridad de renderizado: Charset y Viewport primero -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#000000" />
 
-    <!-- CANONICAL: Evita el contenido duplicado entre Vercel y tu dominio -->
+    <!-- CANONICAL: Evita contenido duplicado -->
     <link rel="canonical" href={canonicalURL} />
 
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- RENDIMIENTO: Pre-conexión a recursos críticos -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <!-- 
+      ✅ AUDITORÍA DE RENDIMIENTO: 
+      Se eliminaron los preconnects a Google Fonts porque las fuentes 
+      ahora se sirven desde meloclaps.com (Vercel Edge).
+    -->
 
     <!-- SEO + OPEN GRAPH + TWITTER -->
     <SEO
@@ -106,7 +111,7 @@ const personSchema = {
 
     <ThemeManager />
 
-    <!-- INYECCIÓN DE DATOS ESTRUCTURADOS PARA IA Y GOOGLE -->
+    <!-- JSON-LD: Identidad para IA y Google -->
     <script
       type="application/ld+json"
       set:html={JSON.stringify(personSchema)}
