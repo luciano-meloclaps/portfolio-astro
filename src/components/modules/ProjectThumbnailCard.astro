@@ -19,6 +19,8 @@ const { title, tagline, cover, status, techStack } = project.data;
 // Limitamos a 3 tecnologías visibles
 const visibleTechs = techStack.slice(0, 3);
 const techStackJson = JSON.stringify(techStack || []);
+
+const isLCP = index === 0; // El primer proyecto es el candidato a LCP
 ---
 
 <div
@@ -30,7 +32,7 @@ const techStackJson = JSON.stringify(techStack || []);
 >
   <Card
     padding="none"
-    class="relative flex h-full flex-col overflow-hidden card-border bg-panel transition-transform duration-300 hover:-translate-y-1"
+    class="card-border relative flex h-full flex-col overflow-hidden bg-panel transition-transform duration-300 hover:-translate-y-1"
   >
     <div class="halo-effect pointer-events-none"></div>
 
@@ -40,7 +42,8 @@ const techStackJson = JSON.stringify(techStack || []);
         alt={`Portada de ${title}`}
         class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         loading={index < 2 ? 'eager' : 'lazy'}
-        decoding="async"
+        decoding={isLCP ? 'sync' : 'async'}
+        fetchpriority={isLCP ? 'high' : 'low'}
         widths={[480, 768]}
         sizes="(max-width: 768px) 100vw, 50vw"
         format="webp"
@@ -66,7 +69,6 @@ const techStackJson = JSON.stringify(techStack || []);
         {tagline}
       </p>
 
-      <!-- Tech Stack - REFACTORIZADO: Usa TechChip en modo static -->
       <div class="mb-6 flex flex-wrap gap-2">
         {
           visibleTechs.map((tech) => {
