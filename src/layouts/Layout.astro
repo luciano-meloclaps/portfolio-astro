@@ -2,6 +2,8 @@
 // src/layouts/Layout.astro
 import { SEO } from 'astro-seo';
 import '@/styles/global.css';
+
+// Fuentes locales
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 
@@ -21,7 +23,6 @@ const fullName = 'Luciano Stefano Melo Claps';
 const defaultTitle = `${fullName} | Software Developer`;
 const defaultDescription = `${fullName} | Desarrollador Fullstack .NET & React. Soluciones de software escalables, UX/UI y optimización técnica. Conocé mi trayectoria.`;
 
-// URL oficial del activo digital
 const siteUrl = 'https://meloclaps.com';
 
 const {
@@ -31,10 +32,8 @@ const {
   canonicalURL = Astro.url.href,
 } = Astro.props;
 
-// Construcción robusta de la URL de imagen para redes sociales
 const ogImageUrl = new URL(image, siteUrl).href;
 
-// DEFINICIÓN DE DATOS ESTRUCTURADOS (JSON-LD)
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -54,28 +53,21 @@ const personSchema = {
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
-    <!-- Prioridad de renderizado: Charset y Viewport primero -->
+    <!-- 1. Prioridad Crítica: Codificación y Viewport -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#000000" />
 
-    <!-- CANONICAL: Evita contenido duplicado -->
+    <!-- 2. Identidad y Canonicidad -->
     <link rel="canonical" href={canonicalURL} />
-
-    <!-- FAVICON -->
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- PERFORMANCE: Preload de la fuente principal -->
-    <link
-      rel="preload"
-      href="/_astro/inter-latin-ext-variable-wghtOnly-normal.B9f8s7d.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
 
-    <!-- SEO + OPEN GRAPH + TWITTER -->
+    <!-- 3. SEO y Metadatos Sociales -->
     <SEO
       title={title}
       description={description}
@@ -88,7 +80,7 @@ const personSchema = {
           url: canonicalURL,
         },
         image: {
-          alt: `${fullName} - Software Developer Portfolio`,
+          alt: `${fullName} - Portfolio`,
           width: 1200,
           height: 630,
         },
@@ -111,9 +103,8 @@ const personSchema = {
       }}
     />
 
+    <!-- 4. Scripts Críticos (Theme) y Datos Estructurados -->
     <ThemeManager />
-
-    <!-- JSON-LD: Identidad para IA y Google -->
     <script
       type="application/ld+json"
       set:html={JSON.stringify(personSchema)}
@@ -121,9 +112,9 @@ const personSchema = {
   </head>
 
   <body
-    class="selection:bg-accent-magenta/30 overflow-x-hidden bg-background font-sans text-text-primary antialiased selection:text-text-primary"
+    class="selection:bg-accent-magenta/30 overflow-x-hidden bg-background font-sans text-text-primary antialiased"
   >
-    <!-- GRID GLOBAL DE FONDO -->
+    <!-- GRID GLOBAL -->
     <div
       class="pointer-events-none fixed inset-0 z-[-1]"
       style="
