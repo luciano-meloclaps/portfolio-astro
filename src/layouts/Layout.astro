@@ -3,7 +3,7 @@
 import { SEO } from 'astro-seo';
 import '@/styles/global.css';
 
-// Fuentes locales
+// Fuentes locales: Astro las procesará y servirá desde meloclaps.com
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 
@@ -18,11 +18,9 @@ interface Props {
   canonicalURL?: string;
 }
 
-// CONFIGURACIÓN DE MARCA Y SEO
 const fullName = 'Luciano Stefano Melo Claps';
 const defaultTitle = `${fullName} | Software Developer`;
 const defaultDescription = `${fullName} | Desarrollador Fullstack .NET & React. Soluciones de software escalables, UX/UI y optimización técnica. Conocé mi trayectoria.`;
-
 const siteUrl = 'https://meloclaps.com';
 
 const {
@@ -53,7 +51,6 @@ const personSchema = {
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
-    <!-- 1. Prioridad Crítica: Codificación y Viewport -->
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -62,37 +59,23 @@ const personSchema = {
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#000000" />
 
-    <!-- 2. Identidad y Canonicidad -->
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- 3. SEO y Metadatos Sociales -->
     <SEO
       title={title}
       description={description}
       canonical={canonicalURL}
       openGraph={{
-        basic: {
-          title: title,
-          type: 'website',
-          image: ogImageUrl,
-          url: canonicalURL,
-        },
-        image: {
-          alt: `${fullName} - Portfolio`,
-          width: 1200,
-          height: 630,
-        },
-        optional: {
-          siteName: `${fullName} Portfolio`,
-          locale: 'es_AR',
-        },
+        basic: { title, type: 'website', image: ogImageUrl, url: canonicalURL },
+        image: { alt: `${fullName} - Portfolio`, width: 1200, height: 630 },
+        optional: { siteName: `${fullName} Portfolio`, locale: 'es_AR' },
       }}
       twitter={{
         card: 'summary_large_image',
-        title: title,
-        description: description,
+        title,
+        description,
         image: ogImageUrl,
       }}
       extend={{
@@ -103,7 +86,6 @@ const personSchema = {
       }}
     />
 
-    <!-- 4. Scripts Críticos (Theme) y Datos Estructurados -->
     <ThemeManager />
     <script
       type="application/ld+json"
@@ -114,22 +96,14 @@ const personSchema = {
   <body
     class="selection:bg-accent-magenta/30 overflow-x-hidden bg-background font-sans text-text-primary antialiased"
   >
-    <!-- GRID GLOBAL -->
     <div
       class="pointer-events-none fixed inset-0 z-[-1]"
-      style="
-        background-size: 4.5rem 4.5rem;
-        background-image: 
-          linear-gradient(to right, rgb(var(--color-grid-line) / 0.05) 1px, transparent 1px),
-          linear-gradient(to bottom, rgb(var(--color-grid-line) / 0.05) 1px, transparent 1px);
-      "
+      style="background-size: 4.5rem 4.5rem; background-image: linear-gradient(to right, rgb(var(--color-grid-line) / 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-grid-line) / 0.05) 1px, transparent 1px);"
       aria-hidden="true"
     >
     </div>
-
     <Navbar />
     <MobileMenu />
-
     <slot />
   </body>
 </html>
