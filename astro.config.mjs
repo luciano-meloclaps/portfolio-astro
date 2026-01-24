@@ -5,27 +5,30 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 
+// https://astro.build/config
 export default defineConfig({
-  // 1. Identidad oficial
+  // 1. Identidad oficial del dominio
   site: 'https://meloclaps.com',
+
+  // 2. Modo estático para máxima velocidad en el Edge de Vercel
   output: 'static',
 
-  // 3. SEO: Forzamos la barra final para que Google no vea contenido duplicado.
+  // 3. SEO: Normalización de URLs para evitar contenido duplicado
   trailingSlash: 'always',
 
   integrations: [react(), tailwind(), sitemap()],
 
   image: {
-    // Evita errores de memoria en el plan gratuito de Vercel.
     service: { entrypoint: 'astro/assets/services/noop' },
   },
 
+  // 5. Configuración de entorno de desarrollo
   server: {
     host: true,
     port: 4321,
   },
 
-  // 4. Conexión con el motor de Vercel y sus analíticas.
+  // 6. Adaptador de despliegue con analíticas activas
   adapter: vercel({
     webAnalytics: {
       enabled: true,
