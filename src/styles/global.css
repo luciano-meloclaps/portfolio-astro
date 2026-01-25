@@ -1,5 +1,8 @@
 /* src/styles/global.css */
-@import url('https://fonts.googleapis.com/css2?family=Tomorrow:wght@200;300;400;700&display=swap');
+@import '@fontsource/tomorrow/200.css';
+@import '@fontsource/tomorrow/300.css';
+@import '@fontsource/tomorrow/400.css';
+@import '@fontsource/tomorrow/700.css';
 
 @tailwind base;
 @tailwind components;
@@ -8,7 +11,9 @@
 @layer base {
   :root {
     /* --- TIPOGRAFÍA --- */
-    --font-main: 'Tomorrow';
+    --font-main: 'Tomorrow', sans-serif;
+
+    /* --- TAMAÑOS (Igual que antes) --- */
     --font-size-xxs: 0.6875rem;
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
@@ -30,9 +35,8 @@
     --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
     --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
-    /* --- COLORES (CANALES RGB PUROS) --- */
-
-    /* MODO CLARO (Light) */
+    /* --- COLORES --- */
+    /* Light */
     --color-background: 243 247 253;
     --color-panel-bg: 255 255 255;
     --color-text-primary: 26 26 26;
@@ -42,7 +46,7 @@
   }
 
   .dark {
-    /* MODO OSCURO (Dark) */
+    /* Dark */
     --color-background: 31 34 37;
     --color-panel-bg: 31 34 37;
     --color-text-primary: 234 234 234;
@@ -56,10 +60,11 @@
   body {
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-text-primary));
-    font-family: var(--font-main), sans-serif;
+    /* Usamos la variable que ya tenías configurada */
+    font-family: var(--font-main);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden; /* Previene scroll horizontal */
+    overflow-x: hidden;
   }
 }
 
