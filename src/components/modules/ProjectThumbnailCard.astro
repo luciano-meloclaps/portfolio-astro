@@ -1,5 +1,5 @@
 ---
-// filepath: src/components/modules/ProjectThumbnailCard.astro
+// src/components/modules/ProjectThumbnailCard.astro
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import Card from '@/components/ui/Card.astro';
@@ -18,15 +18,14 @@ const { title, tagline, cover, status, techStack } = project.data;
 
 // Limitamos a 3 tecnologías visibles
 const visibleTechs = techStack.slice(0, 3);
-const techStackJson = JSON.stringify(techStack || []);
+// ⚡ ELIMINADO: const techStackJson = JSON.stringify(techStack || []); <- Ya no se necesita aquí
 
-const isLCP = index === 0; // El primer proyecto es el candidato a LCP
+// Lógica LCP: Solo el primer proyecto (index 0) es eager
+const isLCP = index === 0;
 ---
 
 <div
   class="project-thumbnail-trigger group h-full cursor-pointer"
-  data-project-slug={project.slug}
-  data-tech={techStackJson}
   role="button"
   aria-label={`Ver detalles de ${title}`}
 >
@@ -41,12 +40,12 @@ const isLCP = index === 0; // El primer proyecto es el candidato a LCP
         src={cover}
         alt={`Portada de ${title}`}
         class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-        loading={index < 2 ? 'eager' : 'lazy'}
+        loading={isLCP ? 'eager' : 'lazy'}
         decoding={isLCP ? 'sync' : 'async'}
         fetchpriority={isLCP ? 'high' : 'low'}
         widths={[480, 768]}
         sizes="(max-width: 768px) 100vw, 50vw"
-        format="webp"
+        format="avif"
       />
       <div
         class="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"
