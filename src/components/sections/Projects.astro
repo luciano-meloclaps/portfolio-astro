@@ -5,6 +5,9 @@ import ProjectThumbnailCard from '../modules/ProjectThumbnailCard.astro';
 import ProjectCard from '../modules/ProjectCard.astro';
 import SectionTitle from '@/components/ui/SectionTitle.astro';
 import FilterBar from '@/components/ui/FilterBar.astro';
+// ⚡ IMPORTAMOS TU BOTÓN
+import Button from '@/components/ui/Button.astro';
+import { IconChevronDown } from '@tabler/icons-react';
 
 import { PROJECT_FILTERS } from '@/config/filter-list';
 import { normalizeTechName } from '@/lib/normalizeTech';
@@ -24,6 +27,8 @@ const usedTechsInProjects = new Set(
 const activeFilters = PROJECT_FILTERS.filter((tech) =>
   usedTechsInProjects.has(tech)
 );
+
+const INITIAL_LIMIT = 4;
 ---
 
 <section id="projects" class="relative py-24 md:py-32">
@@ -46,21 +51,50 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
 
     <div id="projects-grid" class="grid grid-cols-1 gap-8 md:grid-cols-2">
       {
-        allProjects.map((project, index) => (
-          <ProjectThumbnailCard project={project} index={index} />
-        ))
+        allProjects.map((project, index) => {
+          const isHiddenInitially = index >= INITIAL_LIMIT;
+          const techStackJson = JSON.stringify(project.data.techStack || []);
+
+          return (
+            <div
+              class={`project-item-wrapper transition-all duration-300 ${isHiddenInitially ? 'hidden-by-pagination hidden' : ''}`}
+              data-index={index}
+              data-project-slug={project.slug}
+              data-tech={techStackJson}
+            >
+              <ProjectThumbnailCard project={project} index={index} />
+            </div>
+          );
+        })
       }
     </div>
+
+    <!-- ⚡ BOTÓN VER MÁS (REDISEÑADO) -->
+    {
+      allProjects.length > INITIAL_LIMIT && (
+        <div
+          class="mt-12 flex justify-center"
+          id="load-more-projects-container"
+        >
+          <div id="load-more-projects-trigger">
+            <Button variant="secondary" class="group min-w-[200px]">
+              Ver Más Proyectos
+              <IconChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-1" />
+            </Button>
+          </div>
+        </div>
+      )
+    }
   </div>
 
-  <!-- OVERLAY MODAL -->
+  <!-- OVERLAY MODAL (Sin cambios) -->
   <div
     id="project-overlay"
     class="pointer-events-none fixed inset-0 z-[9999] opacity-0"
     aria-hidden="true"
   >
     <div
-      class="bg-background/95 absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
+      class="absolute inset-0 bg-background/95 backdrop-blur-sm transition-opacity duration-300"
       id="overlay-bg"
     >
     </div>
@@ -73,13 +107,13 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
         class="flex min-h-full items-center justify-center p-4 text-center sm:p-6"
       >
         {
-          allProjects.map((project) => (
+          allProjects.map((project, index) => (
             <div
               class="project-detail-wrapper relative hidden w-full max-w-5xl text-left"
               data-slug={project.slug}
             >
               <div class="pointer-events-auto relative">
-                <ProjectCard project={project} />
+                <ProjectCard project={project} index={index} />
               </div>
             </div>
           ))
@@ -93,29 +127,52 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
   import gsap from 'gsap';
   import { normalizeTechArray } from '@/lib/normalizeTech';
 
-  // --- LÓGICA DE FILTRADO ---
   let filterTimeline: gsap.core.Timeline | null = null;
 
+  // Usamos el ID del wrapper del botón para el evento click
+  const loadMoreBtn = document.getElementById('load-more-projects-trigger');
+  const loadMoreContainer = document.getElementById(
+    'load-more-projects-container'
+  );
+  const STEP = 4;
+
+  // --- LÓGICA DE FILTRADO (Optimizada en velocidad) ---
   function handleFilterChange(event: Event) {
     const customEvent = event as CustomEvent;
     const { activeTechs } = customEvent.detail as { activeTechs: string[] };
-    const cards = document.querySelectorAll('[data-project-slug][data-tech]');
+    const wrappers = document.querySelectorAll('.project-item-wrapper');
 
     if (filterTimeline) filterTimeline.kill();
 
     filterTimeline = gsap.timeline({
-      defaults: { duration: 0.15, ease: 'power2.inOut' },
+      defaults: { duration: 0.3, ease: 'power2.out' },
     });
 
-    const cardsToShow: HTMLElement[] = [];
-    const cardsToHide: HTMLElement[] = [];
+    const wrappersToShow: HTMLElement[] = [];
+    const wrappersToHide: HTMLElement[] = [];
 
-    cards.forEach((card) => {
-      const el = card as HTMLElement;
+    const isFiltering = activeTechs && activeTechs.length > 0;
+    if (loadMoreContainer) {
+      loadMoreContainer.style.display = isFiltering ? 'none' : '';
+      if (!isFiltering) {
+        const remaining = document.querySelectorAll(
+          '.hidden-by-pagination'
+        ).length;
+        loadMoreContainer.style.display = remaining > 0 ? '' : 'none';
+      }
+    }
+
+    wrappers.forEach((wrapper) => {
+      const el = wrapper as HTMLElement;
+      if (!isFiltering && el.classList.contains('hidden-by-pagination')) {
+        wrappersToHide.push(el);
+        return;
+      }
+
       const techStr = el.getAttribute('data-tech');
       let show = true;
 
-      if (techStr && activeTechs && activeTechs.length > 0) {
+      if (isFiltering && techStr) {
         try {
           const projectTechs = JSON.parse(techStr);
           const normalizedProjectTechs = normalizeTechArray(projectTechs);
@@ -126,17 +183,18 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
           show = true;
         }
       }
-      if (show) cardsToShow.push(el);
-      else cardsToHide.push(el);
+
+      if (show) wrappersToShow.push(el);
+      else wrappersToHide.push(el);
     });
 
-    cardsToHide.forEach((el) => {
+    wrappersToHide.forEach((el) => {
       filterTimeline!.to(
         el,
         {
           opacity: 0,
-          scale: 0.92,
-          duration: 0.12,
+          scale: 0.95, // Menos escala para que sea más sutil
+          duration: 0.15,
           onComplete: () => {
             el.classList.add('hidden');
             el.style.display = 'none';
@@ -145,19 +203,60 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
         0
       );
     });
-    cardsToShow.forEach((el) => {
+
+    wrappersToShow.forEach((el) => {
       el.classList.remove('hidden');
       el.style.display = '';
-      filterTimeline!.to(el, { opacity: 1, scale: 1, duration: 0.15 }, 0);
+      filterTimeline!.to(el, { opacity: 1, scale: 1, duration: 0.2 }, 0);
     });
   }
+
+  // --- LÓGICA DE PAGINACIÓN (TURBO MODE) ---
+  loadMoreBtn?.addEventListener('click', () => {
+    const hiddenWrappers = document.querySelectorAll('.hidden-by-pagination');
+    let count = 0;
+
+    hiddenWrappers.forEach((wrapper) => {
+      if (count < STEP) {
+        wrapper.classList.remove('hidden', 'hidden-by-pagination');
+        const el = wrapper as HTMLElement;
+
+        // Estado inicial para animación
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(15px)'; // Menos distancia
+        el.style.display = '';
+
+        gsap.to(el, {
+          opacity: 1,
+          y: 0,
+          duration: 0.3,
+          ease: 'power2.out',
+          delay: count * 0.05,
+        });
+
+        count++;
+      }
+    });
+
+    const remaining = document.querySelectorAll('.hidden-by-pagination').length;
+    if (remaining === 0 && loadMoreContainer) {
+      gsap.to(loadMoreContainer, {
+        opacity: 0,
+        height: 0,
+        margin: 0,
+        duration: 0.3,
+        onComplete: () => {
+          loadMoreContainer.style.display = 'none';
+        },
+      });
+    }
+  });
 
   document.addEventListener('filter-changed', handleFilterChange);
   document.addEventListener('astro:before-swap', () => {
     if (filterTimeline) filterTimeline.kill();
   });
 
-  // --- LÓGICA DEL MODAL (BODY FREEZE + NO JUMP FIX) ---
   function initializeModal() {
     const overlay = document.getElementById('project-overlay');
     const overlayBg = document.getElementById('overlay-bg');
@@ -171,7 +270,6 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
       const wrapper = overlay.querySelector(`[data-slug="${slug}"]`);
       if (!wrapper) return;
 
-      // 1. Guardar posición y congelar
       scrollPosition = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollPosition}px`;
@@ -208,23 +306,14 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
             duration: 0.2,
             onComplete: () => {
               overlay.classList.add('pointer-events-none');
-
-              // --- FIX DEL SALTO (JUMP) ---
-              // 1. Desactivar scroll suave globalmente
               const html = document.documentElement;
               const originalScrollBehavior = html.style.scrollBehavior;
               html.style.scrollBehavior = 'auto';
-
-              // 2. Restaurar propiedades del body
               document.body.style.position = '';
               document.body.style.top = '';
               document.body.style.width = '';
               document.body.style.overflowY = '';
-
-              // 3. Restaurar posición instantáneamente (sin animación)
               window.scrollTo(0, scrollPosition);
-
-              // 4. Reactivar scroll suave (en el siguiente frame)
               requestAnimationFrame(() => {
                 html.style.scrollBehavior = originalScrollBehavior;
               });
@@ -235,20 +324,16 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
     };
 
     grid.addEventListener('click', (e) => {
-      const card = (e.target as HTMLElement).closest('[data-project-slug]');
-      if (card) openProjectModal(card.getAttribute('data-project-slug')!);
+      const cardWrapper = (e.target as HTMLElement).closest(
+        '[data-project-slug]'
+      );
+      if (cardWrapper)
+        openProjectModal(cardWrapper.getAttribute('data-project-slug')!);
     });
 
     overlay.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
-      if (
-        target.id === 'overlay-bg' ||
-        target.classList.contains('overflow-y-auto') ||
-        target.classList.contains('min-h-full')
-      ) {
-        closeProjectModal();
-      }
-      if (target.closest('.close-modal-btn')) {
+      if (target.id === 'overlay-bg' || target.closest('.close-modal-btn')) {
         closeProjectModal();
       }
     });
@@ -260,32 +345,3 @@ const activeFilters = PROJECT_FILTERS.filter((tech) =>
 
   initializeModal();
 </script>
-
-<style>
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  #projects-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
-    gap: 2rem !important;
-  }
-  @media (max-width: 767px) {
-    #projects-grid {
-      grid-template-columns: repeat(1, 1fr) !important;
-    }
-  }
-  @media (min-width: 768px) {
-    #projects-grid {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-  }
-  .project-thumbnail-trigger.hidden {
-    display: none !important;
-  }
-</style>
